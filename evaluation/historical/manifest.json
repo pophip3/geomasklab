@@ -7,7 +7,7 @@
       "original_relative_path": "evaluation/results/agent_full_results.csv",
       "original_sha256": "eb52abc20a944af7621ecd07479560cc8dd8efc1efc763e6a9f0b03523a2650a",
       "curated_path": "planner_baseline.csv",
-      "curated_sha256": "fa528fbf993be0dd88ab385604acdfb9616a1035114f1e29022986e1074f86f4",
+      "curated_sha256": "0fc8f40bfaf02ea36db285ad0efa0a676ba9013f1c301ff9ddcc57d9a7795040",
       "rows": 40,
       "excluded_columns": [
         "failure_reason",
@@ -19,7 +19,7 @@
       "original_relative_path": "evaluation/results/agent_full_results_final.csv",
       "original_sha256": "29bb6243c0c097c3f6f336e43f889c0cee79e805767c17e6944d54a76c28bbba",
       "curated_path": "planner_optimized.csv",
-      "curated_sha256": "103ef4644708c0eaf27fad8131f2d12c36d3cf56d5c24047d2cd5ad84fdbd987",
+      "curated_sha256": "db1e247889cc2631871e002e046ed2ec352c646eeaeb124be26be27c39da5d5c",
       "rows": 40,
       "excluded_columns": [
         "failure_reason",
@@ -31,7 +31,7 @@
       "original_relative_path": "evaluation/results/remotesam_full_results.csv",
       "original_sha256": "ff7085139f0de7cf26c0eaea8e44705c211b030ba4d8173a7b1e7e99d5895929",
       "curated_path": "segmentation_diagnostic.csv",
-      "curated_sha256": "f97a0c9b0cd531fcdd199c97de435c41d3909c43bbd7a465584e1812691fabf3",
+      "curated_sha256": "ee63386b287c2a475fee48afc880c8732e9f1a38d9b39f32ab1f0fa267862d0d",
       "rows": 20,
       "excluded_columns": [
         "dataset",
@@ -50,7 +50,7 @@
       "original_relative_path": "evaluation/results/aircraft_v2/remotesam_aircraft_all_experiments_verified.csv",
       "original_sha256": "a53fd377b0d505b512f15c9e999e89ab29b3e5f33008e6a4ebcd41e5bca927e3",
       "curated_path": "aircraft_tuning.csv",
-      "curated_sha256": "c0cd2357474b530bb4f6a21b6c6fa8787773d0a720e280f0d6c1347391e49449",
+      "curated_sha256": "af25bd9e346fa73f980241954d7af65c9e626d032d4321ad742730ed2c6b7dac",
       "rows": 160,
       "excluded_columns": [
         "dataset",
@@ -63,5 +63,7 @@
         "service_version"
       ]
     }
-  ]
+  ],
+  "curated_encoding": "UTF-8",
+  "curated_newlines": "LF; enforced by repository .gitattributes"
 }

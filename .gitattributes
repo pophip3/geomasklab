@@ -1,0 +1,3 @@
+# Historical table hashes describe exact UTF-8 bytes with LF line endings.
+# Enforce the same checkout bytes on Windows, Linux and macOS.
+evaluation/historical/*.csv text eol=lf
