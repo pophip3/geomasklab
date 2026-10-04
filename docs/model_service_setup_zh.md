@@ -59,4 +59,5 @@ python .\runtime\verify-live-services.py
 完整原始响应、模型元数据、规划与反馈、蒙版、导出包和验证结果留在本机
 `runtime/acceptance` 与被忽略的 `experiments` 目录。当前仅完成服务配置验收；
 这些开发影像没有独立人工标注，**不能据此报告 IoU、Dice、泛化能力或对照优势**。
-投稿所需的新数据独立评测仍按 `independent_validation_protocol.md` 执行。
+随后已按 `application_protocol_v2.md` 完成 60 张新选影像的冻结应用评测，
+参见 `application_results_zh.md`。配置验收的开发影像仍不计入该评测。
