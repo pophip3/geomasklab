@@ -105,3 +105,14 @@ exists. `run_independent.py --root LOCAL_DATA_ROOT` freezes the run protocol and
 retains per-request receipts; rerunning resumes completed requests without changing
 parameters. `summarize_independent.py --root LOCAL_DATA_ROOT` recomputes scores and
 denominators from the saved receipts.
+
+`annotation_packet.py --root LOCAL_DATA_ROOT` produces label-only review sheets
+and a blank human-review record. `verify_independent_scores.py --root
+LOCAL_DATA_ROOT` separately rederives all binary ground truths from the released
+source labels, checks exact RGB pixel duplicates, and audits confusion tables and
+IoU/Dice with Pillow boolean arithmetic, independently of the NumPy scorer. This
+checks conversion and arithmetic, not the annotators' semantic accuracy.
+
+Install `evaluation/requirements-report.txt` for the optional publication figure
+and HTML report; run `report_independent.py --root LOCAL_DATA_ROOT` after summary
+generation. No restricted source imagery is needed in the numerical Git artifacts.
