@@ -515,7 +515,7 @@ def _run_task(s,p,allow_batch=False):
             mask.save(folder/'full_mask.png')
             result['mask_cache_key']=cache_key
             result['full_mask_sha256']=hashlib.sha256((folder/'full_mask.png').read_bytes()).hexdigest()
-            result['provenance']['perception_revision']='manual-polygons-v1' if mode=='demo' else os.environ.get('GEO_REMOTESAM_REVISION','未记录')
+            result['provenance']['perception_revision']='synthetic-fixtures-v1' if mode=='demo' else os.environ.get('GEO_REMOTESAM_REVISION','未记录')
             if plan.get('invert'):
                 mask=ImageOps.invert(mask)
             full_mask=mask

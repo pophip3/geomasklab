@@ -29,7 +29,7 @@ class V07AgentContractTests(unittest.TestCase):
         first = self.run_task('提取框选区域内的飞机', roi=self.roi, quality_mode='fast')
         self.assertEqual(first['status'], 'completed')
         mask = Image.open(server.DATA / self.session['id'] / first['id'] / 'mask.png')
-        self.assertEqual(mask.getbbox(), (100, 429, 383, 659))
+        self.assertEqual(mask.getbbox(), (120, 410, 321, 656))
         self.assertEqual(first['metrics']['roi'], self.roi)
         second = self.run_task('改成高精度模式', parent_run_id=first['id'])
         self.assertEqual(second['task']['roi'], self.roi)
