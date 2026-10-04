@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "model": "RemoteAgent",
+  "source": {
+    "provider": "ModelScope",
+    "repository": "AIMGroup/RemoteAgent",
+    "url": "https://modelscope.cn/models/AIMGroup/RemoteAgent/files",
+    "snapshot_downloaded_at": "2026-09-21",
+    "repository_revision": null,
+    "revision_note": "The exact ModelScope commit revision was not recorded by the download client; file SHA-256 values identify the downloaded snapshot."
+  },
+  "architecture": "Qwen2_5_VLForConditionalGeneration",
+  "model_type": "qwen2_5_vl",
+  "dtype": "bfloat16",
+  "config_transformers_version": "4.57.1",
+  "serving_vllm_version": "0.15.1",
+  "weight_index": {
+    "tensor_count": 729,
+    "total_parameters": 8292166656,
+    "total_tensor_bytes": 16584333312
+  },
+  "files": [
+    {
+      "name": "model.safetensors.index.json",
+      "size_bytes": 57655,
+      "sha256": "4be35310ddc165e46e88de4c3fec8c1210014b0b8717f4544d82cc740814ae0c"
+    },
+    {
+      "name": "model-00001-of-00004.safetensors",
+      "size_bytes": 4968243304,
+      "sha256": "f4f28b4714d1d9b93119af56ec9f9e35e3d641711a0a81a334e2f5f6eb783abf"
+    },
+    {
+      "name": "model-00002-of-00004.safetensors",
+      "size_bytes": 4991495816,
+      "sha256": "27b9a72fb6ed93ebb040546e496fa69396772a50ddd134660982c16590b06ec1"
+    },
+    {
+      "name": "model-00003-of-00004.safetensors",
+      "size_bytes": 4932751040,
+      "sha256": "2e2583c71bf4443b68b767ef848307a8104958b05ff544222253d3addfa9562b"
+    },
+    {
+      "name": "model-00004-of-00004.safetensors",
+      "size_bytes": 1691924384,
+      "sha256": "65800034ea0b5467e25abd1aac5bdd8e23973c06ac3ee8f019f3cc4b98d41319"
+    }
+  ],
+  "remote_shards_reverified_utc": "2026-10-04",
+  "remote_shards_reverified": true
+}

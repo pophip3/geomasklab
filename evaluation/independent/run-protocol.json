@@ -1,0 +1,120 @@
+{
+  "protocol": "geoscope-application-v2.1",
+  "locked_utc": "2026-10-04T12:41:31.423845+00:00",
+  "data_lock": {
+    "locked_utc": "2026-10-04T12:40:26.977662+00:00",
+    "images": 60,
+    "manifest_sha256": "d5ea564c63d61c4c76e2f27d36fac7ff46bab43a48fa0f7f641502786895063e",
+    "acquisition_plan_sha256": "25a23d765ca1ca44c028e5a57c764ece37f8ccc54b59258b556fd306781c53b2",
+    "loveda_range_bytes_this_run": 16777216,
+    "dota_range_bytes_this_run": 153729989,
+    "full_archive_md5_verified": false,
+    "zip_entry_crc_verified": true,
+    "original_human_labels_preserved": true
+  },
+  "quality_mode": "fast",
+  "fixed_prompts": {
+    "building": "all buildings",
+    "aircraft": "all planes"
+  },
+  "scope_tests": [
+    "whole",
+    "right",
+    "roi"
+  ],
+  "roi": "[floor(W/4),floor(H/4),floor(3W/4),floor(3H/4)]",
+  "force_perception": true,
+  "threshold": "Service binary masks only; no test-specific threshold adjustment.",
+  "sampling_seed": "geoscope-softwarex-application-v2-20261004",
+  "paired_order": "fixed baseline / whole-workbench order by SHA256(image_id)[0] parity; matched direct request follows each workbench call because its actual arguments must be known.",
+  "comparators": "Fixed referring prompt vs workbench as separate application paths. For preservation, replay exactly the planner-selected task/text/classes/quality to the same service; do not call different prompts a matched pair.",
+  "failures": "Retain all 180 planned supported requests. Conditional positive-image IoU/Dice and all-positive-request utility (failure=0) both reported. Empty-GT images reported with FP pixels and image rate; 0/0 not assigned perfect score.",
+  "nondeterminism": "On any exact matched-mask mismatch preserve first observations, obtain two extra direct repetitions, and flag nondeterminism; never replace the initial result.",
+  "software_commit": "46ffbbb1898a4b5e8f2ac5974f0bdabace3a94bd",
+  "evaluator_sha256": {
+    "run_independent.py": "4e73ab1e0569aa2dbee11e33cd7a0c90014d6bf160505585ee7fdcc0ca6f5ff7",
+    "segmentation_metrics.py": "94951e060b0d864a731d3ec86fb449cb9ee81cbbc0cd1664d6f9b39204417e9f",
+    "agent_bridge.py": "8e40895623b79225c0646d28346fe7f3d367c5516fb506589b383bbd0e3bdf36",
+    "planner_protocol.py": "b4acc661e56104879b3c93a05bbadd89bc01b8b4cc1f450f1c9a0348d7591ba5",
+    "server.py": "6632c60d9d539d8c5aa5e9fe722e0fc1f32ac0db7d3c913be7a09e54e08bc8bc",
+    "export_bundle.py": "9eb5aebcead7a3860478400577fca5e6eb17e9b03ebd2f69c4bfca7bb9dd51fd"
+  },
+  "python": "3.13.9 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 19:09:58) [MSC v.1929 64 bit (AMD64)]",
+  "numpy": "2.3.5",
+  "sam_model_info": {
+    "ready": true,
+    "error": null,
+    "checkpoint_sha256": "f85dfa044a527f096b9e41eacfe298040d52e77fca642f46dfe1226745e137e7",
+    "loaded_at": 1791114893.8776689,
+    "load_time_ms": 20150.88,
+    "checkpoint_diagnostics": {
+      "missing_keys": [
+        "text_encoder.embeddings.position_ids"
+      ],
+      "unexpected_keys": [],
+      "checkpoint_tensor_count": 1107
+    },
+    "service_version": "1.2.0",
+    "device": "cuda:0",
+    "fp16": true,
+    "epoc": false,
+    "checkpoint_name": "RemoteSAMv1.pth"
+  },
+  "agent_model": "RemoteAgent",
+  "perception_revision": "service-1.2.0@df802ab54b8f4ee496ca83c104bfaee44f7ee888:sha256:f85dfa044a527f096b9e41eacfe298040d52e77fca642f46dfe1226745e137e7",
+  "agent_weight_lock": {
+    "schema_version": 1,
+    "model": "RemoteAgent",
+    "source": {
+      "provider": "ModelScope",
+      "repository": "AIMGroup/RemoteAgent",
+      "url": "https://modelscope.cn/models/AIMGroup/RemoteAgent/files",
+      "snapshot_downloaded_at": "2026-09-21",
+      "repository_revision": null,
+      "revision_note": "The exact ModelScope commit revision was not recorded by the download client; file SHA-256 values identify the downloaded snapshot."
+    },
+    "architecture": "Qwen2_5_VLForConditionalGeneration",
+    "model_type": "qwen2_5_vl",
+    "dtype": "bfloat16",
+    "config_transformers_version": "4.57.1",
+    "serving_vllm_version": "0.15.1",
+    "weight_index": {
+      "tensor_count": 729,
+      "total_parameters": 8292166656,
+      "total_tensor_bytes": 16584333312
+    },
+    "files": [
+      {
+        "name": "model.safetensors.index.json",
+        "size_bytes": 57655,
+        "sha256": "4be35310ddc165e46e88de4c3fec8c1210014b0b8717f4544d82cc740814ae0c"
+      },
+      {
+        "name": "model-00001-of-00004.safetensors",
+        "size_bytes": 4968243304,
+        "sha256": "f4f28b4714d1d9b93119af56ec9f9e35e3d641711a0a81a334e2f5f6eb783abf"
+      },
+      {
+        "name": "model-00002-of-00004.safetensors",
+        "size_bytes": 4991495816,
+        "sha256": "27b9a72fb6ed93ebb040546e496fa69396772a50ddd134660982c16590b06ec1"
+      },
+      {
+        "name": "model-00003-of-00004.safetensors",
+        "size_bytes": 4932751040,
+        "sha256": "2e2583c71bf4443b68b767ef848307a8104958b05ff544222253d3addfa9562b"
+      },
+      {
+        "name": "model-00004-of-00004.safetensors",
+        "size_bytes": 1691924384,
+        "sha256": "65800034ea0b5467e25abd1aac5bdd8e23973c06ac3ee8f019f3cc4b98d41319"
+      }
+    ],
+    "remote_shards_reverified_utc": "2026-10-04",
+    "remote_shards_reverified": true
+  },
+  "warm_start": true,
+  "concurrency": 1,
+  "human_label_origin": "Released dataset annotators, not agent-generated annotations.",
+  "geographic_and_pretraining_limitations": "Own observed tuning sets excluded; source-scene location and external model pretraining overlap cannot be guaranteed."
+}

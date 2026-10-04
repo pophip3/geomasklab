@@ -1,0 +1,11 @@
+{
+  "locked_utc": "2026-10-04T12:40:26.977662+00:00",
+  "images": 60,
+  "manifest_sha256": "d5ea564c63d61c4c76e2f27d36fac7ff46bab43a48fa0f7f641502786895063e",
+  "acquisition_plan_sha256": "25a23d765ca1ca44c028e5a57c764ece37f8ccc54b59258b556fd306781c53b2",
+  "loveda_range_bytes_this_run": 16777216,
+  "dota_range_bytes_this_run": 153729989,
+  "full_archive_md5_verified": false,
+  "zip_entry_crc_verified": true,
+  "original_human_labels_preserved": true
+}
