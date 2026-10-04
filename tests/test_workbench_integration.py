@@ -155,6 +155,45 @@ class IntegrationTests(unittest.TestCase):
         sid = self.session['id']; server.SESSIONS.clear()
         (server.DATA/sid/'session.json').write_text('{invalid', encoding='utf-8')
         self.assertIsNone(server.get_session(sid))
+    def test_semantic_report_preserves_actual_request_and_nested_model_identity(self):
+        response={'status':'success','masks':{'building':server.image_b64(Image.new('L',(11,7),255))},
+                  'quality_mode':'fast','model':{'service_version':'fixture-1.2','checkpoint_sha256':'fixture-checkpoint'}}
+        with patch('agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(semantic_segmentation, "ignored.png", ["building"])'), \
+             patch.object(server,'post_json',return_value=response):
+            result=self.run_task('提取建筑',quality_mode='fast')
+        self.assertEqual(result['status'],'completed',result['message'])
+        report=(server.DATA/self.session['id']/result['id']/'report.md').read_text(encoding='utf-8')
+        self.assertIn('"task": "semantic_seg"',report)
+        self.assertIn('"classes": ["building"]',report)
+        self.assertNotIn('all buildings',report)
+        self.assertIn('fixture-1.2',report)
+        self.assertIn('fixture-checkpoint',report)
+        self.assertTrue(result['capability']['semantic_review_required'])
+
+    def test_experimental_category_stays_available_and_explicitly_labelled(self):
+        response={'status':'success','mask':server.image_b64(Image.new('L',(11,7),255)),'quality_mode':'fast'}
+        with patch('agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all roads")'), \
+             patch.object(server,'post_json',return_value=response):
+            result=self.run_task('提取道路',quality_mode='fast')
+        self.assertEqual(result['status'],'completed')
+        self.assertEqual(result['capability']['level'],'experimental')
+        self.assertIn('实验阶段',result['message'])
+        report=(server.DATA/self.session['id']/result['id']/'report.md').read_text(encoding='utf-8')
+        self.assertIn('"text": "all roads"',report)
+        self.assertIn('实验类别',report)
+
+    def test_demo_report_never_invents_a_model_prompt(self):
+        s=server.SESSIONS[server.new_session('urban')['id']]
+        result=server.run_task(s,{'query':'提取建筑','mode':'demo'})
+        report=(server.DATA/s['id']/result['id']/'report.md').read_text(encoding='utf-8')
+        self.assertIn('合成演示未调用模型',report)
+        self.assertNotIn('all buildings',report)
+
+    def test_new_quality_label_maps_to_existing_accurate_mode(self):
+        from v07_contract import resolve_quality
+        for label in ('改成分块细化模式','use accurate mode','改成高精度模式'):
+            self.assertEqual(resolve_quality(label,{},None)[:2],('accurate','accurate'))
+
     def test_dotenv_is_literal_and_shell_wins(self):
         path = Path(self.temp.name)/'.env'
         path.write_text('GEO_AGENT_MODEL=from-file\nGEO_TEST_LITERAL="$(do-not-execute)"\n', encoding='utf-8')

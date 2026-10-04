@@ -1,11 +1,12 @@
 # GeoScope Workbench — SoftwareX preparation
 
-Private research preview, version **0.8.0-research.1**. This repository is separate
+Private development preview, version **0.9.0-dev.1**. This repository is separate
 from the competition repository. It is not a submitted manuscript or an approved
 open-source release. The user has authorized publication of their competition
 code in a modified research version. The original competition repository stays
 unchanged. Formal licensing remains unresolved. A frozen 60-image real-model
-application evaluation is complete, with the limitations described below.
+application evaluation of an earlier commit is complete, with the limitations below.
+Software completion and reviewer usability take priority over further manuscript editing.
 
 GeoScope Workbench records bounded image-segmentation experiments: a language
 planner proposes one allowed action; a deterministic executor binds the image,
@@ -20,14 +21,27 @@ the explicitly labelled synthetic demonstration.
 
 ```sh
 python -m pip install -r requirements.txt
-python fixtures.py
-python server.py
+python reviewer_demo.py
+python quickstart.py
 ```
 
 Open `http://127.0.0.1:4180`. Built-in examples are generated diagrams with exact
 fixture masks. They are **not satellite observations, ground truth for real EO
 images, or neural model predictions**. The current interface supports Chinese
 and English task text; most interface labels are Chinese.
+
+`reviewer_demo.py` runs five offline examples through the workbench executor:
+whole image, right half, a left branch, rectangular ROI and aircraft. It checks
+pixel counts, saves a clearly labelled automated review record, reloads it, and
+verifies five portable ZIP exports. Outputs go to `reviewer-output/`. No GPU,
+account, service endpoint, model weights, NumPy or requests is needed for this path.
+It verifies software behavior, **not neural inference or EO accuracy**.
+
+On a new Windows Python 3.13 environment with only Pillow 12.3.0 installed, the
+five-example run took 0.784 seconds on 2026-10-04. Initial package download took
+about 3.5 minutes on this connection; installation time depends on connectivity.
+These timings are convenience measurements, not an acceptance deadline. The
+user has explicitly removed a fixed time requirement. See [reviewer instructions](docs/reviewer_quickstart.md).
 
 ```sh
 python -m unittest discover -s tests -p "test_*.py" -q
@@ -57,7 +71,8 @@ verification on a development image on 2026-10-04. See
 [model service configuration](docs/model_service_setup_zh.md) for the deployment
 and acceptance record. This is not independent segmentation accuracy validation.
 
-The subsequent frozen application set contains 30 LoveDA building images and 30
+The earlier frozen application set (commit `46ffbbb1898a4b5e8f2ac5974f0bdabace3a94bd`)
+contains 30 LoveDA building images and 30
 iSAID/DOTA aircraft images, each with 20 positive and 10 empty-target cases.
 Original dataset human pixel annotations supply ground truth. Whole-workbench
 positive-image mean IoU/Dice is **22.75%/29.12% for buildings** and
@@ -77,15 +92,29 @@ provide multi-user authentication or a production security deployment.
 ## Research scope
 
 - One RGB image and one category per segmentation task; six recognised classes.
+- Buildings and aircraft are the primary application focus; roads, water,
+  vegetation and ships remain explicitly experimental. Primary does not mean
+  high accuracy; the measured limitations above still apply to the earlier version.
 - Whole image, one pixel half, or a rectangular ROI; no CRS or geographic area.
 - Connected components are candidate regions, not validated object counts.
 - Sequential batches of two to five images; no autonomous replanning loop.
 - Saved masks, overlays, deterministic statistics, reports and parent-run links.
 - Exports now include the full pre-scope mask and a checksum manifest.
+- Each new segmentation result begins with pending semantic review. Acceptance,
+  rejection and returning to pending require a reviewer label and reason. Events
+  bind to the exact input and mask hashes, survive reload and appear in exports.
+  They do not edit masks or become ground truth, and new branches do not inherit
+  acceptance. The local reviewer label is self-reported, not authenticated.
+- The UI calls the external service's `accurate` option tiled refinement; no
+  guaranteed accuracy improvement is claimed. Machine reports preserve the actual
+  tool request, including semantic classes when applicable.
 
 The publication direction is reproducible workflow and evidence integrity, with
 segmentation quality attributed to the external model. Historical competition
 metrics are diagnostic records, not independent generalisation estimates.
+The concrete candidate differentiator and acceptance order are documented in
+[software definition](docs/software_definition_zh.md). A comprehensive first-of-its-kind
+claim has not been established.
 
 ## Origin and publication status
 

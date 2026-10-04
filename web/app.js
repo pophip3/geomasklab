@@ -2,10 +2,11 @@ const $ = id => document.getElementById(id);
 const state = { session:null, selected:null, last:null, original:null, mask:null, mode:'demo', view:'original', zoom:1, busy:false, status:null, loadToken:0,
  roi:null,roiDraft:null,roiStart:null,roiDrawing:false,roiClear:false,batch:null };
 const sideNames = {all:'全图',left:'左半幅',right:'右半幅',top:'上半幅',bottom:'下半幅'};
-const qualityNames = {auto:'自动',fast:'快速',accurate:'高精度'};
+const qualityNames = {auto:'自动',fast:'快速',accurate:'分块细化'};
 const targetNames = {building:'建筑',aircraft:'飞机',road:'道路',water:'水体',tree:'植被',ship:'船舶'};
 const targetLabel = run => (run?.task?.invert?'非':'')+(targetNames[run?.task?.target]||'目标');
 const statusNames = {completed:'待语义复核',answered:'已回答',needs_clarification:'待确认',failed:'未完成',needs_review:'待复核',export_ready:'可导出'};
+const reviewNames = {pending:'待人工复核',accepted:'人工已接受',rejected:'人工已拒绝'};
 const number = n => Number(n).toLocaleString('en-US');
 const escape = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icon = name => `<svg><use href="#i-${name}"/></svg>`;
@@ -70,6 +71,7 @@ function updateMode(){
  $('composerNote').textContent=state.mode==='demo'?'当前为流程演示，未调用模型':'上传影像将发送至你配置的模型服务';
 }
 function resetMetrics(){
+ $('reviewPanel').hidden=true;
  $('answerCard').hidden=true;$('coverageCard').hidden=false;$('metricsPanel').hidden=false;$('checksPanel').hidden=false;
  $('resultEyebrow').textContent='COVERAGE ANALYSIS';$('artifactText').textContent='原图 · 蒙版 · 叠加图 · 统计 · 日志';
  $('ratioValue').textContent='—';$('areaValue').innerHTML='— <small>px</small>';$('scopeValue').textContent='—';$('timeValue').textContent='—';$('candidateValue').textContent='—';$('qualityValue').textContent='—';
@@ -78,6 +80,7 @@ function resetMetrics(){
  $('checksList').innerHTML=['结果与原始影像对齐','空间条件完成检查','统计与产物已生成'].map(s=>`<p class="pending"><span>○</span>${s}</p>`).join('');$('checkCount').textContent='0 / 3';$('exportBtn').disabled=true;$('reportBtn').disabled=true;
 }
 function renderAnswer(run){
+ $('reviewPanel').hidden=true;
  $('answerCard').hidden=false;$('coverageCard').hidden=true;$('metricsPanel').hidden=true;$('checksPanel').hidden=true;
  $('resultEyebrow').textContent='IMAGE UNDERSTANDING';$('resultTitle').textContent='影像理解已完成';
  $('resultSubtitle').textContent='RemoteAgent 直接看图回答';$('answerText').textContent=run.message;
@@ -200,13 +203,35 @@ async function selectRun(run){
   $('candidateValue').textContent=m.candidate_stats?`${number(m.candidate_stats.candidate_count)} 个`:'旧结果未统计';
   $('qualityValue').textContent=run.mode==='demo'?'预置演示':qualityNames[run.task?.effective_quality_mode]||'服务未确认';
   $('resultTitle').textContent=(run.task.roi?'框选区域 · ':sideNames[run.task.side])+targetLabel(run);$('resultSubtitle').textContent=`V${run.version} · ${run.mode==='demo'?'预置演示标注，非模型输出':'模型输出，需人工复核'}`;
-  $('resultStatus').textContent=statusNames[run.status];$('resultStatus').className='result-badge '+(run.status==='completed'?'success':'warning');
+  $('resultStatus').textContent=statusNames[run.status];
+  const category=run.capability||state.status?.capabilities?.targets?.[run.task.target];
+  if(category?.level==='experimental')$('resultSubtitle').textContent+=' · 实验类别，精度尚未验证';
+  renderReview(run);
   $('coverageBar').style.width=ratio+'%';$('ringValue').setAttribute('stroke-dasharray',`${ratio*1.634} 164`);
   $('checksList').innerHTML=['蒙版尺寸与原始影像一致',`像素范围符合${run.task.roi?'矩形研究区':sideNames[run.task.side]}条件`,'统计及结果文件已生成'].map(s=>`<p><span>✓</span>${escape(s)}</p>`).join('');$('checkCount').textContent='3 / 3';
   $('contextChip').hidden=false;$('contextChip').lastElementChild.textContent=`继承 V${run.version} · ${targetLabel(run)} · ${sideNames[run.task.side]}`;
   $('exportBtn').disabled=false;$('reportBtn').disabled=!run.report_url;renderVersions();renderTrace(run);draw();syncView();
  }catch(e){toast(e.message);}
 }
+function renderReview(run){
+ const review=run.semantic_review||{state:'pending',events:[]},last=review.events.at(-1);
+ $('reviewPanel').hidden=false;$('reviewState').textContent=reviewNames[review.state]||reviewNames.pending;
+ $('reviewSummary').textContent=last?`${last.reviewer} · ${new Date(last.at).toLocaleString()} · ${last.note}`:'检查目标语义、漏检、误检和边界后记录决定。';
+ $('resultStatus').textContent=reviewNames[review.state]||reviewNames.pending;
+ $('resultStatus').className='result-badge '+(review.state==='accepted'?'success':review.state==='rejected'?'warning':'');
+}
+$('reviewBtn').onclick=()=>{
+ if(state.busy||!state.selected)return toast('请等待任务完成后复核');
+ const selected=state.selected,sessionId=state.session.id;
+ modal('记录人工复核',`<p>请先检查原图与叠加蒙版，记录目标语义、漏检、误检及边界情况。决定只适用于 V${selected.version}；后续新结果重新待复核。</p><div class="modal-notice">复核不会修改蒙版或统计。此处保存自报记录，不等同独立精度评测或身份认证。</div><form id="reviewForm" class="review-form"><label for="reviewDecision">复核决定</label><select id="reviewDecision"><option value="accepted">接受这个结果</option><option value="rejected">拒绝这个结果</option><option value="pending">退回待复核</option></select><label for="reviewerName">复核人标识</label><input id="reviewerName" required maxlength="100" autocomplete="off"><label for="reviewNote">复核依据或退回原因</label><textarea id="reviewNote" required maxlength="2000" rows="4" placeholder="说明检查了哪些区域，发现哪些问题，以及结果是否适合当前用途。"></textarea><button type="submit" class="primary" id="saveReview">保存复核记录</button></form><h3>已有复核记录</h3><div class="review-history">${(selected.semantic_review?.events||[]).map(e=>`<p><strong>${escape(reviewNames[e.decision])}</strong> · ${escape(e.reviewer)} · ${escape(new Date(e.at).toLocaleString())}<br>${escape(e.note)}</p>`).join('')||'<p>尚无人工复核记录。</p>'}</div>`,'SEMANTIC REVIEW');
+ $('reviewForm').onsubmit=async e=>{
+  e.preventDefault();const button=$('saveReview');button.disabled=true;
+  try{const updated=await api('/api/review',{session_id:sessionId,run_id:selected.id,decision:$('reviewDecision').value,reviewer:$('reviewerName').value,note:$('reviewNote').value});
+   if(state.session.id===sessionId){const existing=state.session.runs.find(r=>r.id===updated.id);if(existing)Object.assign(existing,updated);if(state.selected?.id===updated.id){Object.assign(state.selected,updated);renderReview(state.selected);}}
+   closeModal();toast('复核记录已保存，将随实验包和报告导出');
+  }catch(error){toast(error.message);button.disabled=false;}
+ };
+};
 async function run(query,simulateFailure=false){
  if(state.busy||!state.session)return;
  query=query.trim();if(!query)return;
@@ -237,7 +262,7 @@ $('exportBtn').onclick=()=>{if(state.selected){download(state.selected.export_ur
 $('reportBtn').onclick=()=>{if(state.selected?.report_url)download(state.selected.report_url);};
 function gallery(){
  if(state.busy)return toast('请等待当前任务完成');
- modal('选择一幅研究影像',`<p>从预置样例体验完整实验，或上传自己的影像连接模型分析。</p><div class="sample-grid">${Object.entries(state.status?.samples||{}).map(([key,s])=>`<button class="sample-card" data-sample="${key}"><img src="assets/${escape(s.file)}" alt="${escape(s.name)}"><strong>${escape(s.name)}</strong><small>${s.size.join(' × ')} px · 预置${targetNames[s.target]}近似标注</small></button>`).join('')}</div><p style="margin-top:16px">样例蒙版用于演示交互与几何计算，不是RemoteSAM预测，也不是精度评测真值。</p><button class="secondary" id="modalUpload">${icon('image')}上传自己的影像</button>`,'IMAGE LIBRARY');
+ modal('选择一幅研究影像',`<p>从预置样例体验完整实验，或上传自己的影像连接模型分析。</p><div class="sample-grid">${Object.entries(state.status?.samples||{}).map(([key,s])=>`<button class="sample-card" data-sample="${key}"><img src="assets/${escape(s.file)}" alt="${escape(s.name)}"><strong>${escape(s.name)}</strong><small>${s.size.join(' × ')} px · 程序生成${targetNames[s.target]}掩膜</small></button>`).join('')}</div><p style="margin-top:16px">样例蒙版用于演示交互与几何计算，不是RemoteSAM预测，也不是精度评测真值。</p><button class="secondary" id="modalUpload">${icon('image')}上传自己的影像</button>`,'IMAGE LIBRARY');
  $('modalBody').querySelectorAll('[data-sample]').forEach(b=>b.onclick=()=>newExperiment(b.dataset.sample));$('modalUpload').onclick=()=>{closeModal();$('fileInput').click();};
 }
 $('galleryBtn').onclick=gallery;$('newBtn').onclick=gallery;$('uploadBtn').onclick=gallery;$('workspaceBtn').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
@@ -316,7 +341,7 @@ function details(log=false){
  modal(log?'完整执行日志':'结果与运行详情',`<p><strong>RUN ${r.id}</strong> · ${r.mode==='demo'?'预置标注演示':'模型服务模式'} · ${statusNames[r.status]}</p><div class="modal-notice">${escape(r.provenance.perception)}</div>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>完整实验包 ↓</a></div>`:''}<h3>数据来源与方法</h3><p>${escape(r.provenance.source)}</p><p>规划器：${escape(r.provenance.planner)}。面积按实际二值蒙版计算，未推断平方米。</p><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre>`,'RUN PROVENANCE');
 }
 $('detailBtn').onclick=()=>details(false);$('logBtn').onclick=()=>details(true);
-$('sourceBtn').onclick=()=>modal('影像与数据来源',`<p>${escape(state.session?.source||'未选择影像')}</p><p>内置建筑和飞机区域为人工绘制的近似演示多边形，只用于检验交互、上下文和几何计算。不能据此报告模型准确率。</p><p>坐标以图像左上角为原点，X向右、Y向下。上下左右均为影像方向。面积占比使用整图像素为分母。</p>`,'DATA NOTES');
+$('sourceBtn').onclick=()=>modal('影像与数据来源',`<p>${escape(state.session?.source||'未选择影像')}</p><p>内置建筑和飞机区域由程序几何规则生成，只用于检验交互、上下文和几何计算。不能据此报告模型准确率。</p><p>坐标以图像左上角为原点，X向右、Y向下。上下左右均为影像方向。面积占比使用整图像素为分母。</p>`,'DATA NOTES');
 async function connections(){
  try{state.status=await api('/api/status');}catch(e){return toast('本地服务不可用');}
  const canLive=state.status.agent_configured&&state.status.sam_configured;
@@ -331,7 +356,7 @@ async function connections(){
  };
 }
 $('connectionBtn').onclick=connections;
-$('aboutBtn').onclick=()=>modal('让一个问题，成为可复查的实验',`<p>观域 GeoScope v0.7 支持从自然语言任务到遥感分割结果的完整实验流程。</p><h3>建议体验顺序</h3><p>选择影像 → 框选研究区 → 选择快速或高精度模式 → 提取目标 → 查看候选区域与统计 → 下载实验报告。也可用“批量实验”处理多张影像。</p><h3>目前已经能做什么</h3><p>真实影像上传、RemoteAgent任务规划、Harness校验、RemoteSAM分割、确定性几何统计、结果复核、上下文继承、版本恢复、批量运行和产物导出。</p><h3>当前边界</h3><p>演示模式使用预置标注，不代表真实模型精度；模型模式需要实际服务连通。候选区域按最终范围内的蒙版计算。像素面积不是地理面积，验证检查也不等于语义或边界正确。</p><p>实验文件保存在本机experiments目录。刷新页面或重启服务后可恢复实验，也可从历史记录重新打开。</p>`,'ABOUT THE PROTOTYPE');
+$('aboutBtn').onclick=()=>modal('让一个问题，成为可复查的实验',`<p>观域 GeoScope 是辅助研究者提取、检查和复核像素结果的工作台。</p><h3>建议体验顺序</h3><p>选择影像 → 框选研究区 → 选择快速或分块细化模式 → 提取目标 → 查看候选区域与统计 → 下载实验报告。也可用“批量实验”处理多张影像。</p><h3>类别与质量</h3><p>建筑、飞机为重点应用；道路、水体、植被、船舶为实验功能。分块细化可能改善小目标，也可能产生误检，名称不保证更高精度。所有模型结果都需要人工复核。</p><h3>目前已经能做什么</h3><p>真实影像上传、RemoteAgent任务规划、Harness校验、RemoteSAM分割、确定性几何统计、结果复核、上下文继承、版本恢复、批量运行和产物导出。</p><h3>当前边界</h3><p>演示模式使用预置标注，不代表真实模型精度；模型模式需要实际服务连通。候选区域按最终范围内的蒙版计算。像素面积不是地理面积，验证检查也不等于语义或边界正确。</p><p>实验文件保存在本机experiments目录。刷新页面或重启服务后可恢复实验，也可从历史记录重新打开。</p>`,'ABOUT THE PROTOTYPE');
 
 async function init(){
  try{
@@ -339,6 +364,6 @@ async function init(){
   if(saved){try{await showSession(await api('/api/session/'+encodeURIComponent(saved)));return;}catch(e){localStorage.removeItem('geoscope-session');}}
   await newExperiment('urban');
  }
- catch(e){modal('本地服务尚未启动','<p>请双击项目目录中的“启动Demo.bat”，再打开 http://127.0.0.1:4180。</p>');}
+ catch(e){modal('本地服务尚未启动','<p>请按项目 README 的启动说明运行本地服务，再打开 http://127.0.0.1:4180。</p>');}
 }
 init();

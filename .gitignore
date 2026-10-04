@@ -21,6 +21,7 @@ checkpoints/
 weights/
 .pytest_cache/
 outputs/
+reviewer-output/
 .cache/
 cupy-cache/
 .DS_Store

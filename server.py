@@ -18,6 +18,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageOps
 from runtime_config import load_settings, settings_status
 from service_transport import request_json, inspect_services
+from product_contract import VERSION, TARGET_CAPABILITIES, capabilities
+from semantic_review import initial_review, append_review
 from agent_bridge import AgentTurn, Clarification, decision_record, resolve_scope, segmentation_plan
 from v07_contract import batch_requested, has_target_intent, resolve_quality, resolve_roi, target_intent, validate_target_intent
 
@@ -127,10 +129,16 @@ def experiment_report(session, result):
     metrics=result['metrics']; task=result['task']; candidates=metrics['candidate_stats']
     options=result.get('task_options',{})
     service=result.get('service_metadata') or {}
+    model=service.get('model') or {}
+    if not isinstance(model,dict): model={}
+    request=task.get('service_request') or {}
+    request={key:request[key] for key in ('task','text','classes','quality_mode') if key in request}
+    actual_request=json.dumps(request,ensure_ascii=False,sort_keys=True) if request else '合成演示未调用模型' if result['mode']=='demo' else '旧记录缺少实际请求，不能推断'
     decision=result.get('agent_decision') or {}
     call=decision.get('tool_call') or {}
     roi=options.get('roi')
     quality=options.get('effective_quality_mode') or '服务未确认'
+    review=result.get('semantic_review') or initial_review()
     lines=[f'# GeoScope 实验报告：{session["name"]}', '',
            f'- 实验编号：{result["id"]}',f'- 运行状态：{result["status"]}（语义与边界仍需人工复核）',
            f'- 输入影像：{session["width"]} × {session["height"]} 像素',
@@ -144,8 +152,10 @@ def experiment_report(session, result):
            f'- 服务确认的执行模式：{quality}',
            f'- 受限工具调用：{call.get("name", "演示流程，未调用模型工具")}',
            f'- Harness 校验：目标、影像、ROI、模式、二值蒙版尺寸与范围由程序检查',
-           f'- RemoteSAM 提示词：{DESCRIPTIONS[task["target"]]}',
-           f'- 服务版本：{service.get("service_version", "未记录")}',
+           f'- 实际模型请求：{actual_request}',
+           f'- 服务版本：{service.get("service_version") or model.get("service_version", "未记录")}',
+           f'- 检查点 SHA-256：{model.get("checkpoint_sha256", "未记录")}',
+           f'- 类别定位：{"重点应用，仍需人工复核" if TARGET_CAPABILITIES[task["target"]]["level"]=="primary" else "实验类别，尚无冻结语义精度验证"}',
            f'- 模式参数：{json.dumps(service.get("mode_parameters", {}),ensure_ascii=False,sort_keys=True)}',
            f'- 服务耗时：{json.dumps(service.get("timing_ms", {}),ensure_ascii=False,sort_keys=True)}',
            f'- 推理与统计总耗时：{result["duration_ms"]} ms',
@@ -160,6 +170,8 @@ def experiment_report(session, result):
            f'- 完整蒙版左/右半幅前景：{metrics["distribution"]["left_pixels"]:,} / {metrics["distribution"]["right_pixels"]:,} 像素',
            *(([f'- 完整蒙版 ROI 内/外前景：{metrics["distribution"]["roi_inside_pixels"]:,} / {metrics["distribution"]["roi_outside_pixels"]:,} 像素'] if roi else [])),
            '', '## 复核与复现', '',
+           f'- 语义复核状态：{review["state"]}；自报记录不等同精度评测或身份认证。',
+           f'- 复核记录：{json.dumps(review["events"],ensure_ascii=False,sort_keys=True)}',
            f'- 影像 SHA-256：{result["provenance"]["image_sha256"]}',
            f'- 感知版本：{result["provenance"].get("perception_revision","未记录")}',
            f'- mask 与原图对齐：{metrics["width"]==session["width"] and metrics["height"]==session["height"]}',
@@ -296,6 +308,26 @@ def run_task(s,p,allow_batch=False):
     try: return _run_task(s,p,allow_batch=allow_batch)
     finally: s['lock'].release()
 
+def review_result(s, payload):
+    rid=payload.get('run_id')
+    if not isinstance(rid,str) or not SID_RE.fullmatch(rid): raise ValueError('结果编号不合法')
+    if not s['lock'].acquire(blocking=False): raise ValueError('当前实验仍在执行，请稍后再复核')
+    try:
+        result=next((r for r in s['runs'] if r['id']==rid),None)
+        if not result or not result.get('mask_url') or result['status'] not in ('completed','needs_review'):
+            raise ValueError('只能复核当前影像已有蒙版的有效结果')
+        folder=DATA/s['id']/rid
+        review=append_review(result.get('semantic_review'),payload,at=now(),run_id=rid,
+                             image_bytes=(DATA/s['id']/'original.png').read_bytes(),
+                             mask_bytes=(folder/'mask.png').read_bytes())
+        updated={**result,'semantic_review':review}
+        save_json(folder/'result.json',{k:v for k,v in updated.items() if k!='trace'})
+        (folder/'report.md').write_text(experiment_report(s,updated),encoding='utf-8')
+        result.update(semantic_review=review)
+        save_json(DATA/s['id']/'session.json',public_session(s))
+        return result
+    finally: s['lock'].release()
+
 def run_batch(p, progress=None, batch_id=None):
     ids=p.get('session_ids')
     if (not isinstance(ids,list) or not 2<=len(ids)<=5 or
@@ -373,7 +405,7 @@ def _run_task(s,p,allow_batch=False):
     start=time.perf_counter(); trace=[]; runid=uid(); folder=DATA/s['id']/runid; folder.mkdir()
     def event(name,detail,state='completed',elapsed=0): trace.append({'step':len(trace)+1,'name':name,'detail':detail,'state':state,'duration_ms':round(elapsed,2),'at':now()})
     result={'id':runid,'session_id':s['id'],'parent_run_id':previous['id'] if previous else None,
-            'version':len(s['runs'])+1,'query':query,'mode':mode,'created_at':now(),'status':'failed','trace':trace,
+            'version':len(s['runs'])+1,'software_version':VERSION,'query':query,'mode':mode,'created_at':now(),'status':'failed','trace':trace,
             'provenance':{'planner':'演示规则解析器' if mode=='demo' else os.environ.get('GEO_AGENT_MODEL','未配置'),
                           'perception':'fixtures.py 程序生成的确定性合成掩膜，非遥感观测、非模型预测' if mode=='demo' else 'RemoteSAM服务',
                           'source':s['source'],'image_sha256':hashlib.sha256((DATA/s['id']/'original.png').read_bytes()).hexdigest()}}
@@ -459,6 +491,9 @@ def _run_task(s,p,allow_batch=False):
             if mode=='live':
                 plan['service_request']['quality_mode']=effective_quality
         result['task']=plan
+        if plan.get('target') in TARGET_CAPABILITIES:
+            result['capability']={**TARGET_CAPABILITIES[plan['target']],
+                                  'semantic_review_required':True,'software_version':VERSION}
         if plan['action']=='clarify':
             result.update(status='needs_clarification',message=plan['question']); event('等待条件确认','需求尚未执行','waiting')
         elif plan['action']=='scene':
@@ -533,6 +568,8 @@ def _run_task(s,p,allow_batch=False):
             base=f'/experiments/{s["id"]}/{runid}'
             result.update(status=status,metrics=metrics,mask_url=base+'/mask.png',overlay_url=base+'/overlay.png',export_url=f'/api/export/{s["id"]}/{runid}',
               message=f'已生成{SIDES[side]}{"非" if plan.get("invert") else ""}{TARGETS[target]}区域：{metrics["pixel_area"]:,} px，占整幅影像 {metrics["area_ratio"]*100:.2f}%。'+('这是预置标注的流程演示，尚未进行模型推理。' if mode=='demo' else '请结合叠加图复核目标语义与边界。') if metrics['pixel_area'] else '本次未检出有效区域，需要复核，不能据此断言目标不存在。')
+            if mode=='live' and TARGET_CAPABILITIES[target]['level']=='experimental':
+                result['message']+=' 该类别处于实验阶段，尚无冻结语义精度验证。'
             s['context']={'target':target,'side':side,'invert':bool(plan.get('invert')),
                           'roi':roi,'quality_mode':quality_mode}; save_json(folder/'statistics.json',metrics)
             if mode=='live':
@@ -551,6 +588,7 @@ def _run_task(s,p,allow_batch=False):
         feedback({'status':'error','message':result['message'],'artifacts_created':False})
     result['duration_ms']=round((time.perf_counter()-start)*1000,2)
     if result.get('mask_url'):
+        result['semantic_review']=initial_review()
         result['report_url']=f'/api/report/{s["id"]}/{runid}'
         (folder/'report.md').write_text(experiment_report(s,result),encoding='utf-8')
     save_json(folder/'result.json',{k:v for k,v in result.items() if k!='trace'}); save_json(folder/'run_log.json',trace)
@@ -562,7 +600,7 @@ class Handler(SimpleHTTPRequestHandler):
         raw=json.dumps(value,ensure_ascii=False).encode(); self.send_response(status); self.send_header('Content-Type','application/json; charset=utf-8'); self.send_header('Cache-Control','no-store'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); self.wfile.write(raw)
     def do_GET(self):
         path=self.path.split('?')[0]
-        if path=='/api/status': return self.json({**settings_status(),'samples':SAMPLES,'version':'0.8.0-research.1'})
+        if path=='/api/status': return self.json({**settings_status(),'samples':SAMPLES,'version':VERSION,'capabilities':capabilities()})
         if path=='/api/sessions': return self.json({'sessions':session_index()})
         if path.startswith('/api/batch/'):
             bid=path.rsplit('/',1)[-1]
@@ -590,13 +628,19 @@ class Handler(SimpleHTTPRequestHandler):
             folder=DATA/sid/rid
             if not (folder/'mask.png').exists(): return self.send_error(404)
             from export_bundle import build_bundle
-            raw=build_bundle(DATA/sid/'original.png',folder); self.send_response(200); self.send_header('Content-Type','application/zip'); self.send_header('Content-Disposition',f'attachment; filename="geoscope_{rid}.zip"'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); return self.wfile.write(raw)
+            s=get_session(sid)
+            if not s: return self.send_error(404)
+            with s['lock']: raw=build_bundle(DATA/sid/'original.png',folder)
+            self.send_response(200); self.send_header('Content-Type','application/zip'); self.send_header('Content-Disposition',f'attachment; filename="geoscope_{rid}.zip"'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); return self.wfile.write(raw)
         if path.startswith('/api/report/'):
             parts=path.split('/'); sid,rid=parts[-2:]
             if len(parts)!=5 or not SID_RE.fullmatch(sid) or not SID_RE.fullmatch(rid): return self.send_error(404)
             file=DATA/sid/rid/'report.md'
             if not file.is_file(): return self.send_error(404)
-            raw=file.read_bytes(); self.send_response(200)
+            s=get_session(sid)
+            if not s: return self.send_error(404)
+            with s['lock']: raw=file.read_bytes()
+            self.send_response(200)
             self.send_header('Content-Type','text/markdown; charset=utf-8')
             self.send_header('Content-Disposition',f'attachment; filename="geoscope_{rid}_report.md"')
             self.send_header('Content-Length',str(len(raw))); self.end_headers(); return self.wfile.write(raw)
@@ -618,6 +662,10 @@ class Handler(SimpleHTTPRequestHandler):
                 s=get_session(p.get('session_id'))
                 if not s: raise ValueError('实验不存在，请重新选择影像')
                 return self.json(run_task(s,p))
+            if self.path=='/api/review':
+                s=get_session(p.get('session_id'))
+                if not s: raise ValueError('实验不存在，请重新选择影像')
+                return self.json(review_result(s,p))
             if self.path=='/api/batch': return self.json(run_batch(p))
             if self.path=='/api/batch/start': return self.json(start_batch(p))
             return self.json({'error':'接口不存在'},404)

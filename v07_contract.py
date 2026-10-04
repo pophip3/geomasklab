@@ -60,7 +60,7 @@ def resolve_roi(query, context, selected, width, height):
 def resolve_quality(query, context, selected=None):
     q = query.lower()
     fast = bool(re.search(r'快速|快一点|快些|速度优先|\bfast\b', q))
-    accurate = bool(re.search(r'高精度|精细|小目标|精度优先|\baccurate\b', q))
+    accurate = bool(re.search(r'高精度|精细|细化|分块|小目标|精度优先|\baccurate\b', q))
     automatic = bool(re.search(r'自动模式|自动选择|\bauto\b', q))
     found = [name for name, present in (('fast', fast), ('accurate', accurate), ('auto', automatic)) if present]
     if len(found) > 1:

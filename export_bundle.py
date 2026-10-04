@@ -6,6 +6,8 @@ import json
 import math
 import zipfile
 from PIL import Image, ImageOps
+from product_contract import VERSION
+from semantic_review import verify_review
 
 SCHEMA = 'geoscope-evidence/1.0'
 MAX_BUNDLE_BYTES = 96 * 1024 * 1024
@@ -21,7 +23,9 @@ def build_bundle(original, run_folder):
         contents[name] = (folder / name).read_bytes()
     if (folder / 'report.md').is_file():
         contents['report.md'] = (folder / 'report.md').read_bytes()
-    manifest = {'schema': SCHEMA, 'software_version': '0.8.0-research.1',
+    result = json.loads(contents['result.json'])
+    manifest = {'schema': SCHEMA, 'software_version': result.get('software_version','unrecorded'),
+                'export_generator_version': VERSION,
                 'checksums': {name: {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
                               for name, raw in contents.items()},
                 'verification_scope': 'file integrity and deterministic pixel arithmetic; not model accuracy or authorship'}
@@ -77,6 +81,10 @@ def verify_bundle(payload):
         raise ValueError('Input identity mismatch.')
     if result['full_mask_sha256'] != checksums['full_mask.png']['sha256']:
         raise ValueError('Full-mask identity mismatch.')
+    review=result.get('semantic_review')
+    if review is not None:
+        verify_review(review,run_id=result['id'],image_sha256=checksums['original.png']['sha256'],
+                      mask_sha256=checksums['mask.png']['sha256'])
     w,h = original.size
     task = result['task']
     side = task['side']
@@ -117,6 +125,7 @@ def verify_bundle(payload):
     return {'verified': True, 'schema':SCHEMA, 'files_checked':len(checksums),
             'pixel_area':area,'area_ratio':area/(w*h),'mode':result['mode'],
             'scope':side,'width':w,'height':h,
+            'semantic_review_state':review['state'] if review else 'unrecorded',
             'semantic_accuracy_verified':False,'origin_authenticated':False}
 
 

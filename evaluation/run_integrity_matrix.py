@@ -17,6 +17,7 @@ sys.path.insert(0,str(ROOT))
 import server
 from agent_bridge import WorkbenchAgent
 from export_bundle import build_bundle,verify_bundle
+from product_contract import VERSION
 
 
 def run_matrix():
@@ -78,7 +79,7 @@ def run_matrix():
         writer.writeheader();writer.writerows(records)
     correct=sum(r['exact_mask_match'] and r['offline_verification'] and r['status_correct'] for r in records)
     summary={'protocol':'integrity-matrix-v1','seed':20261004,'cases':len(records),'passed':correct,
-             'software_version':'0.8.0-research.1','real_model_inference':False,'model_semantic_accuracy_measured':False,
+             'software_version':VERSION,'real_model_inference':False,'model_semantic_accuracy_measured':False,
              'measurement_scope':'binary mask postprocessing, persisted pixel metrics and offline export verification',
              'platform':sys.platform,'python':sys.version.split()[0],
              'failure_cases':[r['case_id'] for r in records if not(r['exact_mask_match'] and r['offline_verification'] and r['status_correct'])]}
