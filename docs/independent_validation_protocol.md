@@ -1,5 +1,10 @@
 # Independent application validation protocol — planned, not executed
 
+This file preserves the original v1 proposal. The executable sampling and scoring
+protocol has been revised before test inference: see
+[protocol v2.1](application_protocol_v2.md), which uses unused LoveDA building
+images and held-out iSAID source IDs after auditing other local experiments.
+
 Protocol `geoscope-application-v1`. Freeze the repository commit, data manifest,
 checkpoint SHA-256, model revision, endpoint software, prompt and thresholds
 **before** inspecting test predictions. Protocol version changes must be dated.
