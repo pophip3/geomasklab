@@ -1,0 +1,33 @@
+{
+  "competition_repository": "https://github.com/SitianGao/geoscope",
+  "competition_commit": "df802ab54b8f4ee496ca83c104bfaee44f7ee888",
+  "research_repository": "https://github.com/pophip3/geoscope-softwarex",
+  "visibility": "private",
+  "selected_files": [
+    "server.py",
+    "agent_bridge.py",
+    "runtime_config.py",
+    "service_transport.py",
+    "v07_contract.py",
+    "requirements.txt",
+    ".env.example",
+    ".gitignore",
+    "web/index.html",
+    "web/app.js",
+    "web/styles.css",
+    "web/competition.css",
+    "web/v07.css",
+    "tests/test_harness.py",
+    "tests/test_workbench_integration.py",
+    "tests/test_agent_integration.py",
+    "tests/test_v07_agent_contract.py"
+  ],
+  "excluded": [
+    "services/** (unresolved upstream redistribution licenses)",
+    "web/assets/** (original image rights unresolved)",
+    ".env and machine-specific configuration",
+    "competition planning documents",
+    "raw historical model responses and personal coordination material"
+  ],
+  "release_license_status": "awaiting rights-holder approval"
+}

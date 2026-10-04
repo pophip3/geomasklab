@@ -1,0 +1,28 @@
+.quality-control{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 1px 8px;color:#708474;font-size:10px}
+.quality-control select{min-width:92px;border:1px solid #dce8de;border-radius:6px;background:#f7faf6;color:#386d56;padding:4px 7px;font-size:10px}
+.roi-toolbar{display:flex;align-items:center;gap:7px;padding:7px 13px;border-bottom:1px solid #e6ebe4;background:#fbfcf9;min-height:37px}
+.roi-toolbar button{border:1px solid #dce8de;border-radius:5px;background:#fff;color:#3e735a;padding:4px 8px;font-size:10px;white-space:nowrap}
+.roi-toolbar button.selected{background:#e6f2e7;border-color:#8db598}
+.roi-toolbar span{margin-left:auto;color:#899989;font-size:9px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#imageCanvas.roi-drawing{cursor:crosshair;outline:2px solid #edbb58}
+.artifact-actions{grid-template-columns:minmax(0,1fr) auto auto;gap:7px}
+.artifact-actions .secondary{margin:0;padding:7px 9px;font-size:9px}
+.artifact-actions .text-button{margin:0;width:auto;white-space:nowrap}
+.batch-selector{max-height:220px;overflow:auto;border:1px solid #e5ebe2;border-radius:8px;margin:10px 0}
+.batch-selector label{display:flex;gap:10px;align-items:center;padding:9px 11px;border-bottom:1px solid #edf1eb;cursor:pointer}
+.batch-selector label:last-child{border-bottom:0}
+.batch-selector input,.batch-inline input{accent-color:#39785e}
+.batch-selector span{color:#385c48;font-size:11px}
+.batch-selector small{display:block;color:#91a092;font-size:9px}
+.batch-add{display:flex;gap:7px;margin:10px 0 15px}
+.batch-add button{padding:7px 10px}
+.batch-label{display:block;color:#4f715b;margin-bottom:5px}
+#batchQuery{width:100%;resize:vertical;border:1px solid #dce8de;border-radius:7px;padding:9px;color:#3d5948}
+.batch-inline{display:flex;align-items:center;gap:5px;margin:10px 0;color:#667d6d}
+.batch-progress{border:1px solid #dce8de;background:#f3f8f1;border-radius:8px;padding:12px;margin-bottom:12px}
+.batch-progress strong{color:#356c50}.batch-progress p{margin:4px 0 0!important}
+.batch-items{display:grid;gap:6px;margin-bottom:13px}
+.batch-item{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px;border:1px solid #e7ede6;border-radius:7px}
+.batch-item span{font:10px Consolas,monospace;color:#54745e}.batch-item b{font-weight:500;color:#49775b;font-size:10px}
+.batch-item small{color:#7b8f7d}.batch-item button{grid-column:2;border:0;background:none;color:#38765d;font-size:10px;padding:0;text-align:right}
+@media(max-width:760px){.roi-toolbar{flex-wrap:wrap}.roi-toolbar span{width:100%;margin:0}.artifact-actions{grid-template-columns:1fr 1fr}.artifact-actions .text-button{grid-column:1/-1;justify-content:flex-start}}

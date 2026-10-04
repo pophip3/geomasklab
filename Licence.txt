@@ -1,0 +1,17 @@
+RESEARCH PREPARATION — RELEASE LICENSE NOT YET APPROVED
+
+This private repository contains selected workbench files derived from
+SitianGao/geoscope and new preparation code. Original contributor ownership and
+permission to publish under an open-source license must be confirmed by the
+rights holders. No MIT, Apache, GPL or other blanket redistribution grant is
+asserted by this file. No SoftwareX submission-ready license is claimed.
+
+Bundled RemoteAgent and RemoteSAM third-party code and weights are excluded.
+Using external services does not grant permission to redistribute their weights,
+data or source. Generated illustrative assets come from fixtures.py; original
+competition demo images are excluded.
+
+Before public release: select a license with all relevant rights holders,
+replace this file with its legally approved text, retain contributor attribution,
+and document compatible dependency and data licensing. MIT or Apache-2.0 are
+possible candidates, subject to the rights-holder decision.
