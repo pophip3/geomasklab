@@ -11,6 +11,9 @@ def main():
     ap=argparse.ArgumentParser();ap.add_argument('--root',type=Path,required=True);a=ap.parse_args();root=a.root
     summary=json.loads((root/'summary.json').read_text(encoding='utf-8'));protocol=json.loads((root/'run-protocol.json').read_text(encoding='utf-8'))
     manifest=list(csv.DictReader((root/'manifest.csv').open(encoding='utf-8')));out=root/'report';out.mkdir(exist_ok=True)
+    audit=json.loads((root/'independent-score-audit.json').read_text(encoding='utf-8'))
+    metric_rows=list(csv.DictReader((root/'per_request_metrics.csv').open(encoding='utf-8')))
+    missed={target:sum(r['target']==target and r['method']=='whole' and r['stratum']=='positive' and r.get('success')=='True' and r.get('predicted_pixels')=='0' for r in metric_rows) for target in ['building','aircraft']}
     fig,axes=plt.subplots(1,2,figsize=(10,4.2),sharey=True)
     for ax,target in zip(axes,['building','aircraft']):
         s=next(s for s in summary['summaries'] if s['target']==target and s['method']=='fixed_direct')
@@ -18,7 +21,7 @@ def main():
         errs=np.array([[v-c['lower'] if c else 0 for v,c in zip(vals,cis)],[c['upper']-v if c else 0 for v,c in zip(vals,cis)]])*100
         ax.bar(['IoU','Dice'],[v*100 for v in vals],color=['#3574a5','#4b9f80'],yerr=errs,capsize=5,width=.55)
         ax.set_title(target.capitalize()+f' (positive n={s["positive_scoped_successes"]})');ax.set_ylim(0,100);ax.grid(axis='y',alpha=.2);ax.set_axisbelow(True)
-        for x,v in enumerate(vals):ax.text(x,v*100+4,f'{v*100:.1f}%',ha='center',fontsize=10)
+        for x,(v,c) in enumerate(zip(vals,cis)):ax.text(x,(c['upper'] if c else v)*100+3,f'{v*100:.1f}%',ha='center',fontsize=10)
     axes[0].set_ylabel('Positive-image mean score (%)')
     fig.suptitle('Frozen external-model segmentation: fixed referring prompts',fontsize=12)
     fig.text(.5,.015,'Warm fast mode; no test tuning. Error bars: nominal image-bootstrap 95% intervals; scene correlation is unverified.',ha='center',fontsize=8)
@@ -39,6 +42,7 @@ def main():
 <h2>实际精度</h2><p>下表的 IoU、Dice 是有目标且成功返回蒙版的图像均值。无目标图像单列误检，不把空真值自动计为满分。ROI 和半幅指标只在相应区域内的有效像素计分；界面覆盖率分母仍是整幅影像。完整逐请求结果包含失败项。</p>
 <table><tr><th>类别</th><th>路径</th><th>成功/请求</th><th>区域内正样本</th><th>平均 IoU</th><th>平均 Dice</th><th>空真值误检图/成功空图</th><th>空真值误检像素总数</th><th>请求中位数 ms</th></tr>{''.join(tr)}</table>
 <p class="note">固定直接路径用 <code>all buildings</code> / <code>all planes</code> 与 referring_seg；工作台由 Agent 选择 semantic_seg 或 referring_seg。因此两种路径的数值差异包含提示与工具选择差异，不能解释成工作台提高了同一模型算法的精度。严格保真对照另外重放工作台实际选择的相同服务参数。</p>
+<p>工作台全图路径在 20 个建筑正样本中有 {missed['building']} 张输出空蒙版，在 20 个飞机正样本中有 {missed['aircraft']} 张输出空蒙版。这些漏检均按 IoU/Dice 为 0 保留。软件执行成功与识别正确是不同的结果；空蒙版在界面中标记为待复核，不证明目标不存在。</p>
 <img src="fixed_model_accuracy.png" alt="固定外部模型精度图"><p>误差条为 2000 次图像/源图编号 bootstrap 的名义 95% 区间。场景相关性未完全核实，区间仅作探索性描述，不作显著性或独立城市泛化结论。</p>
 <h2>工作台执行与证据</h2><ul>
 <li>支持请求完成：{summary['completed_supported_requests']}/180。</li>
@@ -46,8 +50,9 @@ def main():
 <li>导出包通过离线校验：{summary['exports_verified']}/180。</li>
 <li>独立 NumPy 范围重建一致：{summary['independent_scope_reconstructions_equal']}/180。</li>
 <li>同参数直接分割对照：完成 {summary['matched_direct_evaluated']} 次，全图蒙版逐像素相同 {summary['matched_full_equal']} 次。</li></ul>
+<p>独立 Pillow 核验：{audit['frozen_input_file_hashes_checked']} 个输入文件哈希、{audit['human_label_conversions_checked']} 张原始人工标签到二值真值的转换，以及 {audit['confusion_tables_and_scores_checked']} 组混淆矩阵和 IoU/Dice 全部一致。该检查验证数据转换与算术，不认证原人工标注的语义准确率。</p>
 <p>全部请求使用 fast 模式和新推理，未复用已有蒙版。软件提交：<code>{protocol['software_commit']}</code>；RemoteSAM 检查点 SHA-256：<code>{protocol['sam_model_info']['checkpoint_sha256']}</code>。顺序执行，服务已预热；RemoteAgent 在实验室 RTX 3090 上运行，RemoteSAM 在本机 RTX 4060 Laptop 上运行。共享设备负载可能影响耗时；当前结果不构成速度优势证明。</p>
-<h2>材料与使用边界</h2><p><a href="../annotation-review/index.html">60 图人工标注复核包</a>、<a href="../annotation-review/human_review_sheet.csv">新增人工复核记录表</a>、<a href="../manifest.csv">冻结数据清单</a>、<a href="../run-protocol.json">预测前运行协议</a>、<a href="../per_request_metrics.csv">逐请求精度与失败记录</a>、<a href="../summary.json">完整汇总与分母</a>。</p>
+<h2>材料与使用边界</h2><p><a href="../annotation-review/index.html">60 图人工标注复核包</a>、<a href="../annotation-review/human_review_sheet.csv">新增人工复核记录表</a>、<a href="../manifest.csv">冻结数据清单</a>、<a href="../run-protocol.json">预测前运行协议</a>、<a href="../per_request_metrics.csv">逐请求精度与失败记录</a>、<a href="../summary.json">完整汇总与分母</a>、<a href="../independent-score-audit.json">独立算术与标签转换核验</a>。</p>
 <p>新增人工复核人员、签字和审核结论均未虚构。当前采用原作者公开人工标注；可进一步由研究成员进行盲法复核。LoveDA/iSAID/DOTA 数据仅在本地用于学术研究，原始影像和标注没有上传研究 GitHub。该小规模、分层应用集不是数据集完整官方测试榜，也不足以证明泛化、用户效率收益或新模型优越性。</p>'''
     (out/'index.html').write_text(body,encoding='utf-8');print('REPORT',str(out/'index.html'))
 if __name__=='__main__':main()

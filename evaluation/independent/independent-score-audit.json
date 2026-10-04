@@ -1,0 +1,9 @@
+{
+  "verified": true,
+  "frozen_input_file_hashes_checked": 240,
+  "human_label_conversions_checked": 60,
+  "unique_image_pixel_hashes": 60,
+  "confusion_tables_and_scores_checked": 420,
+  "implementation": "Pillow ImageChops boolean masks; independent of NumPy scoring implementation",
+  "human_annotation_accuracy_certified": false
+}

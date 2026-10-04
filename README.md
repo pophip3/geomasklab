@@ -4,7 +4,8 @@ Private research preview, version **0.8.0-research.1**. This repository is separ
 from the competition repository. It is not a submitted manuscript or an approved
 open-source release. The user has authorized publication of their competition
 code in a modified research version. The original competition repository stays
-unchanged. Formal licensing and independent model validation remain unfinished.
+unchanged. Formal licensing remains unresolved. A frozen 60-image real-model
+application evaluation is complete, with the limitations described below.
 
 GeoScope Workbench records bounded image-segmentation experiments: a language
 planner proposes one allowed action; a deterministic executor binds the image,
@@ -55,6 +56,18 @@ The local research deployment passed fresh end-to-end model inference and export
 verification on a development image on 2026-10-04. See
 [model service configuration](docs/model_service_setup_zh.md) for the deployment
 and acceptance record. This is not independent segmentation accuracy validation.
+
+The subsequent frozen application set contains 30 LoveDA building images and 30
+iSAID/DOTA aircraft images, each with 20 positive and 10 empty-target cases.
+Original dataset human pixel annotations supply ground truth. Whole-workbench
+positive-image mean IoU/Dice is **22.75%/29.12% for buildings** and
+**35.23%/47.61% for aircraft**. Empty-target images have false positives in 1/10
+building and 4/10 aircraft cases. All 180 supported workbench requests and exports
+completed; all 180 matched service masks and independent scope reconstructions
+agreed exactly. These integrity results do not establish high semantic accuracy.
+See [full results and interpretation](docs/application_results_zh.md),
+[executable protocol](docs/application_protocol_v2.md), and
+[frozen metadata and numerical results](evaluation/independent/).
 
 Your uploaded image is sent to the configured services in live mode. Credentials
 stay on the Python server and must not be committed. The server binds to loopback

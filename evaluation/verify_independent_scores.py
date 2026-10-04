@@ -20,8 +20,13 @@ def audit(pred,gt,valid,scope,record):
 
 def main():
     ap=argparse.ArgumentParser();ap.add_argument('--root',type=Path,required=True);a=ap.parse_args();root=a.root
-    rows=list(csv.DictReader((root/'manifest.csv').open(encoding='utf-8')));checked=0;conversions=0;image_hashes=set()
+    lock=json.loads((root/'data-lock.json').read_text(encoding='utf-8'))
+    if hashlib.sha256((root/'manifest.csv').read_bytes()).hexdigest()!=lock['manifest_sha256']:raise ValueError('Frozen manifest changed')
+    rows=list(csv.DictReader((root/'manifest.csv').open(encoding='utf-8')));checked=0;conversions=0;image_hashes=set();files_checked=0
     for row in rows:
+        for path_key,hash_key in [('image_path','image_sha256'),('ground_truth_path','ground_truth_sha256'),('valid_path','valid_sha256'),('original_label_path','source_label_sha256')]:
+            if hashlib.sha256((root/row[path_key]).read_bytes()).hexdigest()!=row[hash_key]:raise ValueError('Frozen image/annotation file changed')
+            files_checked+=1
         gt=Image.open(root/row['ground_truth_path']);valid=Image.open(root/row['valid_path']);original=Image.open(root/row['original_label_path'])
         image=Image.open(root/row['image_path']).convert('RGB');pixel_hash=hashlib.sha256(image.tobytes()).hexdigest()
         if pixel_hash in image_hashes:raise ValueError('Exact image-pixel duplicate')
@@ -44,7 +49,7 @@ def main():
                 with zipfile.ZipFile(folder/(method+'-evidence.zip')) as z:pred=Image.open(io.BytesIO(z.read('mask.png')));audit(pred,gt,valid,scope,event['score']);checked+=1
                 if event.get('matched_direct_score'):
                     audit(Image.open(folder/(method+'-matched-direct-mask.png')),gt,valid,scope,event['matched_direct_score']);checked+=1
-    result={'verified':True,'human_label_conversions_checked':conversions,'unique_image_pixel_hashes':len(image_hashes),
+    result={'verified':True,'frozen_input_file_hashes_checked':files_checked,'human_label_conversions_checked':conversions,'unique_image_pixel_hashes':len(image_hashes),
             'confusion_tables_and_scores_checked':checked,'implementation':'Pillow ImageChops boolean masks; independent of NumPy scoring implementation',
             'human_annotation_accuracy_certified':False}
     (root/'independent-score-audit.json').write_text(json.dumps(result,indent=2),encoding='utf-8');print(json.dumps(result))
