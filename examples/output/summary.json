@@ -1,0 +1,62 @@
+[
+  {
+    "verified": true,
+    "schema": "geoscope-evidence/1.0",
+    "files_checked": 8,
+    "pixel_area": 75350,
+    "area_ratio": 0.15697916666666667,
+    "mode": "demo",
+    "scope": "all",
+    "width": 800,
+    "height": 600,
+    "semantic_accuracy_verified": false,
+    "origin_authenticated": false,
+    "example": "whole",
+    "evidence_kind": "procedural illustration; no model inference"
+  },
+  {
+    "verified": true,
+    "schema": "geoscope-evidence/1.0",
+    "files_checked": 8,
+    "pixel_area": 37350,
+    "area_ratio": 0.0778125,
+    "mode": "demo",
+    "scope": "right",
+    "width": 800,
+    "height": 600,
+    "semantic_accuracy_verified": false,
+    "origin_authenticated": false,
+    "example": "right",
+    "evidence_kind": "procedural illustration; no model inference"
+  },
+  {
+    "verified": true,
+    "schema": "geoscope-evidence/1.0",
+    "files_checked": 8,
+    "pixel_area": 38000,
+    "area_ratio": 0.07916666666666666,
+    "mode": "demo",
+    "scope": "left",
+    "width": 800,
+    "height": 600,
+    "semantic_accuracy_verified": false,
+    "origin_authenticated": false,
+    "example": "left",
+    "evidence_kind": "procedural illustration; no model inference"
+  },
+  {
+    "verified": true,
+    "schema": "geoscope-evidence/1.0",
+    "files_checked": 8,
+    "pixel_area": 12850,
+    "area_ratio": 0.026770833333333334,
+    "mode": "demo",
+    "scope": "all",
+    "width": 800,
+    "height": 600,
+    "semantic_accuracy_verified": false,
+    "origin_authenticated": false,
+    "example": "roi",
+    "evidence_kind": "procedural illustration; no model inference"
+  }
+]

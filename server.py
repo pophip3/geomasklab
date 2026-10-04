@@ -135,7 +135,7 @@ def experiment_report(session, result):
            f'- 实验编号：{result["id"]}',f'- 运行状态：{result["status"]}（语义与边界仍需人工复核）',
            f'- 输入影像：{session["width"]} × {session["height"]} 像素',
            f'- 数据来源：{session["source"]}',f'- 用户任务：{result["query"]}',
-           f'- 运行来源：{"预置样例演示，非模型预测" if result["mode"]=="demo" else "真实模型服务返回"}',
+           f'- 运行来源：{"程序生成的合成样例及确定性掩膜，非模型预测" if result["mode"]=="demo" else "真实模型服务返回"}',
            f'- 规划器：{result["provenance"]["planner"]}',
            f'- 感知工具：{result["provenance"]["perception"]}',
            f'- 目标：{TARGETS.get(task["target"],task["target"])}',
@@ -164,8 +164,8 @@ def experiment_report(session, result):
            f'- 感知版本：{result["provenance"].get("perception_revision","未记录")}',
            f'- mask 与原图对齐：{metrics["width"]==session["width"] and metrics["height"]==session["height"]}',
            f'- 空间范围检查：{metrics["spatial_check"]}',
-           '- 同包附件：original.png、mask.png、overlay.png、statistics.json、result.json、run_log.json。',
-           '- 原图、mask、叠加图、完整统计与运行日志见同一实验包。',
+           '- 同包附件：original.png、full_mask.png、mask.png、overlay.png、statistics.json、result.json、run_log.json、manifest.json。',
+           '- 离线复核：python export_bundle.py 实验包.zip；复算范围、反选、像素面积和整图覆盖率。',
            '- 当前统计基于像素，不代表平方米、公顷或地理坐标。',
            '- 模型语义准确性和候选边界需要人工核查。', '']
     return '\n'.join(lines)
@@ -263,7 +263,7 @@ def binary_mask(mask):
     raise ValueError('RemoteSAM须返回0/1或0/255二值蒙版，不能把概率图或多类标签直接计算为目标面积')
 
 def mask_cache_key(s,mode,target,service_request=None):
-    revision='manual-polygons-v1' if mode=='demo' else os.environ.get('GEO_REMOTESAM_REVISION','')
+    revision='synthetic-fixtures-v1' if mode=='demo' else os.environ.get('GEO_REMOTESAM_REVISION','')
     if not revision: return None  # Unknown live model revision cannot be safely reused.
     value={'image':hashlib.sha256((DATA/s['id']/'original.png').read_bytes()).hexdigest(),
            'mode':mode,'target':target,'prompt':DESCRIPTIONS[target],'revision':revision,
@@ -375,7 +375,7 @@ def _run_task(s,p,allow_batch=False):
     result={'id':runid,'session_id':s['id'],'parent_run_id':previous['id'] if previous else None,
             'version':len(s['runs'])+1,'query':query,'mode':mode,'created_at':now(),'status':'failed','trace':trace,
             'provenance':{'planner':'演示规则解析器' if mode=='demo' else os.environ.get('GEO_AGENT_MODEL','未配置'),
-                          'perception':'手工绘制的近似样例蒙版，非模型预测、非评测真值' if mode=='demo' else 'RemoteSAM服务',
+                          'perception':'fixtures.py 程序生成的确定性合成掩膜，非遥感观测、非模型预测' if mode=='demo' else 'RemoteSAM服务',
                           'source':s['source'],'image_sha256':hashlib.sha256((DATA/s['id']/'original.png').read_bytes()).hexdigest()}}
     image_path=DATA/s['id']/'original.png'
     image=Image.open(image_path).convert('RGB')
@@ -416,6 +416,11 @@ def _run_task(s,p,allow_batch=False):
         t=time.perf_counter()
         if mode=='demo':
             plan=parse_task(query,context)
+            if plan.get('action')=='segment':
+                demo_side,demo_scope_source=resolve_scope(query,context,p.get('scope'))
+                if roi and demo_side!='all':
+                    raise ValueError('矩形 ROI 与半幅范围不能同时选择；请清除矩形或改为全图条件。')
+                plan.update(side=demo_side,scope_source=demo_scope_source)
         elif re.fullmatch(r'(?:请)?(?:导出|下载)(?:刚才的|当前|这个|所选)?(?:实验包|结果)?[。！! ]*',query):
             plan={'action':'export','planner_protocol':'harness_export_command'}
         else:
@@ -485,7 +490,7 @@ def _run_task(s,p,allow_batch=False):
             elif mode=='demo':
                 if not s['sample']: raise ValueError('上传影像没有预置标注。请选择模型模式，或返回内置样例体验流程。')
                 if target!=SAMPLES[s['sample']]['target']: raise ValueError(f'这个样例只提供{TARGETS[SAMPLES[s["sample"]]["target"]]}的演示标注，不能据此判断其他类别。')
-                mask=demo_mask(s['sample']); event('读取预置样例蒙版','近似人工多边形；未调用RemoteSAM',elapsed=(time.perf_counter()-t)*1000)
+                mask=demo_mask(s['sample']); event('生成合成样例掩膜','由 fixtures.py 几何规则生成；未调用RemoteSAM',elapsed=(time.perf_counter()-t)*1000)
             else:
                 url=os.environ.get('GEO_REMOTESAM_URL','')
                 if not url: raise ValueError('RemoteSAM 服务未配置，未执行分割')

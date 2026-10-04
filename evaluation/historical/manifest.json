@@ -1,0 +1,67 @@
+{
+  "source_commit": "df802ab54b8f4ee496ca83c104bfaee44f7ee888",
+  "evidence_kind": "historical numerical records; not a new model run",
+  "prediction_masks_available": false,
+  "sources": [
+    {
+      "original_relative_path": "evaluation/results/agent_full_results.csv",
+      "original_sha256": "eb52abc20a944af7621ecd07479560cc8dd8efc1efc763e6a9f0b03523a2650a",
+      "curated_path": "planner_baseline.csv",
+      "curated_sha256": "fa528fbf993be0dd88ab385604acdfb9616a1035114f1e29022986e1074f86f4",
+      "rows": 40,
+      "excluded_columns": [
+        "failure_reason",
+        "request",
+        "tool_name"
+      ]
+    },
+    {
+      "original_relative_path": "evaluation/results/agent_full_results_final.csv",
+      "original_sha256": "29bb6243c0c097c3f6f336e43f889c0cee79e805767c17e6944d54a76c28bbba",
+      "curated_path": "planner_optimized.csv",
+      "curated_sha256": "103ef4644708c0eaf27fad8131f2d12c36d3cf56d5c24047d2cd5ad84fdbd987",
+      "rows": 40,
+      "excluded_columns": [
+        "failure_reason",
+        "request",
+        "tool_name"
+      ]
+    },
+    {
+      "original_relative_path": "evaluation/results/remotesam_full_results.csv",
+      "original_sha256": "ff7085139f0de7cf26c0eaea8e44705c211b030ba4d8173a7b1e7e99d5895929",
+      "curated_path": "segmentation_diagnostic.csv",
+      "curated_sha256": "f97a0c9b0cd531fcdd199c97de435c41d3909c43bbd7a465584e1812691fabf3",
+      "rows": 20,
+      "excluded_columns": [
+        "dataset",
+        "empty_mask",
+        "failure_code",
+        "failure_detail",
+        "http_status",
+        "peak_vram_mb",
+        "prompt",
+        "protocol_version",
+        "service_total_ms",
+        "service_version"
+      ]
+    },
+    {
+      "original_relative_path": "evaluation/results/aircraft_v2/remotesam_aircraft_all_experiments_verified.csv",
+      "original_sha256": "a53fd377b0d505b512f15c9e999e89ab29b3e5f33008e6a4ebcd41e5bca927e3",
+      "curated_path": "aircraft_tuning.csv",
+      "curated_sha256": "c0cd2357474b530bb4f6a21b6c6fa8787773d0a720e280f0d6c1347391e49449",
+      "rows": 160,
+      "excluded_columns": [
+        "dataset",
+        "empty_mask",
+        "failure_code",
+        "failure_detail",
+        "peak_vram_mb",
+        "protocol_version",
+        "service_total_ms",
+        "service_version"
+      ]
+    }
+  ]
+}

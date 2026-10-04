@@ -1,9 +1,11 @@
-RESEARCH PREPARATION — RELEASE LICENSE NOT YET APPROVED
+RESEARCH PREPARATION — PUBLICATION AUTHORIZED, FORMAL LICENSE PENDING
 
 This private repository contains selected workbench files derived from
-SitianGao/geoscope and new preparation code. Original contributor ownership and
-permission to publish under an open-source license must be confirmed by the
-rights holders. No MIT, Apache, GPL or other blanket redistribution grant is
+SitianGao/geoscope and new preparation code. On 4 October 2026, the user expressly
+authorized publication of their competition code in a modified research version.
+The original competition repository must remain unchanged. This authorization
+does not specify an open-source license or transfer third-party rights.
+No MIT, Apache, GPL or other blanket redistribution grant is
 asserted by this file. No SoftwareX submission-ready license is claimed.
 
 Bundled RemoteAgent and RemoteSAM third-party code and weights are excluded.

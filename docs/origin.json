@@ -29,5 +29,6 @@
     "competition planning documents",
     "raw historical model responses and personal coordination material"
   ],
-  "release_license_status": "awaiting rights-holder approval"
+  "publication_authorization_status": "user expressly authorizes publication of their code in a modified research version; original competition repository remains unchanged",
+  "release_license_status": "formal open-source license has not been specified"
 }

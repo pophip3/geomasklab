@@ -1,0 +1,181 @@
+{
+  "verification_scope": "offline aggregate recomputation from committed per-task/per-image CSV evidence",
+  "remoteagent": {
+    "verified": true,
+    "checks": {
+      "same_frozen_40_tasks": true,
+      "six_aircraft_tasks": true,
+      "baseline_aircraft_correct": true,
+      "optimized_aircraft_correct": true,
+      "only_failure_is_A04": true
+    },
+    "baseline": {
+      "verified": true,
+      "checks": {
+        "total_tasks": true,
+        "task_routing_accuracy": true,
+        "legal_tool_call_rate": true,
+        "target_category_accuracy": true,
+        "spatial_condition_accuracy": true,
+        "clarification_recognition_rate": true,
+        "avg_decision_latency_ms": true,
+        "median_decision_latency_ms": true,
+        "outcome_counts": true,
+        "agent_status_counts": true
+      },
+      "metrics": {
+        "total_tasks": 40,
+        "task_routing_accuracy": 0.75,
+        "legal_tool_call_rate": 0.7692307692307693,
+        "target_category_accuracy": 1.0,
+        "spatial_condition_accuracy": 1.0,
+        "clarification_recognition_rate": 1.0,
+        "avg_decision_latency_ms": 2524.7552631578947,
+        "median_decision_latency_ms": 2447.0,
+        "outcome_counts": {
+          "scene": 8,
+          "segment": 16,
+          "unparsed": 3,
+          "rejected_tool": 6,
+          "reject_args": 4,
+          "dense_answered_text": 1,
+          "deterministic_clarify": 2
+        },
+        "agent_status_counts": {
+          "completed": 9,
+          "tool_call": 20,
+          "unparsed": 3,
+          "rejected_tool": 6,
+          "n/a": 2
+        }
+      }
+    },
+    "optimized": {
+      "verified": true,
+      "checks": {
+        "total_tasks": true,
+        "task_routing_accuracy": true,
+        "legal_tool_call_rate": true,
+        "target_category_accuracy": true,
+        "spatial_condition_accuracy": true,
+        "clarification_recognition_rate": true,
+        "avg_decision_latency_ms": true,
+        "median_decision_latency_ms": true,
+        "outcome_counts": true,
+        "agent_status_counts": true
+      },
+      "metrics": {
+        "total_tasks": 40,
+        "task_routing_accuracy": 0.975,
+        "legal_tool_call_rate": 1.0,
+        "target_category_accuracy": 1.0,
+        "spatial_condition_accuracy": 1.0,
+        "clarification_recognition_rate": 1.0,
+        "avg_decision_latency_ms": 872.9894736842106,
+        "median_decision_latency_ms": 848.4,
+        "outcome_counts": {
+          "scene": 7,
+          "unparsed": 1,
+          "segment": 26,
+          "deterministic_clarify": 2,
+          "reject_args": 3,
+          "dense_answered_text": 1
+        },
+        "agent_status_counts": {
+          "completed": 8,
+          "unparsed": 1,
+          "tool_call": 29,
+          "n/a": 2
+        }
+      }
+    },
+    "routing_gain_percentage_points": 22.5,
+    "aircraft_gain": "1/6 to 6/6",
+    "remaining_failure_ids": [
+      "A04"
+    ],
+    "evidence_boundary": "The optimized Agent run used the historical aircraft phrase 'all airplanes'. The integrated Harness now canonicalizes any accepted aircraft phrase to the RemoteSAM-validated service phrase 'all planes'; an online rerun of the exact integrated prompt remains required before claiming a fresh end-to-end score."
+  },
+  "remotesam": {
+    "verified": true,
+    "checks": {
+      "row_formulas_and_contract": true,
+      "images": true,
+      "successes": true,
+      "mean_iou": true,
+      "mean_dice": true,
+      "building_images": true,
+      "building_mean_iou": true,
+      "building_mean_dice": true,
+      "plane_images": true,
+      "plane_mean_iou": true,
+      "plane_mean_dice": true
+    },
+    "metrics": {
+      "images": 20,
+      "successes": 20,
+      "mean_iou": 0.255352573372817,
+      "mean_dice": 0.3697820672102867,
+      "mean_service_inference_ms": 313.3825,
+      "median_service_inference_ms": 267.64
+    },
+    "by_class": {
+      "building": {
+        "images": 10,
+        "successes": 10,
+        "mean_iou": 0.35223397579445986,
+        "mean_dice": 0.5114964213020148,
+        "mean_service_inference_ms": 262.107,
+        "median_service_inference_ms": 236.48000000000002
+      },
+      "plane": {
+        "images": 10,
+        "successes": 10,
+        "mean_iou": 0.1584711709511742,
+        "mean_dice": 0.22806771311855864,
+        "mean_service_inference_ms": 364.658,
+        "median_service_inference_ms": 346.49
+      }
+    },
+    "protocol_version": "sam-eval-v1.0",
+    "dataset_manifest_sha256": "5b5339814a2c83c4b87ec026fa46fe8ff67cf6b534554c24ac8d21e421456241",
+    "checkpoint_sha256": "f85dfa044a527f096b9e41eacfe298040d52e77fca642f46dfe1226745e137e7"
+  },
+  "remotesam_aircraft_improvement": {
+    "verified": true,
+    "checks": {
+      "rows": true,
+      "experiments": true,
+      "ten_images_per_experiment": true,
+      "same_image_set": true,
+      "row_formulas_and_contract": true,
+      "best_experiment": true,
+      "best_mean_iou": true,
+      "best_mean_dice": true,
+      "best_service_time": true,
+      "best_client_time": true,
+      "best_request_count": true,
+      "absolute_gain": true,
+      "target_met": true
+    },
+    "baseline_mean_iou": 0.1584711709511742,
+    "best_experiment_id": "tile_1024_overlap_256_p0_88",
+    "best": {
+      "images": 10,
+      "successes": 10,
+      "mean_iou": 0.3055661981202589,
+      "mean_dice": 0.4132893733561945,
+      "mean_service_inference_ms": 5658.794,
+      "mean_client_wall_ms": 12388.663,
+      "total_requests": 237
+    },
+    "absolute_iou_gain": 0.14709502716908474,
+    "relative_iou_gain": 0.9282131651214056,
+    "selection_boundary": "The best configuration was selected on these same 10 diagnostic images; the improvement is not an independent generalization estimate."
+  },
+  "evidence_boundaries": {
+    "end_to_end_precision": "not measured by these separate evaluations",
+    "user_study": "not completed",
+    "workflow_comparison": "not completed"
+  }
+}

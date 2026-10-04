@@ -117,6 +117,17 @@ class ResearchEvidenceTests(unittest.TestCase):
         self.assertEqual(result.tool_call.arguments['image_path'],str(Path('bound.png').resolve()))
         self.assertEqual(parse_decision(raw,'bound.png',set()).status,'rejected_tool')
 
+    def test_roi_cannot_silently_intersect_inherited_half(self):
+        first=server.run_task(self.session,{'query':'提取右侧建筑','mode':'demo'})
+        roi={'xyxy':[80,50,280,250],'source':'drawn','image_size':[800,600]}
+        rejected=server.run_task(self.session,{'query':'提取框选区域内的建筑','mode':'demo',
+                                             'parent_run_id':first['id'],'roi':roi})
+        self.assertEqual(rejected['status'],'failed')
+        self.assertNotIn('mask_url',rejected)
+        accepted=server.run_task(self.session,{'query':'提取框选区域内的建筑','mode':'demo',
+                                             'parent_run_id':first['id'],'roi':roi,'scope':'all'})
+        self.assertEqual(accepted['metrics']['pixel_area'],12850)
+
 
 if __name__=='__main__':
     unittest.main()

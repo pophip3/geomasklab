@@ -1,0 +1,11 @@
+{
+  "recorded_on": "2026-10-04",
+  "source": "Direct instruction from the human user in this Codex conversation",
+  "user_owned_competition_code_publication": "authorized",
+  "required_transformation": "modify and prepare a separate research software version rather than publishing an unchanged competition copy",
+  "original_competition_repository_changes": "not authorized; preserve unchanged",
+  "research_repository": "https://github.com/pophip3/geoscope-softwarex",
+  "formal_open_source_license": "not specified by this authorization",
+  "third_party_code_weights_and_data": "authorization does not replace their applicable licenses",
+  "journal_submission_author_approval_and_payments": "not established by this code-publication authorization"
+}

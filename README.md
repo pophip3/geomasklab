@@ -2,8 +2,9 @@
 
 Private research preview, version **0.8.0-research.1**. This repository is separate
 from the competition repository. It is not a submitted manuscript or an approved
-open-source release. Rights-holder approval and independent model validation are
-still required before public release.
+open-source release. The user has authorized publication of their competition
+code in a modified research version. The original competition repository stays
+unchanged. Formal licensing and independent model validation remain unfinished.
 
 GeoScope Workbench records bounded image-segmentation experiments: a language
 planner proposes one allowed action; a deterministic executor binds the image,
@@ -29,6 +30,9 @@ and English task text; most interface labels are Chinese.
 
 ```sh
 python -m unittest discover -s tests -p "test_*.py" -q
+python evaluation/run_integrity_matrix.py
+python evaluation/recompute_historical.py
+python examples/reproduce_example.py
 python export_bundle.py path/to/export.zip
 ```
 
@@ -76,3 +80,17 @@ imagery and team coordination documents are excluded. `planner_protocol.py`,
 See `Licence.txt` for the unresolved release licensing status. A SoftwareX
 submission requires a legally approved license and a stable accessible release;
 this private preview is preparation toward those requirements.
+
+## Publication preparation documents
+
+- [Changes from the competition version](docs/research_changes_zh.md)
+- [Publication direction and contribution boundaries](docs/publication_strategy_zh.md)
+- [Related software and literature reading records](docs/literature_review.md)
+- [Independent real-service evaluation protocol](docs/independent_validation_protocol.md)
+- [Submission status and remaining requirements](docs/submission_checklist_zh.md)
+- [Publication authorization record](docs/release_authorization.json)
+
+The integrity matrix uses simulated planner and mask transports. The example
+bundles use procedural fixture masks. These checks demonstrate software
+consistency; they do not constitute a real-model application study. Historical
+results are accompanied by the original commit and curated-file hashes.
