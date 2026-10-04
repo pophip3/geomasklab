@@ -51,6 +51,11 @@ or one `<answer>` block. The mask endpoint implements the documented GeoScope JS
 contract. External service deployments and model licenses must be checked
 separately. Health checks do not establish inference quality.
 
+The local research deployment passed fresh end-to-end model inference and export
+verification on a development image on 2026-10-04. See
+[model service configuration](docs/model_service_setup_zh.md) for the deployment
+and acceptance record. This is not independent segmentation accuracy validation.
+
 Your uploaded image is sent to the configured services in live mode. Credentials
 stay on the Python server and must not be committed. The server binds to loopback
 by default and is intended for a trusted local research environment. It does not
