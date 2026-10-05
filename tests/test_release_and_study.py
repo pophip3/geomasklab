@@ -4,6 +4,7 @@ All response rows here are fictional unit-test fixtures, never study observation
 """
 import csv
 import json
+import hashlib
 from pathlib import Path
 import tempfile
 import unittest
@@ -12,6 +13,11 @@ from release.prepare_metadata import metadata
 
 
 class ReleaseAndStudy(unittest.TestCase):
+    def test_archived_model_manifest_retains_its_prospectively_locked_bytes(self):
+        folder=Path(__file__).resolve().parents[1]/'evaluation/supplementary/remote-model'
+        lock=json.loads((folder/'data-lock.json').read_text(encoding='utf-8'))
+        self.assertEqual(hashlib.sha256((folder/'manifest.csv').read_bytes()).hexdigest(),lock['manifest_sha256'])
+
     def test_release_metadata_requires_confirmed_creators_and_valid_orcid(self):
         with self.assertRaises(ValueError):metadata({'confirmed':False,'creators':[]},'1.0.0')
         fixture={'confirmed':True,'release_date':'2026-10-05','creators':[{'given_names':'Fictional','family_names':'Unit Test'}]}
