@@ -22,7 +22,7 @@
   "files": {
     "image.png": "86b22df1e4276a5c2445f83fbe3904beb3fb712490204581ac5f5fedc96e4d79",
     "mask.png": "d583cb1f74ccd9141499547cbacef250aa528ef98f42f50873887fee45fb9ee7",
-    "mask.png.provider.json": "bd424a5470363e39af176a43ef1da6dc6323c41de3980db2ca301d231e9ab343"
+    "mask.png.provider.json": "c213ceb4e37630b191a48b50e41537b6eb0372d18d167f960b78b3c96b4369f3"
   },
   "georeferenced": false,
   "mask_status": "Precomputed RGB color-contrast baseline; not human annotation or tree ground truth.",
