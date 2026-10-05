@@ -20,7 +20,7 @@ def main():
         session=server.SESSIONS[sid]
         jobs=[('whole','Extract buildings in the whole image.',{}),('right','Extract buildings in the right half.',{}),
               ('left','Extract buildings in the left half.',{}),('roi','Extract buildings in the selected region.',
-               {'roi':{'xyxy':[80,50,280,250],'source':'drawn','image_size':[800,600]}})]
+               {'scope':'all','roi':{'xyxy':[80,50,280,250],'source':'drawn','image_size':[800,600]}})]
         expected={'whole':75350,'right':37350,'left':38000,'roi':12850}
         parent=None
         for label,query,options in jobs:

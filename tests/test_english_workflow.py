@@ -55,6 +55,20 @@ class EnglishWorkflowTests(unittest.TestCase):
                 if name.endswith(('.json', '.md')):
                     self.assert_english(archive.read(name).decode('utf-8'))
 
+    def test_roi_followup_resolves_inherited_half_explicitly(self):
+        right = self.run_task('Extract buildings in the right half.')
+        roi = {'xyxy': [80, 50, 280, 250], 'source': 'drawn', 'image_size': [800, 600]}
+        conflict = self.run_task('Extract buildings in the selected region.',
+                                 parent_run_id=right['id'], roi=roi)
+        self.assertEqual(conflict['status'], 'failed')
+        self.assertNotIn('mask_url', conflict)
+        self.assertEqual(right['metrics']['pixel_area'], 37350)
+        result = self.run_task('Extract buildings in the selected region.',
+                               parent_run_id=right['id'], roi=roi, scope='all')
+        self.assertEqual(result['metrics']['pixel_area'], 12850)
+        self.assertEqual(result['parent_run_id'], right['id'])
+        self.assertEqual(result['metrics']['scope_area_pixels'], 40000)
+
     def test_english_complement_and_positive_override(self):
         complement = self.run_task('Extract non-buildings in the right half.')
         self.assertTrue(complement['task']['invert'])

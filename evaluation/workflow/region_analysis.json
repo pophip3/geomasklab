@@ -1,7 +1,7 @@
 {
   "schema": "geoscope-region-study/1.0",
-  "software_version": "0.9.0-dev.3",
-  "source_bundle_sha256": "3ce2dbf444602c8191d22b373bd9cf41ba56d4074c262b5b39cad07989bf151c",
+  "software_version": "1.0.0-rc.1",
+  "source_bundle_sha256": "de40fceb7bb2fba297272da3bf94e0cff5b2736df4dec5818c6c5158e172947b",
   "source_mode": "demo",
   "passed": true,
   "cases": [

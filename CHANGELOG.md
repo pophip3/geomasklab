@@ -9,7 +9,7 @@ artifact; it does not imply journal submission, acceptance or a permanent DOI.
 - Converted application controls, generated messages/reports and reviewer examples
   to English; retained multilingual input compatibility and original imported records.
 - Extracted task grammar and report generation into focused modules.
-- Added six English end-to-end acceptance cases, including actual complement intent,
+- Added seven English end-to-end acceptance cases, including actual complement intent,
   positive override, scope follow-ups, strict export routing and exported text checks.
 - Added a standard MIT license, third-party notices, API/developer/service guides,
   contribution/security guidance, an ordered submission checklist and archive drafts.

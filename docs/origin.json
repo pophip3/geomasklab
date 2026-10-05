@@ -2,7 +2,7 @@
   "competition_repository": "https://github.com/SitianGao/geoscope",
   "competition_commit": "df802ab54b8f4ee496ca83c104bfaee44f7ee888",
   "research_repository": "https://github.com/pophip3/geoscope-softwarex",
-  "visibility": "private",
+  "visibility": "public",
   "selected_files": [
     "server.py",
     "agent_bridge.py",
@@ -35,5 +35,6 @@
   "license_selected": "MIT",
   "license_selection_basis": "User authorized public release of their modified code, required a standard root open-source license, and requested completion of all release materials without further questions.",
   "individual_creator_metadata": "not yet confirmed; no author identities or order inferred",
-  "third_party_approval_claimed": false
+  "third_party_approval_claimed": false,
+  "public_visibility_verified_on": "2026-10-05"
 }
