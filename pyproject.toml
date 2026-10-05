@@ -21,14 +21,15 @@ classifiers = [
 geomasklab = "geomasklab.cli:main"
 
 [project.urls]
-Documentation = "https://pophip3.github.io/remote-sensing-workbench-docs/"
-Repository = "https://github.com/pophip3/geoscope-softwarex"
-Issues = "https://github.com/pophip3/geoscope-softwarex/issues"
+Documentation = "https://pophip3.github.io/geomasklab/"
+Repository = "https://github.com/pophip3/geomasklab"
+Issues = "https://github.com/pophip3/geomasklab/issues"
 
 [project.optional-dependencies]
 schema = ["jsonschema>=4.18,<5"]
 geo = ["rasterio>=1.3,<2", "pyproj>=3.6,<4"]
 interop = ["prov>=2,<3"]
+signing = ["cryptography>=42,<47"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

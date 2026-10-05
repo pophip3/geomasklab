@@ -22,9 +22,9 @@ GeoMaskLab applies these delivery principles to its smaller Python application:
 | `quickstart.py` | Local server entry point with port diagnostics |
 | `requirements.txt`, `requirements-reviewer.txt` | Minimal dependency range and pinned reviewer environment |
 | `.env.example`, `docs/model_services.md` | Placeholder-only configuration and service contracts; credentials/weights excluded |
-| `web/help.html` | Complete local English user guide, independent of network assets |
+| `workbench/web/help.html` | Complete local English user guide, independent of network assets |
 | `docs/api.md`, `docs/architecture.md` | API and implementation documentation |
-| `fixtures.py`, `reviewer_demo.py`, `examples/` | Procedural fixtures, exact checks and executable examples |
+| `workbench/fixtures.py`, `reviewer_demo.py`, `examples/` | Procedural fixtures, exact checks and executable examples |
 | `tests/`, `.github/workflows/` | Contract/HTTP checks and cross-platform CI |
 | `LICENSE`, `Licence.txt`, `THIRD_PARTY_NOTICES.md` | MIT source license, origin and external dependency boundaries |
 | `release/build_source.py`, `release/check_distribution.py` | Fixed-commit archive, file hashes and extracted-package acceptance |

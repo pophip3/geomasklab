@@ -40,3 +40,14 @@ dataset human annotations. Raw images/labels remain outside this source release;
 download them from their authoritative providers subject to their dataset terms.
 Numerical results are retained with their frozen protocol and source identity.
 MIT licensing of the workbench does not relicense those datasets or annotations.
+
+## NAIP example and optional signing
+
+The Denver chip is USDA NAIP distributed by USGS The National Map, catalog tile
+`m_3910417_nw_13_060_20190803` (2019). Its public-domain provenance, service export,
+coordinate transformation and separate imagery terms are recorded under
+`examples/data/naip-denver/`. Credit USDA-FSA-APFO / USGS The National Map.
+
+The optional signing extra uses Cryptography's Ed25519 implementation under its
+upstream Apache-2.0/BSD terms. GeoMaskLab includes no upstream cryptography source
+or bundled private signing keys. Key ownership and trust remain external decisions.

@@ -13,9 +13,9 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from PIL import Image, ImageDraw
-import server
-from export_bundle import build_bundle, load_verified_bundle
-from reference_evaluation import evaluate_reference, evaluation_packet, verify_reference_packet
+from workbench import server
+from workbench.export_bundle import build_bundle, load_verified_bundle
+from workbench.reference_evaluation import evaluate_reference, evaluation_packet, verify_reference_packet
 
 
 def encoded(image):

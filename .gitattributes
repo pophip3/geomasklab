@@ -6,10 +6,12 @@
 *.html text eol=lf
 *.md text eol=lf
 *.json text eol=lf
+*.geojson text eol=lf
+examples/data/**/*.tif binary
 *.yml text eol=lf
 *.sh text eol=lf
 *.cmd text eol=crlf
 evaluation/historical/*.csv text eol=lf
 
 # Frozen application receipts preserve their recorded byte hashes.
-evaluation/independent/manifest.csv -text
+evaluation/supplementary/remote-model/manifest.csv -text

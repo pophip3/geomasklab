@@ -1,0 +1,6 @@
+{
+  "confirmed": false,
+  "release_date": null,
+  "creators": [],
+  "instructions": "Supply confirmed software creators, not inferred manuscript authors. Each creator needs given_names, family_names and optional affiliation/orcid. Confirm their order and attribution before setting confirmed=true. No creator facts have been invented."
+}

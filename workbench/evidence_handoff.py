@@ -4,7 +4,7 @@ import json
 import math
 import re
 from copy import deepcopy
-from export_bundle import load_verified_bundle
+from workbench.export_bundle import load_verified_bundle
 
 MAX_IMPORT_BYTES = 12 * 1024 * 1024
 

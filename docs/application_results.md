@@ -72,7 +72,7 @@ official multiclass ignore-background evaluation and instance AP. Missing source
 annotations may affect apparent false-positive counts. Image bootstrap intervals
 are exploratory descriptions, not proof of unseen-scene generalization.
 
-[Frozen metadata and numerical artifacts](../evaluation/independent/README.md)
+[Frozen metadata and numerical artifacts](../evaluation/supplementary/remote-model/README.md)
 contain the manifest, model/data locks, request metrics, summary, independent
 score audit and English numerical figures. Raw images, labels, response receipts,
 masks and evidence ZIPs remain in local validation storage; their redistribution

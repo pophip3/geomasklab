@@ -29,7 +29,7 @@ def main(argv=None):
     recalc.add_argument('--roi',type=int,nargs=4,metavar=('X1','Y1','X2','Y2'))
     create=sub.add_parser('create',help='Create evidence from an aligned external binary mask.')
     create.add_argument('--image',type=Path,required=True);create.add_argument('--mask',type=Path,required=True)
-    create.add_argument('--target',choices=['building','aircraft','road','water','tree','ship'],required=True)
+    create.add_argument('--target',required=True,help='Positive semantic label; 1-64 ASCII letters/digits/underscores/hyphens.')
     create.add_argument('--source',required=True);create.add_argument('--output',type=Path,required=True)
     create.add_argument('--provider-info',type=Path,help='Optional provider sidecar whose mask hash must match.')
     create.add_argument('--aligned',action='store_true',required=True,help='Assert alignment with the normalized displayed image.')
@@ -50,6 +50,23 @@ def main(argv=None):
     geo.add_argument('--output',type=Path,required=True)
     geocheck=sub.add_parser('verify-geospatial',help='Replay an optional GeoTIFF area-assessment packet.')
     geocheck.add_argument('packet',type=Path)
+    render=sub.add_parser('render-raster',help='Render explicit GeoTIFF RGB bands/window with recorded scaling (optional geo extra).')
+    render.add_argument('raster',type=Path);render.add_argument('--bands',type=int,nargs=3,required=True)
+    render.add_argument('--window',type=int,nargs=4,metavar=('COLUMN','ROW','WIDTH','HEIGHT'))
+    render.add_argument('--value-range',type=float,nargs=2,metavar=('LOW','HIGH'))
+    render.add_argument('--output',type=Path,required=True)
+    zones=sub.add_parser('zonal',help='Measure Polygon/MultiPolygon zones and preserve a replayable packet.')
+    zones.add_argument('bundle',type=Path);zones.add_argument('geometry',type=Path)
+    zones.add_argument('--coordinates',choices=['pixel','wgs84'],default='pixel')
+    zones.add_argument('--raster',type=Path);zones.add_argument('--output',type=Path,required=True)
+    zonecheck=sub.add_parser('verify-zonal',help='Replay polygon domains and their measurements.')
+    zonecheck.add_argument('packet',type=Path)
+    keygen=sub.add_parser('keygen',help='Create an optional local Ed25519 key pair; protect the private PEM.')
+    keygen.add_argument('--private-key',type=Path,required=True);keygen.add_argument('--public-key',type=Path,required=True)
+    sign=sub.add_parser('sign',help='Sign exact artifact bytes with a local Ed25519 private key.')
+    sign.add_argument('artifact',type=Path);sign.add_argument('--private-key',type=Path,required=True);sign.add_argument('--output',type=Path,required=True)
+    sigcheck=sub.add_parser('verify-signature',help='Verify a detached signature using a separately trusted public key.')
+    sigcheck.add_argument('artifact',type=Path);sigcheck.add_argument('signature',type=Path);sigcheck.add_argument('--trusted-key',type=Path,required=True)
     report=sub.add_parser('report',help='Render verified evidence as a standalone English HTML report.')
     report.add_argument('bundle',type=Path);report.add_argument('--output',type=Path,required=True)
     segment=sub.add_parser('segment',help='Run a local color baseline or an explicit external-command adapter.')
@@ -59,7 +76,7 @@ def main(argv=None):
     segment.add_argument('--argv-json',type=Path,help='JSON executable argument array containing {image} and {output}.')
     segment.add_argument('--timeout',type=float,default=300)
     schema=sub.add_parser('schema',help='Print a packaged JSON Schema.')
-    schema.add_argument('kind',choices=['manifest','result','statistics','geospatial'],default='manifest',nargs='?')
+    schema.add_argument('kind',choices=['manifest','result','statistics','geospatial','zonal','signature'],default='manifest',nargs='?')
     args=parser.parse_args(argv)
     try:
         if args.command=='verify':
@@ -99,6 +116,39 @@ def main(argv=None):
         elif args.command=='verify-geospatial':
             from .geospatial import verify_geospatial_packet
             out=verify_geospatial_packet(args.packet.read_bytes())
+        elif args.command=='render-raster':
+            from .raster_input import render_raster
+            image,raster,out=render_raster(args.raster,bands=args.bands,window=args.window,value_range=args.value_range)
+            write(args.output/'image.png',image);write(args.output/'source.tif',raster)
+            write(args.output/'rendering.json',json.dumps(out,indent=2).encode())
+            out={'output':str(args.output),**out}
+        elif args.command=='zonal':
+            from .zonal import zonal_packet,verify_zonal_packet
+            raw=zonal_packet(args.bundle.read_bytes(),args.geometry.read_bytes(),coordinates=args.coordinates,
+                raster=args.raster.read_bytes() if args.raster else None)
+            out=verify_zonal_packet(raw);write(args.output,raw);out['output']=str(args.output)
+        elif args.command=='verify-zonal':
+            from .zonal import verify_zonal_packet
+            out=verify_zonal_packet(args.packet.read_bytes())
+        elif args.command=='keygen':
+            from .signing import generate_keys
+            if args.private_key.resolve()==args.public_key.resolve():raise ValueError('Private and public key paths must differ.')
+            if args.private_key.exists() or args.public_key.exists():raise ValueError('Key generation will not overwrite existing files.')
+            private,public=generate_keys()
+            args.private_key.parent.mkdir(parents=True,exist_ok=True)
+            import os
+            descriptor=os.open(args.private_key,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+            with os.fdopen(descriptor,'wb') as output:output.write(private)
+            args.public_key.parent.mkdir(parents=True,exist_ok=True)
+            with args.public_key.open('xb') as output:output.write(public)
+            out={'public_key':str(args.public_key),'private_key':str(args.private_key),'notice':'Protect the unencrypted private PEM. Exchange and trust the public key through a separate channel.'}
+        elif args.command=='sign':
+            from .signing import sign_payload
+            out=sign_payload(args.artifact.read_bytes(),args.private_key.read_bytes())
+            write(args.output,json.dumps(out,indent=2).encode());out={'output':str(args.output),'artifact_sha256':out['artifact_sha256']}
+        elif args.command=='verify-signature':
+            from .signing import verify_signature
+            out=verify_signature(args.artifact.read_bytes(),json.loads(args.signature.read_text(encoding='utf-8')),args.trusted_key.read_bytes())
         elif args.command=='report':
             from .report import build_report
             write(args.output,build_report(args.bundle.read_bytes()).encode('utf-8'))

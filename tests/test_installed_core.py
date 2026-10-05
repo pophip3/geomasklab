@@ -1,5 +1,6 @@
 """Headless core, provider contracts and safe standalone report boundaries."""
 import io
+import importlib.util
 import json
 from pathlib import Path
 import sys
@@ -41,6 +42,7 @@ class HeadlessCore(unittest.TestCase):
         result=json.loads(files['result.json'])
         self.assertFalse(result['inference_performed'])
 
+    @unittest.skipUnless(importlib.util.find_spec('jsonschema'), 'Optional schema extra not installed')
     def test_packaged_schemas_validate_new_and_derived_metadata(self):
         import zipfile
         for bundle in (self.bundle,recalculate_evidence(self.bundle,scope='bottom')):
@@ -62,6 +64,7 @@ class HeadlessCore(unittest.TestCase):
         files['result.json']=json.dumps(result).encode()
         with self.assertRaises(ValueError):build_report(bundle_contents(files))
 
+    @unittest.skipUnless(importlib.util.find_spec('jsonschema'), 'Optional schema extra not installed')
     def test_schema_catches_invalid_metadata_type(self):
         import zipfile
         _,files=load_verified_bundle(self.bundle)
@@ -78,6 +81,13 @@ class HeadlessCore(unittest.TestCase):
         self.assertEqual(json.loads(files['result.json'])['external_mask']['provider'],product.metadata)
         with self.assertRaisesRegex(ValueError,'identity'):
             create_evidence(self.image,self.mask,target='tree',source='Mismatch',aligned=True,provider_info=product.metadata)
+
+    def test_headless_labels_are_independent_of_workbench_categories(self):
+        bundle=create_evidence(self.image,self.mask,target='solar_panel',source='External solar-panel mask',aligned=True)
+        _,files=load_verified_bundle(recalculate_evidence(bundle,scope='right'))
+        self.assertEqual(json.loads(files['result.json'])['task']['target'],'solar_panel')
+        for target in ('','9bad','label with spaces','x'*65):
+            with self.assertRaises(ValueError):create_evidence(self.image,self.mask,target=target,source='Invalid label',aligned=True)
 
 
 class Providers(unittest.TestCase):

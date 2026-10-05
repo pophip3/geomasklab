@@ -8,9 +8,9 @@ from unittest.mock import patch
 import zipfile
 
 from PIL import Image
-import server
-from export_bundle import build_bundle, verify_bundle
-from planner_protocol import parse_decision
+from workbench import server
+from workbench.export_bundle import build_bundle, verify_bundle
+from workbench.planner_protocol import parse_decision
 
 
 class ResearchEvidenceTests(unittest.TestCase):

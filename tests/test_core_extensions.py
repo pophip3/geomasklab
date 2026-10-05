@@ -73,8 +73,13 @@ class Geospatial(unittest.TestCase):
         self.assertEqual(record['measurements']['whole_image_area_m2'],8.75)
         self.assertFalse(record['area_model']['ground_area_corrected'])
         self.assertTrue(verify_geospatial_packet(geospatial_packet(child,raster))['verified'])
+
+    @unittest.skipUnless(importlib.util.find_spec('jsonschema'), 'Optional schema extra not installed')
+    def test_geospatial_metadata_schema(self):
         from importlib.resources import files
         from jsonschema import Draft202012Validator
+        bundle,raster=self.fixture()
+        record,_=measure_geospatial(bundle,raster)
         schema=json.loads(files('geomasklab').joinpath('schemas','geospatial-1.0.schema.json').read_text())
         Draft202012Validator(schema).validate(record)
 
@@ -191,6 +196,44 @@ class Geospatial(unittest.TestCase):
                     output.write(array)
             raw=memory.read()
         with self.assertRaisesRegex(ValueError,'stored affine'):measure_geospatial(bundle,raw)
+
+    def test_row_geodesic_matches_per_pixel_oracle_above_old_limit(self):
+        from affine import Affine
+        from pyproj import Geod
+        bundle,raster=self.fixture(crs='EPSG:4326',transform=Affine(.001,0,-105,0,-.001,40),width=1000,height=501)
+        record,_=measure_geospatial(bundle,raster,method='geodesic')
+        self.assertEqual(record['measurements']['whole_image_pixels'],501000)
+        self.assertGreater(record['measurements']['whole_image_area_m2'],0)
+        small,raster=self.fixture(crs='EPSG:4326',transform=Affine(.001,0,-105,0,-.001,40),width=7,height=5)
+        measured,_=measure_geospatial(small,raster,method='geodesic')
+        import math
+        geod=Geod(ellps='WGS84')
+        direct=math.fsum(abs(geod.polygon_area_perimeter(
+            [-105+x*.001,-105+(x+1)*.001,-105+(x+1)*.001,-105+x*.001],
+            [40-y*.001,40-y*.001,40-(y+1)*.001,40-(y+1)*.001])[0]) for y in range(5) for x in range(7))
+        self.assertTrue(math.isclose(measured['measurements']['whole_image_area_m2'],direct,rel_tol=1e-9))
+
+    def test_explicit_high_bit_depth_multiband_window_rendering(self):
+        import numpy as np
+        import rasterio
+        import tempfile
+        from pathlib import Path
+        from affine import Affine
+        from geomasklab.raster_input import render_raster
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/'four-band.tif'
+            values=np.stack([np.full((5,7),v,dtype='uint16') for v in (0,500,1000,1200)])
+            transform=Affine(.5,0,500000,0,-.5,3950000)
+            with rasterio.open(path,'w',driver='GTiff',width=7,height=5,count=4,dtype='uint16',crs='EPSG:32654',transform=transform) as output:
+                output.write(values)
+            with self.assertRaisesRegex(ValueError,'explicit'):render_raster(path,bands=[1,2,3])
+            image,raster,metadata=render_raster(path,bands=[3,2,1],window=[1,1,3,2],value_range=[0,1000])
+            with Image.open(io.BytesIO(image)) as rendered:
+                self.assertEqual(rendered.size,(3,2));self.assertEqual(rendered.getpixel((0,0)),(255,128,0))
+            self.assertEqual(metadata['transform'],[.5,0,500000.5,0,-.5,3949999.5])
+            self.assertFalse(metadata['resampling_performed'])
+            with self.assertRaisesRegex(ValueError,'inside'):render_raster(path,bands=[1,2,3],window=[0,0,8,5],value_range=[0,1000])
+            with self.assertRaisesRegex(ValueError,'band index'):render_raster(path,bands=[1,2,5],value_range=[0,1000])
 
 
 if __name__=='__main__':unittest.main()

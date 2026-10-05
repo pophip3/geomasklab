@@ -9,9 +9,8 @@ import time
 import uuid
 from PIL import Image, ImageOps
 from ._version import VERSION
-from .contract import TARGET_CAPABILITIES
 from .evidence import bundle_contents, load_verified_bundle
-from .masks import binary_png, source_text, MAX_MASK_BYTES
+from .masks import binary_png, source_text, MAX_IMAGE_BYTES, MAX_MASK_PIXELS
 from .measurements import constrain, statistics
 from .regions import validate_region, prepare_analysis, region_report
 from .review import initial_review
@@ -33,14 +32,15 @@ def create_evidence(image_bytes, mask_bytes, *, target, source, aligned, scope='
     """
     start=time.perf_counter();source=source_text(source)
     if aligned is not True:raise ValueError('Confirm pixel alignment with the normalized image.')
-    if not isinstance(target,str) or target not in TARGET_CAPABILITIES:raise ValueError('Choose a supported semantic target.')
+    if not isinstance(target,str) or not re.fullmatch(r'[A-Za-z][A-Za-z0-9_-]{0,63}',target):
+        raise ValueError('Target must be an ASCII label of 1 to 64 letters, digits, underscores or hyphens, starting with a letter.')
     for value in (session_id,run_id,parent_run_id):
         if value is not None and (not isinstance(value,str) or not re.fullmatch(r'[a-f0-9]{12}',value)):
             raise ValueError('Result/session identifiers must contain 12 lowercase hexadecimal characters.')
     if type(version) is not int or version<1:raise ValueError('Result version must be a positive integer.')
-    if not image_bytes or len(image_bytes)>MAX_MASK_BYTES:raise ValueError('Images must be 12 MB or smaller.')
+    if not image_bytes or len(image_bytes)>MAX_IMAGE_BYTES:raise ValueError('Headless images must be 48 MB or smaller.')
     with Image.open(io.BytesIO(image_bytes)) as raw:
-        if raw.width*raw.height>16_000_000:raise ValueError('Images must contain no more than 16 million pixels.')
+        if raw.width*raw.height>MAX_MASK_PIXELS:raise ValueError('Headless images must contain no more than 64 million pixels.')
         if getattr(raw,'n_frames',1)!=1:raise ValueError('Use a single-frame image.')
         preserve=raw.format=='PNG' and raw.mode=='RGB' and raw.getexif().get(274,1)==1
         image=ImageOps.exif_transpose(raw).convert('RGB')

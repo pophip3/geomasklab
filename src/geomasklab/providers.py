@@ -14,7 +14,7 @@ import tempfile
 from typing import Protocol
 
 from PIL import Image, ImageOps
-from .masks import binary_png, MAX_MASK_BYTES
+from .masks import binary_png, MAX_MASK_BYTES, MAX_IMAGE_BYTES, MAX_MASK_PIXELS
 
 
 @dataclass(frozen=True)
@@ -30,11 +30,11 @@ class MaskProvider(Protocol):
 
 def normalized_image(image_bytes):
     """Use the same displayed orientation as external-mask evidence creation."""
-    if not image_bytes or len(image_bytes) > MAX_MASK_BYTES:
-        raise ValueError('Images must be 12 MB or smaller.')
+    if not image_bytes or len(image_bytes) > MAX_IMAGE_BYTES:
+        raise ValueError('Headless images must be 48 MB or smaller.')
     with Image.open(io.BytesIO(image_bytes)) as raw:
-        if raw.width * raw.height > 16_000_000 or getattr(raw, 'n_frames', 1) != 1:
-            raise ValueError('Use a single image containing no more than 16 million pixels.')
+        if raw.width * raw.height > MAX_MASK_PIXELS or getattr(raw, 'n_frames', 1) != 1:
+            raise ValueError('Use a single image containing no more than 64 million pixels.')
         return ImageOps.exif_transpose(raw).convert('RGB')
 
 
@@ -123,7 +123,7 @@ class CommandProvider:
             if process.returncode:
                 raise ValueError(f'External mask command exited with code {process.returncode}.')
             if not output_path.is_file() or output_path.stat().st_size > MAX_MASK_BYTES:
-                raise ValueError('External command must create a fresh binary PNG of at most 12 MB.')
+                raise ValueError('External command must create a fresh binary PNG of at most 32 MB.')
             source = output_path.read_bytes()
             mask = encode_png(binary_png(source, image.size))
         return MaskProduct(mask, {

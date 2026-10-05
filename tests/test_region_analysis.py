@@ -10,9 +10,9 @@ from http.server import ThreadingHTTPServer
 from pathlib import Path
 from unittest.mock import patch
 from PIL import Image
-import server
-from export_bundle import build_bundle, verify_bundle
-from pixel_geometry import scope_area_pixels
+from workbench import server
+from workbench.export_bundle import build_bundle, verify_bundle
+from workbench.pixel_geometry import scope_area_pixels
 from test_evidence_handoff import rewrite_bundle
 
 

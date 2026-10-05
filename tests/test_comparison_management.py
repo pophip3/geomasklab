@@ -11,10 +11,10 @@ import urllib.request
 from unittest.mock import patch
 from http.server import ThreadingHTTPServer
 from PIL import Image
-import server
-from export_bundle import build_bundle
-from experiment_management import ledger_csv, metadata_changes
-from result_comparison import compare_bundles
+from workbench import server
+from workbench.export_bundle import build_bundle
+from workbench.experiment_management import ledger_csv, metadata_changes
+from workbench.result_comparison import compare_bundles
 
 
 class ComparisonManagementTests(unittest.TestCase):

@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-import server
-from export_bundle import build_bundle,verify_bundle
+from workbench import server
+from workbench.export_bundle import build_bundle,verify_bundle
 
 
 def main():

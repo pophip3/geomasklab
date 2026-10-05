@@ -7,7 +7,7 @@ from importlib.metadata import distribution
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from xml.sax.saxutils import escape
-from export_bundle import load_verified_bundle
+from workbench.export_bundle import load_verified_bundle
 
 
 def official_brush():

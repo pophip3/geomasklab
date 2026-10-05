@@ -11,8 +11,8 @@ from unittest.mock import patch
 from PIL import Image, ImageOps
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-import server
-from export_bundle import build_bundle, load_verified_bundle
+from workbench import server
+from workbench.export_bundle import build_bundle, load_verified_bundle
 
 
 def main():

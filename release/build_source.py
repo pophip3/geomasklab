@@ -15,11 +15,11 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'requirements.txt', 'requirements-reviewer.txt', '.env.example',
-            'quickstart.py', 'reviewer_demo.py', 'fixtures.py', 'web/index.html',
-            'docs/reviewer_quickstart.md', 'docs/model_services.md', 'web/help.html',
-            'bin/geomasklab.cmd', 'bin/geomasklab.sh', 'mask_inputs.py',
-            'reference_evaluation.py', 'examples/reference_workflow.py',
-            'web/mask-tools.js', 'web/mask-tools.css', 'pyproject.toml',
+            'quickstart.py', 'reviewer_demo.py', 'workbench/fixtures.py', 'workbench/web/index.html',
+            'docs/reviewer_quickstart.md', 'docs/model_services.md', 'workbench/web/help.html',
+            'bin/geomasklab.cmd', 'bin/geomasklab.sh', 'workbench/mask_inputs.py',
+            'workbench/reference_evaluation.py', 'examples/reference_workflow.py',
+            'workbench/web/mask-tools.js', 'workbench/web/mask-tools.css', 'pyproject.toml',
             'src/geomasklab/api.py', 'src/geomasklab/cli.py', 'src/geomasklab/_version.py',
             'src/geomasklab/schemas/manifest-1.0.schema.json',
             'src/geomasklab/schemas/result-1.0.schema.json',
@@ -27,7 +27,12 @@ REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'examples/real_image_handoff.py', 'examples/data/san-francisco-bay/provenance.json',
             'src/geomasklab/provenance.py', 'src/geomasklab/geospatial.py',
             'src/geomasklab/schemas/geospatial-1.0.schema.json', 'examples/geospatial_workflow.py',
-            'docs/provenance_mapping.md', 'docs/geospatial_assessment.md')
+            'docs/provenance_mapping.md', 'docs/geospatial_assessment.md',
+            'src/geomasklab/zonal.py', 'src/geomasklab/signing.py',
+            'src/geomasklab/raster_input.py', 'docs/zonal_statistics.md', 'docs/signatures.md',
+            'docs/raster_inputs.md', 'examples/naip_zonal_workflow.py',
+            'examples/data/naip-denver/source.tif', 'examples/data/naip-denver/provenance.json',
+            'examples/prepare_handoff_study.py', 'evaluation/analyze_handoff_study.py')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
                    'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist'}
 FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip', '.whl'}

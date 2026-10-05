@@ -3,8 +3,8 @@
 GeoMaskLab's reusable core is `src/geomasklab`. It requires Python 3.10+ and
 Pillow; it imports no browser server, network client, GPU runtime or model.
 The source browser workbench calls the same measurement and external-mask
-creation functions. Root modules remain compatibility entry points for older
-scripts and examples.
+creation functions. Browser routes and legacy adapters live under `workbench/`; the source root
+retains only launch/demo entry points and the local-package bootstrap.
 
 ## Install and use
 
@@ -48,8 +48,9 @@ file integrity, source-mask normalization, spatial replay and measurement checks
 Verification detects corruption and inconsistent records, including changed
 numbers with regenerated hashes. A completely self-consistent replacement bundle
 can still pass. SHA-256 does not establish authorship, authenticity or semantic
-accuracy. Signed evidence and the incompatible supplied MEP 2.0 format have not
-been adopted into this release.
+accuracy. Optional detached Ed25519 signatures bind exact artifact bytes to a separately
+trusted key. See [the trust contract](signatures.md). The incompatible MEP 2.0
+prototype does not replace the retained core evidence format.
 
 ## Local provider adapters
 
@@ -98,3 +99,13 @@ It never silently changes review decisions or treats a baseline mask as referenc
 [GeoTIFF area assessment](geospatial_assessment.md) uses the optional `.[geo]`
 extra (Rasterio and pyproj). Both work from verified evidence; neither changes
 the core's pixel measurements or its evidence-format identifier.
+
+[Polygon/MultiPolygon zones](zonal_statistics.md) work in pixel coordinates with
+Pillow alone, or in WGS84 coordinates with a matching projected GeoTIFF and the
+geo extra. The separate packet preserves source scope, geometry, domains and
+both denominators. `geomasklab schema zonal` exports its record contract.
+[Detached signatures](signatures.md) require the optional signing extra and a
+separately trusted public key. Export their shape with `geomasklab schema signature`.
+[Raster preparation](raster_inputs.md) records explicit bands, window and scaling
+before geospatial measurement. Headless targets are explicit ASCII labels;
+the browser retains its six category selectors.

@@ -11,21 +11,22 @@ pretending to perform neural inference.
 | `src/geomasklab/api.py`, `measurements.py`, `geometry.py` | Pure evidence creation, explicit domains and deterministic pixel measurements |
 | `src/geomasklab/evidence.py`, `regions.py`, `review.py` | Bundle replay, saved-mask derivation and hash-bound review |
 | `src/geomasklab/provenance.py`, `geospatial.py` | Standard provenance mapping and optional matched-grid physical-area assessment |
+| `src/geomasklab/zonal.py`, `signing.py`, `raster_input.py` | Polygon-domain replay, detached trusted-key signatures and explicit raster-window rendering |
 | `src/geomasklab/providers.py` | Local RGB baseline and fresh-output executable adapter |
 | `src/geomasklab/report.py`, `cli.py`, `schemas/` | Verified standalone reports, installed commands and versioned metadata schemas |
-| `quickstart.py`, `runtime_config.py` | Startup, local settings and dependency guidance |
-| `server.py` | HTTP routing, session locks, bounded task orchestration and persistence |
-| `planner_protocol.py`, `agent_bridge.py` | Literal planner parsing, target alignment, service adapter and bounded tool feedback |
-| `task_grammar.py`, `v07_contract.py` | Explicit task intent, ROI, quality mode and batch constraints |
-| `service_transport.py` | JSON HTTP transport, proxy handling and service inspection |
-| `pixel_geometry.py` | Region denominators and eight-connected candidate measurements |
-| `region_analysis.py` | Verified saved-mask spatial analysis without inference |
-| `semantic_review.py` | Self-reported decisions bound to exact image/mask hashes |
-| `export_bundle.py`, `evidence_handoff.py` | Evidence packaging, independent validation and import |
-| `report_builder.py` | English reports from recorded fields without model-generated statistics |
-| `label_studio_export.py` | Optional official-SDK brush-prediction conversion |
-| `fixtures.py`, `reviewer_demo.py` | Procedural inputs and runnable reviewer workflow |
-| `web/` | Browser interaction, canvas display and local styles/assets |
+| `quickstart.py`, `workbench/runtime_config.py` | Startup, local settings and dependency guidance |
+| `workbench/server.py` | HTTP routing, session locks, bounded task orchestration and persistence |
+| `workbench/planner_protocol.py`, `workbench/agent_bridge.py` | Literal planner parsing, target alignment, service adapter and bounded tool feedback |
+| `workbench/task_grammar.py`, `workbench/v07_contract.py` | Explicit task intent, ROI, quality mode and batch constraints |
+| `workbench/service_transport.py` | JSON HTTP transport, proxy handling and service inspection |
+| `workbench/pixel_geometry.py` | Region denominators and eight-connected candidate measurements |
+| `workbench/region_analysis.py` | Verified saved-mask spatial analysis without inference |
+| `workbench/semantic_review.py` | Self-reported decisions bound to exact image/mask hashes |
+| `workbench/export_bundle.py`, `workbench/evidence_handoff.py` | Evidence packaging, independent validation and import |
+| `workbench/report_builder.py` | English reports from recorded fields without model-generated statistics |
+| `workbench/label_studio_export.py` | Optional official-SDK brush-prediction conversion |
+| `workbench/fixtures.py`, `reviewer_demo.py` | Procedural inputs and runnable reviewer workflow |
+| `workbench/web/` | Browser interaction, canvas display and local styles/assets |
 
 ## Execution and persistence
 
@@ -55,11 +56,11 @@ within-region fields; missing recorded values are not presented as original
 observations. Raw historical/user text is preserved. Generated interface,
 reports, errors and new examples use English.
 
-Legacy root modules delegate to the src package. The server's external-mask
+Optional workbench modules live under `workbench/`; its compatibility adapters delegate to the src package. The server's external-mask
 creation and all measurements use that same core, preventing a separate GUI
 arithmetic implementation. The wheel excludes source-only browser assets.
 
-Source modules have explicit boundaries, but `server.py` and `web/app.js` still
+Source modules have explicit boundaries, but `workbench/server.py` and `workbench/web/app.js` still
 coordinate multiple operations. Changes should be small and verified through
 behavioral tests and public API examples rather than an extensive unvalidated
 rewrite. New scientific quantities need specified units, denominators and an

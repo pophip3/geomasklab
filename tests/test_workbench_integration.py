@@ -13,9 +13,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 from PIL import Image
-import server
-from runtime_config import load_settings
-from service_transport import inspect_services, request_json
+from workbench import server
+from workbench.runtime_config import load_settings
+from workbench.service_transport import inspect_services, request_json
 
 
 class FakeModels(BaseHTTPRequestHandler):
@@ -158,7 +158,7 @@ class IntegrationTests(unittest.TestCase):
     def test_semantic_report_preserves_actual_request_and_nested_model_identity(self):
         response={'status':'success','masks':{'building':server.image_b64(Image.new('L',(11,7),255))},
                   'quality_mode':'fast','model':{'service_version':'fixture-1.2','checkpoint_sha256':'fixture-checkpoint'}}
-        with patch('agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(semantic_segmentation, "ignored.png", ["building"])'), \
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(semantic_segmentation, "ignored.png", ["building"])'), \
              patch.object(server,'post_json',return_value=response):
             result=self.run_task('提取建筑',quality_mode='fast')
         self.assertEqual(result['status'],'completed',result['message'])
@@ -172,7 +172,7 @@ class IntegrationTests(unittest.TestCase):
 
     def test_experimental_category_stays_available_and_explicitly_labelled(self):
         response={'status':'success','mask':server.image_b64(Image.new('L',(11,7),255)),'quality_mode':'fast'}
-        with patch('agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all roads")'), \
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all roads")'), \
              patch.object(server,'post_json',return_value=response):
             result=self.run_task('提取道路',quality_mode='fast')
         self.assertEqual(result['status'],'completed')
@@ -190,7 +190,7 @@ class IntegrationTests(unittest.TestCase):
         self.assertNotIn('all buildings',report)
 
     def test_new_quality_label_maps_to_existing_accurate_mode(self):
-        from v07_contract import resolve_quality
+        from workbench.v07_contract import resolve_quality
         for label in ('改成分块细化模式','use accurate mode','改成高精度模式'):
             self.assertEqual(resolve_quality(label,{},None)[:2],('accurate','accurate'))
 

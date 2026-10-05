@@ -1,6 +1,6 @@
 """Readable English reports built from persisted results, without model calls."""
 import json
-from semantic_review import initial_review
+from workbench.semantic_review import initial_review
 
 
 def build_report(session, result, target_labels, scope_labels, capabilities):
@@ -10,7 +10,7 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
     inference request, review decision or geographic measurement is inferred.
     """
     if result.get('execution_kind') == 'saved_mask_region_analysis':
-        from region_analysis import region_report
+        from workbench.region_analysis import region_report
         return region_report(session, result)
     metrics, task = result['metrics'], result['task']
     candidates = metrics['candidate_stats']

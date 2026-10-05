@@ -1,8 +1,15 @@
 # Reviewer quick start
 
-Version 1.0.0.dev7 provides an installable Pillow-only replay core and optional source workbench.
+Version 1.0.0rc1 provides an installable Pillow-only replay core and optional source workbench.
 
 ## Independent core and real-image example
+
+The primary geographic case is a credited real NAIP GeoTIFF. With the optional
+geo dependencies, run `python -m pip install ".[geo]"` followed by
+`python examples/naip_zonal_workflow.py`. It checks four polygon domains and
+nominal square-metre areas against independent Rasterio/GDAL calculations.
+See [the measured consistency table](../evaluation/geospatial/README.md).
+The following secondary example runs with Pillow alone.
 
 ```sh
 python -m pip install .
@@ -59,7 +66,7 @@ coverage are reconstructed from the recorded full mask and spatial operation.
 To verify any ZIP independently:
 
 ```sh
-python export_bundle.py reviewer-output/right.zip
+python -m workbench.export_bundle reviewer-output/right.zip
 ```
 
 `verified: true` means file integrity and deterministic pixel reconstruction

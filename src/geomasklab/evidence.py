@@ -11,8 +11,8 @@ from .review import verify_review
 from .geometry import candidate_statistics
 
 SCHEMA = 'geoscope-evidence/1.0'
-MAX_BUNDLE_BYTES = 96 * 1024 * 1024
-MAX_IMAGE_PIXELS = 16 * 1024 * 1024
+MAX_BUNDLE_BYTES = 192 * 1024 * 1024
+MAX_IMAGE_PIXELS = 64_000_000
 REQUIRED = {'original.png','full_mask.png','mask.png','overlay.png',
             'result.json','statistics.json','run_log.json'}
 

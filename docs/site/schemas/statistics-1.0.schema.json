@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:evidence:statistics:1.0",
+  "title": "GeoMaskLab pixel statistics, version 1.0",
+  "type": "object",
+  "required": [
+    "pixel_area",
+    "total_pixels",
+    "area_ratio",
+    "width",
+    "height",
+    "scope",
+    "unit",
+    "ground_area_available",
+    "roi",
+    "distribution"
+  ],
+  "properties": {
+    "pixel_area": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "total_pixels": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "area_ratio": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "scope_area_pixels": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "scope_area_ratio": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "width": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "height": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scope": {
+      "enum": [
+        "all",
+        "left",
+        "right",
+        "top",
+        "bottom"
+      ]
+    },
+    "unit": {
+      "const": "pixel"
+    },
+    "ground_area_available": {
+      "const": false
+    },
+    "roi": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "xyxy": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "source": {
+          "enum": [
+            "drawn",
+            "imported"
+          ]
+        },
+        "image_size": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      },
+      "required": [
+        "xyxy",
+        "source",
+        "image_size"
+      ]
+    },
+    "bbox_xyxy": {
+      "type": [
+        "array",
+        "null"
+      ],
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "distribution": {
+      "type": "object",
+      "required": [
+        "left_pixels",
+        "right_pixels"
+      ],
+      "properties": {
+        "left_pixels": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "right_pixels": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "candidate_stats": {
+      "type": "object",
+      "required": [
+        "candidate_count",
+        "min_area_pixels",
+        "connectivity"
+      ],
+      "properties": {
+        "candidate_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "min_area_pixels": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "connectivity": {
+          "const": 8
+        }
+      }
+    }
+  },
+  "description": "Structural validation. Ratios, scope areas and component measurements additionally require deterministic image-pixel replay. Legacy bundles may omit within-region fields."
+}

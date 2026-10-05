@@ -14,10 +14,10 @@ from PIL import Image
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-import server
-from agent_bridge import WorkbenchAgent
-from export_bundle import build_bundle,verify_bundle
-from product_contract import VERSION
+from workbench import server
+from workbench.agent_bridge import WorkbenchAgent
+from workbench.export_bundle import build_bundle,verify_bundle
+from workbench.product_contract import VERSION
 
 
 def run_matrix():

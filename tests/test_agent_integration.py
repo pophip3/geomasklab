@@ -11,9 +11,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from unittest.mock import patch
 
 from PIL import Image
-import server
-
-
+from workbench import server
 class FakeAgentAndSAM(BaseHTTPRequestHandler):
     decision = 'T_call(referring_expression_segmentation, "/not-the-current-image.png", "all buildings")'
     final = '<answer>完成。</answer>'

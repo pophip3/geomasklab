@@ -11,8 +11,8 @@ import zipfile
 from http.server import ThreadingHTTPServer
 from pathlib import Path
 from unittest.mock import patch
-import server
-from export_bundle import build_bundle, verify_bundle
+from workbench import server
+from workbench.export_bundle import build_bundle, verify_bundle
 
 
 def rewrite_bundle(bundle, mutate):

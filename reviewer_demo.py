@@ -13,10 +13,10 @@ from unittest.mock import patch
 
 def run_demo(output):
     started = time.perf_counter()
-    import server
-    from fixtures import fixture, write_assets
-    from export_bundle import build_bundle, verify_bundle
-    from product_contract import VERSION
+    from workbench import server
+    from workbench.fixtures import fixture, write_assets
+    from workbench.export_bundle import build_bundle, verify_bundle
+    from workbench.product_contract import VERSION
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
     records = []

@@ -19,9 +19,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-import server
-from export_bundle import build_bundle, verify_bundle
-from label_studio_export import convert_bundle, official_brush
+from workbench import server
+from workbench.export_bundle import build_bundle, verify_bundle
+from workbench.label_studio_export import convert_bundle, official_brush
 from reviewer_demo import run_demo
 
 

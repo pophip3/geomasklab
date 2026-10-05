@@ -15,8 +15,8 @@ from .evidence import load_verified_bundle
 from .measurements import constrain
 
 SCHEMA='geomasklab-geospatial-assessment/1.0'
-MAX_RASTER_BYTES=64*1024*1024
-MAX_PACKET_BYTES=192*1024*1024
+MAX_RASTER_BYTES=128*1024*1024
+MAX_PACKET_BYTES=384*1024*1024
 MAX_GEODESIC_PIXELS=500_000
 MEMBERS={'evidence.zip','source.tif','mask.tif','geospatial.json','manifest.json'}
 
@@ -34,7 +34,7 @@ def dependencies():
 def source_grid(raw,image):
     """Read only an embedded, bounded GeoTIFF, and verify its complete pixel grid."""
     np,rasterio,pyproj=dependencies()
-    if not raw or len(raw)>MAX_RASTER_BYTES:raise ValueError('Source GeoTIFF must be 64 MB or smaller.')
+    if not raw or len(raw)>MAX_RASTER_BYTES:raise ValueError('Source GeoTIFF must be 128 MB or smaller.')
     with Image.open(io.BytesIO(raw)) as header:
         tags=getattr(header,'tag_v2',{})
         if not (34264 in tags or (33550 in tags and 33922 in tags)):
@@ -92,12 +92,18 @@ def measure_geospatial(bundle,raster,*,method='nominal'):
         epsg=crs.to_epsg()
         if epsg not in {4326,3857} and not (epsg is not None and (32601<=epsg<=32660 or 32701<=epsg<=32760)):
             raise ValueError('Geodesic area supports EPSG:4326, EPSG:3857 and WGS84 UTM grids only.')
-        if w*h>MAX_GEODESIC_PIXELS:raise ValueError('Geodesic corner assessment is limited to 500,000 pixels; use a smaller chip.')
+        row_invariant=epsg in {4326,3857} and transform.b==0 and transform.d==0
+        if row_invariant:
+            longitude_limit=180 if epsg==4326 else 20037508.342789244
+            if any(abs(x)>longitude_limit for x in (transform.c,transform.a*w+transform.c)):
+                raise ValueError('Row-invariant grids must remain inside the unwrapped longitude domain.')
+        if not row_invariant and w*h>MAX_GEODESIC_PIXELS:
+            raise ValueError('General geodesic corner assessment is limited to 500,000 pixels; use a smaller chip or an axis-aligned EPSG:4326/3857 grid.')
         converter=pyproj.Transformer.from_crs(crs,4326,always_xy=True)
         geod=pyproj.Geod(ellps='WGS84')
         all_areas=[];region_areas=[];positive_areas=[]
         for y in range(h):
-            for x in range(w):
+            for x in range(1 if row_invariant else w):
                 corners=[(transform.a*cx+transform.b*cy+transform.c,transform.d*cx+transform.e*cy+transform.f)
                          for cx,cy in ((x,y),(x+1,y),(x+1,y+1),(x,y+1))]
                 try:
@@ -108,9 +114,20 @@ def measure_geospatial(bundle,raster,*,method='nominal'):
                     raise ValueError('Pixel corners must map to finite Earth longitude/latitude coordinates.')
                 area=abs(geod.polygon_area_perimeter(lon,lat)[0])
                 if not math.isfinite(area) or area<=0:raise ValueError('A pixel has undefined or zero geodesic area.')
-                all_areas.append(area)
-                if domain[y*w+x]:region_areas.append(area)
-                if foreground[y*w+x]:positive_areas.append(area)
+                if row_invariant:
+                    # Translation in longitude preserves ellipsoidal corner area.
+                    # Evaluate one cell per row and count exact binary pixels.
+                    far_x=transform.a*w+transform.c
+                    far_lon,_=converter.transform(far_x,transform.e*y+transform.f,errcheck=True)
+                    if not math.isfinite(far_lon) or abs(far_lon-lon[0])>=180:
+                        raise ValueError('Row-invariant geographic grids must span less than 180 degrees of longitude.')
+                    all_areas.append(area*w)
+                    region_areas.append(area*domain[y*w:(y+1)*w].count(255))
+                    positive_areas.append(area*foreground[y*w:(y+1)*w].count(255))
+                else:
+                    all_areas.append(area)
+                    if domain[y*w+x]:region_areas.append(area)
+                    if foreground[y*w+x]:positive_areas.append(area)
         image_area=math.fsum(all_areas);region_area=math.fsum(region_areas);foreground_area=math.fsum(positive_areas)
         model={'method':'wgs84_geodesic_corners','unit':'m2','ellipsoid':'WGS84','ground_area_corrected':True}
         assumptions=['Pixel corners are transformed to WGS84 with explicit XY axis order.',

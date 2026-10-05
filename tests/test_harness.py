@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-import server
+from workbench import server
 from PIL import Image
 
 class HarnessTests(unittest.TestCase):
@@ -79,12 +79,12 @@ class HarnessTests(unittest.TestCase):
         self.assertEqual(r['export_url'],first['export_url'])
     def test_real_mask_size_error_is_not_resized(self):
         wrong=Image.new('L',(2,2),255)
-        with patch('agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all buildings")'), patch.object(server,'post_json',return_value={'status':'success','mask':server.image_b64(wrong)}), patch.dict(server.os.environ,{'GEO_AGENT_BASE_URL':'http://example.invalid/v1','GEO_AGENT_MODEL':'FAKE','GEO_REMOTESAM_URL':'http://example.invalid/predict'}):
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all buildings")'), patch.object(server,'post_json',return_value={'status':'success','mask':server.image_b64(wrong)}), patch.dict(server.os.environ,{'GEO_AGENT_BASE_URL':'http://example.invalid/v1','GEO_AGENT_MODEL':'FAKE','GEO_REMOTESAM_URL':'http://example.invalid/predict'}):
             r=self.run_task('提取右侧建筑',mode='live')
         self.assertEqual(r['status'],'failed');self.assertIn('dimensions',r['message'])
     def test_real_adapter_accepts_aligned_mask(self):
         mask=Image.new('L',(800,600),255)
-        with patch('agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all buildings")'), patch.object(server,'post_json',return_value={'status':'success','mask':server.image_b64(mask)}), patch.dict(server.os.environ,{'GEO_AGENT_BASE_URL':'http://example.invalid/v1','GEO_AGENT_MODEL':'FAKE','GEO_REMOTESAM_URL':'http://example.invalid/predict'}):
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all buildings")'), patch.object(server,'post_json',return_value={'status':'success','mask':server.image_b64(mask)}), patch.dict(server.os.environ,{'GEO_AGENT_BASE_URL':'http://example.invalid/v1','GEO_AGENT_MODEL':'FAKE','GEO_REMOTESAM_URL':'http://example.invalid/predict'}):
             r=self.run_task('提取右侧建筑',mode='live')
         self.assertEqual(r['metrics']['area_ratio'],.5)
         self.assertEqual(r['mode'],'live')

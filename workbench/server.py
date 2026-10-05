@@ -11,23 +11,23 @@ import threading
 import time
 import uuid
 import zipfile
-from pixel_geometry import candidate_statistics, scope_area_pixels
+from workbench.pixel_geometry import candidate_statistics, scope_area_pixels
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageOps
-from runtime_config import load_settings, settings_status
-from service_transport import request_json, inspect_services
-from product_contract import VERSION, TARGET_CAPABILITIES, capabilities
-from semantic_review import initial_review, append_review
-from agent_bridge import AgentTurn, Clarification, decision_record, resolve_scope, segmentation_plan
-from v07_contract import batch_requested, has_target_intent, resolve_quality, resolve_roi, target_intent, validate_target_intent
-from task_grammar import ambiguous_query, is_export_command
+from workbench.runtime_config import load_settings, settings_status
+from workbench.service_transport import request_json, inspect_services
+from workbench.product_contract import VERSION, TARGET_CAPABILITIES, capabilities
+from workbench.semantic_review import initial_review, append_review
+from workbench.agent_bridge import AgentTurn, Clarification, decision_record, resolve_scope, segmentation_plan
+from workbench.v07_contract import batch_requested, has_target_intent, resolve_quality, resolve_roi, target_intent, validate_target_intent
+from workbench.task_grammar import ambiguous_query, is_export_command
 
 load_settings()
 
-ROOT = Path(__file__).resolve().parent
-WEB = ROOT / 'web'
+ROOT = Path(__file__).resolve().parents[1]
+WEB = ROOT / 'workbench/web'
 DATA = ROOT / 'experiments'
 DATA.mkdir(exist_ok=True)
 SESSIONS = {}
@@ -57,14 +57,14 @@ def image_b64(image):
 
 def demo_mask(sample):
     """Exact procedural fixture mask; not an EO model prediction."""
-    from fixtures import fixture
+    from workbench.fixtures import fixture
     return fixture(sample)[1]
 
 from geomasklab.measurements import constrain, foreground_area, statistics
 
 def experiment_report(session, result):
     """Delegate report rendering to the pure English report module."""
-    from report_builder import build_report
+    from workbench.report_builder import build_report
     return build_report(session, result, TARGETS, SIDES, TARGET_CAPABILITIES)
 
 
@@ -81,17 +81,17 @@ def batch_csv(batch):
 
 def parse_task(query, context):
     """Backward-compatible entry point for the procedural-demo grammar."""
-    from task_grammar import parse_demo_task
+    from workbench.task_grammar import parse_demo_task
     return parse_demo_task(query, context)
 
 
 def requires_dense_result(query, context=None):
-    from task_grammar import requires_dense_result as dense_intent
+    from workbench.task_grammar import requires_dense_result as dense_intent
     return dense_intent(query, context)
 
 
 def resolve_invert(query, context=None):
-    from task_grammar import resolve_invert as complement_intent
+    from workbench.task_grammar import resolve_invert as complement_intent
     return complement_intent(query, context)
 
 
@@ -172,7 +172,7 @@ def run_task(s,p,allow_batch=False):
 
 def import_evidence(p):
     """Open verified evidence in a new local session and retain the original ZIP."""
-    from evidence_handoff import prepare_import
+    from workbench.evidence_handoff import prepare_import
     encoded=p.get('bundle')
     if not isinstance(encoded,str) or len(encoded)>16*1024*1024:
         raise ValueError('Upload an evidence bundle no larger than 12 MB.')
@@ -233,8 +233,8 @@ def review_result(s, payload):
 
 def recalculate_region(s, payload):
     """Create a separate spatial-analysis version without invoking model services."""
-    from export_bundle import build_bundle
-    from region_analysis import prepare_analysis
+    from workbench.export_bundle import build_bundle
+    from workbench.region_analysis import prepare_analysis
     if set(payload)-{'session_id','run_id','scope','roi'}:
         raise ValueError('Offline region analysis accepts only a source run and spatial scope; it cannot change the semantic target.')
     rid=payload.get('run_id')
@@ -275,7 +275,7 @@ def recalculate_region(s, payload):
 
 def import_mask(s, payload):
     """Adapt an explicit mask upload to the same evidence core used by the CLI."""
-    from mask_inputs import decode_mask
+    from workbench.mask_inputs import decode_mask
     from geomasklab.api import create_evidence
     from geomasklab.evidence import load_verified_bundle
     if set(payload)-{'session_id','mask','target','source','parent_run_id','aligned'}:
@@ -311,9 +311,9 @@ def import_mask(s, payload):
 
 def assess_reference(s, payload):
     """Return a reproducible reference-assessment packet without changing runs."""
-    from export_bundle import build_bundle
-    from mask_inputs import decode_mask
-    from reference_evaluation import evaluate_reference, evaluation_packet
+    from workbench.export_bundle import build_bundle
+    from workbench.mask_inputs import decode_mask
+    from workbench.reference_evaluation import evaluate_reference, evaluation_packet
     if set(payload)-{'session_id','run_id','reference','source','target','independent','aligned'}:
         raise ValueError('Unsupported reference-evaluation field.')
     if payload.get('aligned') is not True:
@@ -621,7 +621,7 @@ class Handler(SimpleHTTPRequestHandler):
         if path.startswith('/api/ledger/'):
             s=get_session(path.rsplit('/',1)[-1])
             if not s: return self.json({'error':'Experiment not found.'},404)
-            from experiment_management import ledger_csv
+            from workbench.experiment_management import ledger_csv
             with s['lock']: raw=ledger_csv(s).encode('utf-8')
             self.send_response(200)
             self.send_header('Content-Type','text/csv; charset=utf-8')
@@ -653,7 +653,7 @@ class Handler(SimpleHTTPRequestHandler):
             if len(parts)!=5 or not SID_RE.fullmatch(sid) or not SID_RE.fullmatch(rid): return self.send_error(404)
             folder=DATA/sid/rid
             if not (folder/'mask.png').exists(): return self.send_error(404)
-            from export_bundle import build_bundle
+            from workbench.export_bundle import build_bundle
             s=get_session(sid)
             if not s: return self.send_error(404)
             with s['lock']: raw=build_bundle(DATA/sid/'original.png',folder)
@@ -692,7 +692,7 @@ class Handler(SimpleHTTPRequestHandler):
             if self.path=='/api/session/update':
                 s=get_session(p.get('session_id'))
                 if not s: raise ValueError('Experiment not found.')
-                from experiment_management import metadata_changes
+                from workbench.experiment_management import metadata_changes
                 changes=metadata_changes(p)
                 if not s['lock'].acquire(blocking=False): raise ValueError('This experiment is busy.')
                 try:
@@ -707,8 +707,8 @@ class Handler(SimpleHTTPRequestHandler):
                 if a==b: raise ValueError('Choose two different result versions.')
                 selected=[next((r for r in s['runs'] if r['id']==rid and r.get('mask_url')),None) for rid in (a,b)]
                 if not all(selected): raise ValueError('Choose two valid mask results from this experiment.')
-                from export_bundle import build_bundle
-                from result_comparison import compare_bundles
+                from workbench.export_bundle import build_bundle
+                from workbench.result_comparison import compare_bundles
                 if not s['lock'].acquire(blocking=False): raise ValueError('This experiment is busy.')
                 try:
                     bundles=[build_bundle(DATA/s['id']/'original.png',DATA/s['id']/r['id']) for r in selected]

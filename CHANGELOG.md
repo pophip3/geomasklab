@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.0rc1 - 5 October 2026
+
+- Add independent Polygon/MultiPolygon assessment, holes, overlap union and both denominators.
+- Add a frozen real NAIP GeoTIFF example and an independent Rasterio/NumPy consistency table.
+- Add optional detached Ed25519 signatures that require a separately trusted public key.
+- Scale axis-aligned EPSG:4326/3857 geodesic assessment by rows; retain bounded general grids.
+- Extend the headless pixel limit to 64 million; record explicit multiband/high-bit-depth window rendering.
+- Isolate source-only workbench modules, consolidate repository/documentation naming, and retain legacy evidence compatibility.
+- Make optional dependency tests skip cleanly in a Pillow-only environment.
+- Prepare a matched-information human handoff protocol without generating participant results.
+
+
 ## 1.0.0.dev7 - 5 October 2026
 
 - Add a source-bound PROV-JSON mapping with independent parser round trips.

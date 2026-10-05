@@ -5,8 +5,8 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from PIL import Image
-import server
-from agent_bridge import decision_record
+from workbench import server
+from workbench.agent_bridge import decision_record
 
 
 class V07AgentContractTests(unittest.TestCase):
@@ -58,7 +58,7 @@ class V07AgentContractTests(unittest.TestCase):
         self.assertEqual(self.run_task('提取飞机', quality_mode='turbo')['status'], 'failed')
         self.assertEqual(self.run_task('快速且高精度提取飞机')['status'], 'failed')
         self.assertEqual(self.run_task('把同一任务应用到这些影像')['status'], 'needs_clarification')
-        with patch('agent_bridge.WorkbenchAgent._run_llm') as model, \
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm') as model, \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST'}):
             ambiguous = server.run_task(self.session, {'query': '提取所有物体的轮廓', 'mode': 'live'})
@@ -86,7 +86,7 @@ class V07AgentContractTests(unittest.TestCase):
 
     def test_live_mode_requires_service_confirmation(self):
         mask = Image.new('L', (800, 800), 255)
-        with patch('agent_bridge.WorkbenchAgent._run_llm', return_value='T_call(referring_expression_segmentation, "ignored.png", "all airplanes")'), \
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm', return_value='T_call(referring_expression_segmentation, "ignored.png", "all airplanes")'), \
              patch.object(server, 'post_json', return_value={'status': 'success', 'mask': server.image_b64(mask)}), \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
@@ -97,7 +97,7 @@ class V07AgentContractTests(unittest.TestCase):
 
     def test_auto_mode_keeps_legacy_result_without_claiming_actual_mode(self):
         mask = Image.new('L', (800, 800), 255)
-        with patch('agent_bridge.WorkbenchAgent._run_llm', return_value='T_call(referring_expression_segmentation, "ignored.png", "all planes")'), \
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm', return_value='T_call(referring_expression_segmentation, "ignored.png", "all planes")'), \
              patch.object(server, 'post_json', return_value={'status': 'success', 'mask': server.image_b64(mask)}), \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
@@ -108,7 +108,7 @@ class V07AgentContractTests(unittest.TestCase):
 
     def test_agent_target_must_match_explicit_and_inherited_target(self):
         wrong_call = 'T_call(referring_expression_segmentation, "ignored.png", "all buildings")'
-        with patch('agent_bridge.WorkbenchAgent._run_llm', return_value=wrong_call), \
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm', return_value=wrong_call), \
              patch.object(server, 'post_json') as service, \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
@@ -126,7 +126,7 @@ class V07AgentContractTests(unittest.TestCase):
         response = {'status': 'success', 'mask': server.image_b64(mask), 'quality_mode': 'accurate',
                     'mode_parameters': {'tile_size': 1024, 'overlap': 256},
                     'candidate_stats': {'candidate_count': 1, 'total_area_pixels': 640000}}
-        with patch('agent_bridge.WorkbenchAgent._run_llm', return_value='T_call(referring_expression_segmentation, "ignored.png", "all airplanes")'), \
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm', return_value='T_call(referring_expression_segmentation, "ignored.png", "all airplanes")'), \
              patch.object(server, 'post_json', return_value=response), \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
@@ -143,7 +143,7 @@ class V07AgentContractTests(unittest.TestCase):
         replies = [{'status': 'success', 'mask': mask, 'quality_mode': 'fast'},
                    ValueError('RemoteSAM service failed'),
                    {'status': 'success', 'mask': mask, 'quality_mode': 'fast'}]
-        with patch('agent_bridge.WorkbenchAgent._run_llm', return_value='T_call(referring_expression_segmentation, "ignored.png", "all airplanes")'), \
+        with patch('workbench.agent_bridge.WorkbenchAgent._run_llm', return_value='T_call(referring_expression_segmentation, "ignored.png", "all airplanes")'), \
              patch.object(server, 'post_json', side_effect=replies) as service, \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):

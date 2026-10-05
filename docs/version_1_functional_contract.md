@@ -1,6 +1,6 @@
 # Version 1.0 functional contract
 
-Decision date: 5 October 2026. Current implementation: 1.0.0.dev7.
+Decision date: 5 October 2026. Current implementation: 1.0.0rc1.
 
 ## Core contribution
 
@@ -43,8 +43,7 @@ scientific checks, not inferred from core tests or historical model results.
 
 Optional extensions add a replayed PROV-JSON mapping and matched-GeoTIFF area
 assessment, with declared units, CRS, pixel equality, area assumptions and exported
-mask-grid checks. They do not widen the Pillow-only core requirement. Polygon zones,
-temporal change and signatures remain deferred. The supplied MEP 2.0 prototype was evaluated separately;
+mask-grid checks. Polygon/MultiPolygon domains and optional trusted-key signatures are implemented. They retain the Pillow-only base dependency; temporal change remains deferred. The supplied MEP 2.0 prototype was evaluated separately;
 it does not replace the compatible geoscope-evidence/1.0 format in this build.
 
 See [software scope](software_scope.md), [core package](core_package.md) and

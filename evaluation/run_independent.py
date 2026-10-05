@@ -11,9 +11,9 @@ import numpy as np
 from PIL import Image
 REPO=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(REPO))
-from runtime_config import load_settings
-from service_transport import request_json
-from export_bundle import verify_bundle
+from workbench.runtime_config import load_settings
+from workbench.service_transport import request_json
+from workbench.export_bundle import verify_bundle
 from segmentation_metrics import score
 import urllib.request
 
@@ -70,7 +70,7 @@ def main():
                   'failures':'Retain all 180 planned supported requests. Conditional positive-image IoU/Dice and all-positive-request utility (failure=0) both reported. Empty-GT images reported with FP pixels and image rate; 0/0 not assigned perfect score.',
                   'nondeterminism':'On any exact matched-mask mismatch preserve first observations, obtain two extra direct repetitions, and flag nondeterminism; never replace the initial result.',
                   'software_commit':subprocess.check_output(['git','-c','safe.directory='+str(REPO).replace('\\','/'),'rev-parse','HEAD'],cwd=REPO,text=True).strip(),
-                  'evaluator_sha256':{p.name:sha(p.read_bytes()) for p in [Path(__file__),REPO/'evaluation/segmentation_metrics.py',REPO/'agent_bridge.py',REPO/'planner_protocol.py',REPO/'server.py',REPO/'export_bundle.py']},
+                  'evaluator_sha256':{p.name:sha(p.read_bytes()) for p in [Path(__file__),REPO/'evaluation/segmentation_metrics.py',REPO/'workbench/agent_bridge.py',REPO/'workbench/planner_protocol.py',REPO/'workbench/server.py',REPO/'workbench/export_bundle.py']},
                   'python':sys.version,'numpy':np.__version__,'sam_model_info':sam,'agent_model':os.environ['GEO_AGENT_MODEL'],
                   'perception_revision':os.environ.get('GEO_REMOTESAM_REVISION'),
                   'agent_weight_lock':json.loads((root/'remoteagent-weight-lock.json').read_text(encoding='utf-8')) if (root/'remoteagent-weight-lock.json').exists() else {'verified':False,'reason':'weight hashes not supplied'},

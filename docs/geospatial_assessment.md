@@ -23,7 +23,7 @@ it does not replace it.
 
 ## Input contract
 
-- An embedded GeoTIFF of at most 64 MB, with an explicit CRS and stored affine
+- An embedded GeoTIFF of at most 128 MiB, with an explicit CRS and stored affine
   transform. CRS definitions and axis units are read by Rasterio/PROJ, rather
   than inferred from file names or assumed to be metres.
 - A one-band grayscale or three/four-band, unsigned 8-bit RGB raster, on the
@@ -35,8 +35,9 @@ it does not replace it.
   The source raster's coordinate interpretation is an input assertion. Pixel
   equality binds it to the evidence but does not authenticate the raster producer.
 
-Core image limits still apply. Multi-band scientific rasters must first be
-rendered externally to an explicit 8-bit RGB GeoTIFF with retained grid metadata.
+The headless image limit is 64 million pixels. Use the explicit
+[`render-raster` bands/window/scaling operation](raster_inputs.md) to prepare
+multi-band or high-bit-depth rasters while retaining grid metadata.
 Source-image rights continue to apply to an assessment containing the raster.
 
 ## Area models
@@ -44,7 +45,7 @@ Source-image rights continue to apply to an assessment containing the raster.
 | Method | Definition | Supported coordinates | Interpretation |
 | --- | --- | --- | --- |
 | `nominal` | `abs(a*e-b*d) * x_unit_to_m * y_unit_to_m` per affine cell | Projected CRS with declared finite linear-unit conversions | Square metres of projected coordinate cells; projection distortion is uncorrected |
-| `geodesic` | Sum the absolute WGS84 geodesic area of each four-corner pixel polygon | EPSG:4326, EPSG:3857, WGS84 UTM EPSG:32601-32660 / 32701-32760 | Ellipsoid-surface corner model, with explicit XY transformation; limited to 500,000 pixels |
+| `geodesic` | Sum the absolute WGS84 geodesic area of each four-corner pixel polygon | EPSG:4326, EPSG:3857, WGS84 UTM EPSG:32601-32660 / 32701-32760 | Ellipsoid-surface corner model, with explicit XY transformation; row aggregation on axis-aligned EPSG:4326/3857 grids; general grids limited to 500,000 pixels |
 
 Here `(a,b,c,d,e,f)` is the raster affine transform. Nominal area supports rotated
 and sheared grids through the determinant. CRS units may be metres, feet or
@@ -79,4 +80,8 @@ or authenticity; self-consistent replacements remain possible.
 `examples/geospatial_workflow.py` creates explicitly **synthetic** GeoTIFF fixtures
 with known pixel sizes to check area conversion and exported-grid preservation.
 The bundled NASA photograph has no georeference and is never assigned invented
-coordinates. A real georeferenced application case remains a separate evaluation.
+coordinates. The [real 2019 NAIP case](../evaluation/geospatial/README.md) checks four polygon
+domains and nominal areas against independently rasterized GDAL/Rasterio results.
+Axis-aligned EPSG:4326/3857 geodesic areas reuse a longitude-invariant cell area
+per row; other supported grids retain individual four-corner evaluation.
+A small-grid brute-force Geod oracle tests row aggregation independently.

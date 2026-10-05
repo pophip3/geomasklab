@@ -3,8 +3,9 @@ import base64
 import io
 from PIL import Image, ImageChops
 
-MAX_MASK_BYTES = 12 * 1024 * 1024
-MAX_MASK_PIXELS = 16 * 1024 * 1024
+MAX_MASK_BYTES = 32 * 1024 * 1024
+MAX_MASK_PIXELS = 64_000_000
+MAX_IMAGE_BYTES = 48 * 1024 * 1024
 
 
 def decode_mask(value):
@@ -15,7 +16,7 @@ def decode_mask(value):
         raw = base64.b64decode(value.split(',')[-1], validate=True)
     except ValueError as error:
         raise ValueError('The mask upload is not valid base64.') from error
-    if not raw or len(raw) > MAX_MASK_BYTES:
+    if not raw or len(raw) > 12 * 1024 * 1024:
         raise ValueError('Upload a binary PNG mask no larger than 12 MB.')
     return raw
 
@@ -28,7 +29,7 @@ def binary_png(raw, size):
     multiclass and animated images require explicit conversion by the user.
     """
     if not raw or len(raw) > MAX_MASK_BYTES:
-        raise ValueError('Binary PNG masks must be 12 MB or smaller.')
+        raise ValueError('Binary PNG masks must be 32 MB or smaller.')
     try:
         with Image.open(io.BytesIO(raw)) as image:
             if image.format != 'PNG' or getattr(image, 'n_frames', 1) != 1:

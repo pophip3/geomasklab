@@ -5,6 +5,20 @@ on:
 permissions:
   contents: read
 jobs:
+  minimal-install:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install .
+      - run: python -m unittest discover -s tests -p "test_*.py" -q
+      - run: python reviewer_demo.py
   contracts:
     strategy:
       fail-fast: false
@@ -18,8 +32,8 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: python -m pip install -r requirements.txt
-      - run: python -m pip install ".[schema,geo,interop]"
-      - run: python fixtures.py
+      - run: python -m pip install ".[schema,geo,interop,signing]"
+      - run: python -m workbench.fixtures
       - run: python reviewer_demo.py
       - run: python -m pip install -r evaluation/requirements-evaluation.txt
       - run: python -m unittest discover -s tests -p "test_*.py" -q
@@ -30,10 +44,13 @@ jobs:
       - run: python examples/reference_workflow.py
       - run: python examples/real_image_handoff.py
       - run: python examples/geospatial_workflow.py
+      - run: python examples/naip_zonal_workflow.py
+      - run: python examples/signature_workflow.py
+      - run: python examples/prepare_handoff_study.py
       - run: python -m pip wheel . --no-deps --wheel-dir dist
       - run: python release/check_wheel.py --wheel-dir dist
       - run: python -m pip install --no-deps label-studio-sdk==2.1.2
       - run: python examples/compare_handoff.py
-      - run: python label_studio_export.py reviewer-output/right.zip --output workflow-output/label-studio
+      - run: python -m workbench.label_studio_export reviewer-output/right.zip --output workflow-output/label-studio
       - run: python release/build_source.py --output source-package.zip
       - run: python release/check_distribution.py source-package.zip

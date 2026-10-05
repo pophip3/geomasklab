@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "software_version": "1.0.0rc1",
+  "source_tile": "m_3910417_nw_13_060_20190803",
+  "crs": "EPSG:32613",
+  "image_dimensions": [
+    512,
+    512
+  ],
+  "zones_compared": 4,
+  "independent_reference": "Rasterio/GDAL all_touched=False and direct NumPy counts",
+  "maximum_area_difference_m2": 0.0,
+  "whole_image": {
+    "verified": true,
+    "schema": "geomasklab-geospatial-assessment/1.0",
+    "area_model": {
+      "method": "projected_nominal",
+      "unit": "m2",
+      "pixel_area_m2": 0.3600000000001637,
+      "ground_area_corrected": false,
+      "axis_units": [
+        "metre",
+        "metre"
+      ],
+      "axis_unit_to_metre": [
+        1.0,
+        1.0
+      ]
+    },
+    "measurements": {
+      "foreground_pixels": 142629,
+      "selected_region_pixels": 262144,
+      "whole_image_pixels": 262144,
+      "foreground_area_m2": 51346.44000002334,
+      "selected_region_area_m2": 94371.84000004291,
+      "whole_image_area_m2": 94371.84000004291,
+      "coverage_of_region_area": 0.5440864562988281,
+      "coverage_of_image_area": 0.5440864562988281
+    },
+    "scope": "Physical-area model replay and pixel alignment; no terrain or semantic accuracy claim"
+  },
+  "comparison": [
+    {
+      "zone_id": "west-plot",
+      "geomasklab_foreground_pixels": 65910,
+      "rasterio_numpy_foreground_pixels": 65910,
+      "geomasklab_region_pixels": 109968,
+      "rasterio_region_pixels": 109968,
+      "geomasklab_nominal_area_m2": 23727.60000001079,
+      "rasterio_numpy_nominal_area_m2": 23727.60000001079,
+      "area_difference_m2": 0.0,
+      "whole_image_coverage": 0.25142669677734375,
+      "within_region_coverage": 0.5993561763422086
+    },
+    {
+      "zone_id": "east-with-exclusion",
+      "geomasklab_foreground_pixels": 53512,
+      "rasterio_numpy_foreground_pixels": 53512,
+      "geomasklab_region_pixels": 110160,
+      "rasterio_region_pixels": 110160,
+      "geomasklab_nominal_area_m2": 19264.32000000876,
+      "rasterio_numpy_nominal_area_m2": 19264.32000000876,
+      "area_difference_m2": 0.0,
+      "whole_image_coverage": 0.204132080078125,
+      "within_region_coverage": 0.48576615831517794
+    },
+    {
+      "zone_id": "union-plots",
+      "geomasklab_foreground_pixels": 23939,
+      "rasterio_numpy_foreground_pixels": 23939,
+      "geomasklab_region_pixels": 45600,
+      "rasterio_region_pixels": 45600,
+      "geomasklab_nominal_area_m2": 8618.040000003919,
+      "rasterio_numpy_nominal_area_m2": 8618.040000003919,
+      "area_difference_m2": 0.0,
+      "whole_image_coverage": 0.09132003784179688,
+      "within_region_coverage": 0.5249780701754386
+    },
+    {
+      "zone_id": "slanted-plot",
+      "geomasklab_foreground_pixels": 17062,
+      "rasterio_numpy_foreground_pixels": 17062,
+      "geomasklab_region_pixels": 42361,
+      "rasterio_region_pixels": 42361,
+      "geomasklab_nominal_area_m2": 6142.320000002793,
+      "rasterio_numpy_nominal_area_m2": 6142.320000002793,
+      "area_difference_m2": 0.0,
+      "whole_image_coverage": 0.06508636474609375,
+      "within_region_coverage": 0.40277613842921556
+    }
+  ],
+  "semantic_accuracy_assessed": false,
+  "human_participants": 0,
+  "area_interpretation": "Nominal projected exported-grid area; projection distortion and terrain omitted."
+}

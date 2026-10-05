@@ -63,7 +63,13 @@ def main():
         cli('provenance','evidence.zip','--output','provenance.json')
         assert json.loads(cli('verify-provenance','evidence.zip','provenance.json'))['verified']
         checks.append('PROV-JSON export and source-bound replay without extra dependencies')
-        for name in ('manifest','result','statistics','geospatial'):
+        run('-I','-c','import json; json.dump({"type":"Polygon","coordinates":[[[0,0],[4,0],[4,4],[0,4],[0,0]]]},open("zones.geojson","w"))')
+        cli('zonal','evidence.zip','zones.geojson','--output','zones.zip')
+        zones=json.loads(cli('verify-zonal','zones.zip'))
+        assert zones['zones'][0]['foreground_pixels']==9
+        assert zones['zones'][0]['selected_region_pixels']==16
+        checks.append('Pillow-only polygon-domain packet and numerical replay')
+        for name in ('manifest','result','statistics','geospatial','zonal','signature'):
             schema=json.loads(cli('schema',name));assert schema['$schema'].endswith('2020-12/schema')
         checks.append('Packaged JSON Schema resources')
         scripts=python.parent/('geomasklab.exe' if os.name=='nt' else 'geomasklab')

@@ -25,7 +25,7 @@ uniqueness, industrial adoption and reduced human labor require separate evidenc
 | --- | --- |
 | Install | Headless src package and wheel, Python 3.10+, Pillow |
 | Supply a mask | Exact-grid binary PNG; explicit source/target/alignment assertions |
-| Define a domain | Whole image, one pixel half, rectangle; exclusive upper bounds |
+| Define a domain | Whole image, one pixel half, rectangle; independent Polygon/MultiPolygon assessment |
 | Measure | Foreground pixels; both whole-image and selected-region denominators; candidate components |
 | Preserve evidence | Exact source bytes, full and scoped masks, metadata, logs and SHA-256 manifest |
 | Verify | Replay the scope and measurements; compare records and source identities |
@@ -34,7 +34,7 @@ uniqueness, industrial adoption and reduced human labor require separate evidenc
 | Assess labels | Separate reference-assessment packet with exact scoped confusion counts |
 | Adapt a source | Model-free RGB color baseline or local executable argument-array hook |
 
-The core currently supports the six task labels retained by the workbench. Labels
+The headless core supports explicit ASCII target labels; the optional workbench retains its six task categories. Labels
 and review decisions do not establish semantic accuracy. The real NASA example
 uses green-color candidates and explicitly documents their unvalidated semantics.
 
@@ -52,8 +52,7 @@ operation. Legacy bundles may omit within-region fields, and remain readable.
 
 Core measurements use pixels. Optional matched-GeoTIFF assessment adds declared
 projected or WGS84 geodesic-corner area and grid-preserving TIFF export. See
-[its input contract and limits](geospatial_assessment.md). Polygon zones, temporal
-change and signing remain separate extensions pending validated designs.
+[its input contract and limits](geospatial_assessment.md). Polygon zones and optional detached signatures are implemented with explicit replay and trust contracts. Temporal change remains outside this release.
 Internal replay is distinct from semantic accuracy and authenticity. A completely
 self-consistent replacement bundle can pass without identifying its creator.
 Historical real-image metrics retain their original code and dataset identities.
