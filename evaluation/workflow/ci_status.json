@@ -1,0 +1,14 @@
+{
+  "source_software_commit": "e8d6f0bbdfc2cc5c1f09f8211c3e4866f962d1b7",
+  "software_version": "0.9.0-dev.2",
+  "run_url": "https://github.com/pophip3/geoscope-softwarex/actions/runs/37255095991",
+  "conclusion": "success",
+  "checked_on": "2026-10-05",
+  "os": ["ubuntu-latest", "windows-latest", "macos-latest"],
+  "python": ["3.10", "3.13"],
+  "successful_jobs": 6,
+  "all_jobs_ran_converter_comparison": true,
+  "all_jobs_ran_label_studio_export_cli": true,
+  "proves_semantic_accuracy": false,
+  "proves_full_tool_superiority": false
+}

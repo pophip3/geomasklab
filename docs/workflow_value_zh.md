@@ -107,8 +107,11 @@ python examples/compare_handoff.py
 `evaluation/workflow/summary.json`；生成的合成图片与任务 JSON 保留在本机输出目录。
 基础工作台及轻量演示依然只要求 Pillow。
 
-当前 81 项软件测试、60 组像素矩阵及原有四例导出均在本机通过；跨平台 CI 对
-本次提交还需查看实际结果。实验记录的耗时执行了不同数量的工作，不用于性能排名。
+当前 81 项软件测试、60 组像素矩阵及原有四例导出均在本机通过。软件提交
+`e8d6f0bbdfc2cc5c1f09f8211c3e4866f962d1b7` 的 Windows/Linux/macOS × Python 3.10/3.13
+[六组 CI](https://github.com/pophip3/geoscope-softwarex/actions/runs/37255095991) 全部通过，
+每组均实际执行新增官方转换器对照和 Label Studio 导出入口。实验记录的耗时执行了
+不同数量的工作，不用于性能排名。
 
 下一步应在同一真实科研任务上实装 QGIS/SAMGeo/完整标注工具工作流，并让独立
 使用者执行“恢复他人结果、检查分母与范围、形成可复查附件”的任务，测量成功率、
