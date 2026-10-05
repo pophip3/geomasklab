@@ -45,6 +45,55 @@ then run `geomasklab verify evidence.zip --schema`. Schema references resolve
 locally; no remote schema request is made. Shape validation complements mandatory
 file integrity, source-mask normalization, spatial replay and measurement checks.
 
+### Declared valid pixels
+
+Use an aligned binary PNG with white (1 or 255) for included pixels and black (0)
+for excluded pixels. A validity mask has a separate role from the positive-target
+prediction. Source and exclusion rationale are required; colors in the image do
+not automatically define NoData, clouds or black-border exclusions.
+
+```sh
+geomasklab create --image image.png --mask mask.png --target building --source "External prediction" --aligned --valid-mask valid.png --valid-source "Explicit exclusion rationale" --output valid-evidence.zip
+geomasklab recalc valid-evidence.zip --scope right --output right.zip
+geomasklab recalc valid-evidence.zip --all-valid --output reset.zip
+geomasklab verify valid-evidence.zip --schema
+python examples/validity_workflow.py
+```
+
+Validity-aware evidence uses `geomasklab-evidence/2.0`. It includes `analysis.json`,
+the normalized single-channel `valid_mask.png` and the original
+`source_valid_mask.png` when supplied. The manifest binds the configuration,
+validity identity and valid-pixel counts. Configurations record realized pixel
+coordinates, image identity, dimensions, target, complement and connectivity.
+They describe one exact input grid; copying pixel ROIs between different-sized
+images is not an automatic operation.
+
+For selected region S, declared validity V and positive/complement target E,
+the saved output is E intersect S intersect V. `area_ratio` retains the geometric
+whole-image denominator; `scope_area_ratio` retains the geometric selected-region
+denominator. New `validity_measurements` fields separately record valid denominators,
+excluded pixels, `coverage_of_valid_image` and `coverage_of_valid_region`.
+Zero valid denominators produce null. Complements exclude invalid pixels.
+
+Recalculation retains validity by default. `--valid-mask` plus `--valid-source`
+replaces it; `--all-valid` explicitly resets it. Every change creates a separate
+pending-review version and preserves source prediction bytes. The browser exposes
+the same operations under **Set region & validity (offline)**. Reference evaluation,
+polygon statistics and result comparison use the saved valid domain; comparison
+uses the intersection of both domains. No shared valid domain returns
+`No_Common_Valid_Domain` with null agreement and no difference image.
+
+Optional GeoTIFF assessment adds separately named valid-area quantities and an
+internal validity mask in the exported GeoTIFF. Source GeoTIFF NoData is still
+rejected; automatic NoData extraction is not implemented. A user-supplied validity
+mask is not proof that its included pixels are scientifically suitable.
+
+Legacy `geoscope-evidence/1.0` inputs remain readable using their original rules.
+Evidence without a validity extension declares all image pixels valid. A bundle
+cannot place validity files or metadata under the legacy format and have them
+silently ignored. Packaged schemas are available with `geomasklab schema analysis`,
+`geomasklab schema validity` and `geomasklab schema manifest-v2`.
+
 Verification detects corruption and inconsistent records, including changed
 numbers with regenerated hashes. A completely self-consistent replacement bundle
 can still pass. SHA-256 does not establish authorship, authenticity or semantic

@@ -89,6 +89,7 @@ $('bundleInput').onchange=async e=>{
  finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('importBtn').disabled=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
 };
 function resetMetrics(){
+ $('validitySummary').hidden=true;
  $('recalculateBtn').disabled=true;$('regionCoverage').textContent='—';
  $('reviewPanel').hidden=true;
  $('answerCard').hidden=true;$('coverageCard').hidden=false;$('metricsPanel').hidden=false;$('checksPanel').hidden=false;
@@ -99,6 +100,7 @@ function resetMetrics(){
  $('checksList').innerHTML=['Mask matches the image dimensions','Spatial constraints checked','Measurements and artifacts saved'].map(s=>`<p class="pending"><span>○</span>${s}</p>`).join('');$('checkCount').textContent='0 / 3';$('exportBtn').disabled=true;$('reportBtn').disabled=true;
 }
 function renderAnswer(run){
+ $('validitySummary').hidden=true;
  $('recalculateBtn').disabled=true;$('regionCoverage').textContent='—';
  $('reviewPanel').hidden=true;
  $('answerCard').hidden=false;$('coverageCard').hidden=true;$('metricsPanel').hidden=true;$('checksPanel').hidden=true;
@@ -225,6 +227,10 @@ async function selectRun(run){
   $('ratioValue').textContent=ratio.toFixed(2);$('areaValue').innerHTML=number(m.pixel_area)+' <small>px</small>';$('scopeValue').textContent=run.task.roi?'Rectangle ROI':sideNames[run.task.side];$('timeValue').textContent=run.duration_ms+' ms';
   $('candidateValue').textContent=m.candidate_stats?number(m.candidate_stats.candidate_count):'Not recorded in this older result';
   $('regionCoverage').textContent=m.scope_area_ratio==null?'Not recorded or empty scope':`${(m.scope_area_ratio*100).toFixed(2)}% (${number(m.scope_area_pixels)} px)`;
+  const validity=m.validity_measurements;
+  $('validitySummary').hidden=false;
+  const pct=value=>value==null?'Undefined (no valid pixels)':`${(value*100).toFixed(2)}%`;
+  $('validitySummary').innerHTML=validity?`<strong>Declared valid-pixel analysis</strong><dl><div><dt>Valid region coverage</dt><dd>${pct(validity.coverage_of_valid_region)}</dd></div><div><dt>Valid region denominator</dt><dd>${number(validity.valid_region_pixels)} px</dd></div><div><dt>Excluded region pixels</dt><dd>${number(validity.excluded_region_pixels)} px</dd></div><div><dt>Valid whole-image coverage</dt><dd>${pct(validity.coverage_of_valid_image)}</dd></div><div><dt>Valid image denominator</dt><dd>${number(validity.valid_image_pixels)} px</dd></div></dl><small>${escape(run.analysis_config.validity.source||'All image pixels explicitly declared valid.')}</small>`:'<small>All image pixels are declared valid. No exclusions were supplied.</small>';
   $('recalculateBtn').disabled=false;
   $('qualityValue').textContent=run.mode==='demo'?'Procedural demo':qualityNames[run.task?.effective_quality_mode]||'Unconfirmed by service';
   if(run.mode==='external')$('qualityValue').textContent='Imported mask';
@@ -296,20 +302,28 @@ $('recalculateBtn').onclick=()=>{
  if(state.busy||!state.selected?.mask_url)return;
  const sessionId=state.session.id,sourceId=state.selected.id;
  const roi=state.roi?JSON.parse(JSON.stringify(state.roi)):null;
- modal('Recalculate a region from the saved mask',
-  `<p>This operation changes the spatial scope only. It uses the original full-image mask and does not call model services.</p>
+ modal('Set analysis region and validity',
+  `<p>Recalculate from the saved full-image mask without model services. The source prediction is retained.</p>
    <form id="regionForm"><label for="regionScope">Analysis scope</label>
    <select id="regionScope"><option value="all">Whole image</option><option value="left">Left half</option><option value="right">Right half</option><option value="top">Top half</option><option value="bottom">Bottom half</option>${roi?'<option value="roi">Current rectangle ROI</option>':''}</select>
    <p>${roi?`Current rectangle: ${escape(JSON.stringify(roi.xyxy))}.`:'To analyze a rectangle, close this dialog and draw an ROI on the image first.'}</p>
+   <label for="validityAction">Valid-pixel condition</label><select id="validityAction"><option value="keep">Keep saved validity</option><option value="replace">Upload an aligned validity PNG</option><option value="all_valid">Declare every image pixel valid</option></select>
+   <div id="validityUpload" hidden><label for="validityFile">Validity mask · white includes, black excludes</label><input id="validityFile" type="file" accept="image/png,.png"><label for="validitySource">Source and exclusion rationale</label><textarea id="validitySource" maxlength="1000" rows="3" placeholder="Describe who defined the exclusions, the method and intended use."></textarea><p>Use the displayed image grid. NoData, clouds or black borders are never inferred from image colors.</p></div>
    <p>The semantic target and complement setting are retained. The new result will have a separate review record.</p>
    <button id="saveRegion" class="primary" type="submit">Create result version</button></form>`,'OFFLINE REGION ANALYSIS');
  $('regionScope').value=roi?'roi':state.selected.task.side;
+ $('validityAction').onchange=()=>{const upload=$('validityAction').value==='replace';$('validityUpload').hidden=!upload;$('validityFile').required=upload;$('validitySource').required=upload;};
  $('regionForm').onsubmit=async e=>{
   e.preventDefault();if(state.busy)return;
-  const choice=$('regionScope').value;state.busy=true;
+  const choice=$('regionScope').value,action=$('validityAction').value;
+  const file=$('validityFile').files[0],validSource=$('validitySource').value;
+  if(action==='replace'&&(!file||file.size>12*1024*1024))return toast('Choose an aligned binary validity PNG no larger than 12 MB.');
+  state.busy=true;
   $('saveRegion').disabled=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
   try{
-   const result=await api('/api/recalculate-region',{session_id:sessionId,run_id:sourceId,scope:choice==='roi'?'all':choice,roi:choice==='roi'?roi:null});
+   const request={session_id:sessionId,run_id:sourceId,scope:choice==='roi'?'all':choice,roi:choice==='roi'?roi:null,validity_action:action};
+   if(action==='replace'){request.valid_mask=await maskFileData(file);request.valid_source=validSource;}
+   const result=await api('/api/recalculate-region',request);
    if(state.session.id===sessionId){state.session.runs.push(result);state.last=result;addMessage('user',result.query);addMessage('assistant',result.message,'',result);await selectRun(result);}
    closeModal();toast('Created a separate result version without model inference.');
   }catch(error){toast(error.message);if($('saveRegion'))$('saveRegion').disabled=false;}

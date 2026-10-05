@@ -202,8 +202,8 @@ def import_evidence(p):
     (folder/'source-evidence.zip').write_bytes(payload)
     for file in ('full_mask.png','mask.png','overlay.png','statistics.json','run_log.json'):
         (run_folder/file).write_bytes(files[file])
-    if 'source_mask.png' in files:
-        (run_folder/'source_mask.png').write_bytes(files['source_mask.png'])
+    for name in ('source_mask.png','analysis.json','valid_mask.png','source_valid_mask.png'):
+        if name in files:(run_folder/name).write_bytes(files[name])
     save_json(run_folder/'result.json',{k:v for k,v in result.items() if k!='trace'})
     (run_folder/'report.md').write_text(report,encoding='utf-8')
     save_json(folder/'session.json',public_session(s))
@@ -235,7 +235,7 @@ def recalculate_region(s, payload):
     """Create a separate spatial-analysis version without invoking model services."""
     from workbench.export_bundle import build_bundle
     from workbench.region_analysis import prepare_analysis
-    if set(payload)-{'session_id','run_id','scope','roi'}:
+    if set(payload)-{'session_id','run_id','scope','roi','validity_action','valid_mask','valid_source'}:
         raise ValueError('Offline region analysis accepts only a source run and spatial scope; it cannot change the semantic target.')
     rid=payload.get('run_id')
     if not isinstance(rid,str) or not SID_RE.fullmatch(rid):
@@ -248,10 +248,17 @@ def recalculate_region(s, payload):
             raise ValueError('Select an existing mask result in this session.')
         source_folder=DATA/s['id']/rid
         bundle=build_bundle(DATA/s['id']/'original.png',source_folder)
+        from geomasklab.domain import KEEP_VALIDITY
+        from workbench.mask_inputs import decode_mask
+        action=payload.get('validity_action','keep')
+        if action not in ('keep','replace','all_valid'):raise ValueError('Choose keep, replace or all_valid for validity.')
+        if action!='replace' and (payload.get('valid_mask') is not None or payload.get('valid_source') is not None):
+            raise ValueError('Validity uploads require the replace action.')
+        valid=decode_mask(payload.get('valid_mask')) if action=='replace' else None if action=='all_valid' else KEEP_VALIDITY
         runid=uid()
         result,files=prepare_analysis(bundle,payload.get('scope','all'),payload.get('roi'),
             run_id=runid,created_at=now(),version=len(s['runs'])+1,
-            statistics=statistics,constrain=constrain)
+            statistics=statistics,constrain=constrain,valid_mask=valid,valid_source=payload.get('valid_source'))
         if result['session_id']!=s['id'] or result['parent_run_id']!=rid:
             raise ValueError('The saved result does not belong to this session.')
         base=f'/experiments/{s["id"]}/{runid}'
@@ -278,11 +285,12 @@ def import_mask(s, payload):
     from workbench.mask_inputs import decode_mask
     from geomasklab.api import create_evidence
     from geomasklab.evidence import load_verified_bundle
-    if set(payload)-{'session_id','mask','target','source','parent_run_id','aligned'}:
+    if set(payload)-{'session_id','mask','target','source','parent_run_id','aligned','valid_mask','valid_source'}:
         raise ValueError('Unsupported mask-import field.')
     if payload.get('aligned') is not True:
         raise ValueError('Confirm pixel alignment with the displayed image before importing.')
     raw=decode_mask(payload.get('mask'))
+    valid=decode_mask(payload['valid_mask']) if payload.get('valid_mask') is not None else None
     if not s['lock'].acquire(blocking=False):raise ValueError('This experiment is busy.')
     try:
         parent=payload.get('parent_run_id')
@@ -291,7 +299,8 @@ def import_mask(s, payload):
         rid=uid()
         bundle=create_evidence((DATA/s['id']/'original.png').read_bytes(),raw,
             target=payload.get('target'),source=payload.get('source'),aligned=True,
-            image_source=s['source'],session_id=s['id'],run_id=rid,parent_run_id=parent,version=len(s['runs'])+1)
+            image_source=s['source'],session_id=s['id'],run_id=rid,parent_run_id=parent,version=len(s['runs'])+1,
+            valid_mask=valid,valid_source=payload.get('valid_source'))
         _,files=load_verified_bundle(bundle)
         result=json.loads(files['result.json']);result['trace']=json.loads(files['run_log.json'])
         base=f'/experiments/{s["id"]}/{rid}'
@@ -301,6 +310,8 @@ def import_mask(s, payload):
         folder=DATA/s['id']/rid;folder.mkdir()
         for name in ('source_mask.png','full_mask.png','mask.png','overlay.png','statistics.json','run_log.json'):
             (folder/name).write_bytes(files[name])
+        for name in ('analysis.json','valid_mask.png','source_valid_mask.png'):
+            if name in files:(folder/name).write_bytes(files[name])
         save_json(folder/'result.json',{k:v for k,v in result.items() if k!='trace'})
         (folder/'report.md').write_text(report,encoding='utf-8')
         s['runs'].append(result);s['context']={k:result['task'].get(k) for k in ('target','side','invert','roi','quality_mode')}
@@ -436,6 +447,10 @@ def _run_task(s,p,allow_batch=False):
             event('Planner feedback failed',result['feedback_warning'],'warning')
     try:
         event('Load experiment context',f'Image {s["width"]} × {s["height"]}; '+('Use the selected result as context' if context else 'New task'))
+        saved_validity=None
+        if previous and previous.get('analysis_config'):
+            from geomasklab.evidence import build_bundle,load_verified_bundle
+            _,saved_validity=load_verified_bundle(build_bundle(image_path,DATA/s['id']/previous['id']))
         try: validate_target_intent(query)
         except ValueError as exc: raise Clarification(str(exc)) from exc
         if batch_requested(query) and not has_target_intent(query) and not context.get('target'):
@@ -567,7 +582,18 @@ def _run_task(s,p,allow_batch=False):
                 mask=ImageOps.invert(mask)
             full_mask=mask
             mask=constrain(mask,side,roi)
-            metrics=statistics(mask,side,roi,full_mask); event('Apply scope and measure pixels',f'{SIDES[side]}; whole-image denominator: {image.width*image.height:,} pixels')
+            if saved_validity is not None:
+                from geomasklab.domain import valid_image,validity_measurements,configuration,add_validity_statistics
+                valid=valid_image(saved_validity,image.size)
+                mask,_,_=validity_measurements(full_mask,plan,valid)
+                declaration=json.loads(saved_validity['analysis.json'])['validity']
+                result['analysis_config']=configuration(plan,result['provenance']['image_sha256'],image.size,declaration)
+                for name in ('valid_mask.png','source_valid_mask.png'):
+                    if name in saved_validity:(folder/name).write_bytes(saved_validity[name])
+                save_json(folder/'analysis.json',result['analysis_config'])
+            metrics=statistics(mask,side,roi,full_mask)
+            if saved_validity is not None:add_validity_statistics(metrics,full_mask,plan,valid)
+            event('Apply scope and measure pixels',f'{SIDES[side]}; whole-image denominator: {image.width*image.height:,} pixels; saved validity retained when present')
             overlay=image.copy(); tint=Image.new('RGB',image.size,(69,213,152)); colored=Image.blend(image,tint,.48); overlay.paste(colored,(0,0),mask)
             mask.save(folder/'mask.png'); overlay.save(folder/'overlay.png')
             status='completed' if metrics['pixel_area'] else 'needs_review'

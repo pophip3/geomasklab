@@ -1,6 +1,13 @@
 # Version 1.0 functional contract
 
-Decision date: 5 October 2026. Current implementation: 1.0.0rc1.
+Decision date: 5 October 2026. Current development implementation: 1.0.0rc3.dev1.
+
+The software freeze target consists of five connected operations: declared pixel
+validity and realized configuration, fair result comparison, reliable manifest-based
+batch execution, candidate-component inspection and one shared-core browser workflow.
+Each operation requires new acceptance against the eventual fixed candidate.
+This development checkpoint implements the validity foundation; it does not mark
+all five operations, user handoff testing or final-release acceptance complete.
 
 ## Core contribution
 
@@ -30,8 +37,8 @@ origin and human workflow value require separate evidence.
    browser startup and launchers after extraction.
 
 The existing reference-assessment packet is a supporting validation operation.
-Version comparison, experiment management, annotation conversion, model questions
-and animation are frozen auxiliary features. They are not separate contribution
+Fair comparison belongs to the selected workflow. Experiment management, annotation
+conversion, model questions and animation remain auxiliary features. They are not separate contribution
 claims and do not block the headless core's installation.
 
 ## Release gates
@@ -44,7 +51,8 @@ scientific checks, not inferred from core tests or historical model results.
 Optional extensions add a replayed PROV-JSON mapping and matched-GeoTIFF area
 assessment, with declared units, CRS, pixel equality, area assumptions and exported
 mask-grid checks. Polygon/MultiPolygon domains and optional trusted-key signatures are implemented. They retain the Pillow-only base dependency; temporal change remains deferred. The supplied MEP 2.0 prototype was evaluated separately;
-it does not replace the compatible geoscope-evidence/1.0 format in this build.
+it does not define the new validity format. Legacy geoscope-evidence/1.0 remains
+readable, and validity-aware results use geomasklab-evidence/2.0.
 
 See [software scope](software_scope.md), [core package](core_package.md) and
 [architecture](architecture.md) for definitions and extension boundaries.

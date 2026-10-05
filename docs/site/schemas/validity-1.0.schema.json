@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:validity:1.0",
+  "title": "Explicit valid-pixel measurements",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "geomasklab-validity-measurements/1.0"
+    },
+    "foreground_pixels": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "geometric_image_pixels": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "geometric_region_pixels": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "valid_image_pixels": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "valid_region_pixels": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "excluded_image_pixels": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "excluded_region_pixels": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "excluded_foreground_pixels": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "coverage_of_valid_image": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "coverage_of_valid_region": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    }
+  },
+  "required": [
+    "schema",
+    "foreground_pixels",
+    "geometric_image_pixels",
+    "geometric_region_pixels",
+    "valid_image_pixels",
+    "valid_region_pixels",
+    "excluded_image_pixels",
+    "excluded_region_pixels",
+    "excluded_foreground_pixels",
+    "coverage_of_valid_image",
+    "coverage_of_valid_region"
+  ]
+}

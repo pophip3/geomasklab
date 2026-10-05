@@ -13,6 +13,7 @@ from PIL import Image
 from ._version import VERSION
 from .evidence import load_verified_bundle
 from .measurements import constrain
+from .domain import analysis_domain,valid_image
 
 SCHEMA='geomasklab-geospatial-assessment/1.0'
 MAX_RASTER_BYTES=128*1024*1024
@@ -74,6 +75,9 @@ def measure_geospatial(bundle,raster,*,method='nominal'):
     result=json.loads(files['result.json'])
     with Image.open(io.BytesIO(files['mask.png'])) as source:foreground=source.tobytes()
     domain=constrain(Image.new('L',image.size,255),result['task']['side'],result['task'].get('roi')).tobytes()
+    validity_enabled='analysis_config' in result
+    valid=valid_image(files,image.size).tobytes()
+    effective=analysis_domain(files,image.size,result['task']).tobytes()
     w,h=image.size
     region_count=domain.count(255)
     if method=='nominal':
@@ -83,6 +87,7 @@ def measure_geospatial(bundle,raster,*,method='nominal'):
         pixel_area=abs(transform.determinant)*factors[0]*factors[1]
         if not math.isfinite(pixel_area*w*h) or pixel_area<=0:raise ValueError('Projected cell area must be positive and finite.')
         image_area=pixel_area*w*h;region_area=pixel_area*region_count;foreground_area=pixel_area*facts['pixel_area']
+        valid_image_area=pixel_area*valid.count(255);valid_region_area=pixel_area*effective.count(255)
         assumptions=['Projected coordinate-cell area converted using declared CRS axis units.',
                      'Projection distortion is not corrected; nominal m2 may differ from ground area.',
                      'Terrain slope, elevation and semantic mask accuracy are not measured.']
@@ -101,7 +106,7 @@ def measure_geospatial(bundle,raster,*,method='nominal'):
             raise ValueError('General geodesic corner assessment is limited to 500,000 pixels; use a smaller chip or an axis-aligned EPSG:4326/3857 grid.')
         converter=pyproj.Transformer.from_crs(crs,4326,always_xy=True)
         geod=pyproj.Geod(ellps='WGS84')
-        all_areas=[];region_areas=[];positive_areas=[]
+        all_areas=[];region_areas=[];positive_areas=[];valid_image_areas=[];valid_region_areas=[]
         for y in range(h):
             for x in range(1 if row_invariant else w):
                 corners=[(transform.a*cx+transform.b*cy+transform.c,transform.d*cx+transform.e*cy+transform.f)
@@ -124,23 +129,29 @@ def measure_geospatial(bundle,raster,*,method='nominal'):
                     all_areas.append(area*w)
                     region_areas.append(area*domain[y*w:(y+1)*w].count(255))
                     positive_areas.append(area*foreground[y*w:(y+1)*w].count(255))
+                    valid_image_areas.append(area*valid[y*w:(y+1)*w].count(255))
+                    valid_region_areas.append(area*effective[y*w:(y+1)*w].count(255))
                 else:
                     all_areas.append(area)
                     if domain[y*w+x]:region_areas.append(area)
                     if foreground[y*w+x]:positive_areas.append(area)
+                    if valid[y*w+x]:valid_image_areas.append(area)
+                    if effective[y*w+x]:valid_region_areas.append(area)
         image_area=math.fsum(all_areas);region_area=math.fsum(region_areas);foreground_area=math.fsum(positive_areas)
+        valid_image_area=math.fsum(valid_image_areas);valid_region_area=math.fsum(valid_region_areas)
         model={'method':'wgs84_geodesic_corners','unit':'m2','ellipsoid':'WGS84','ground_area_corrected':True}
         assumptions=['Pixel corners are transformed to WGS84 with explicit XY axis order.',
                      'Each pixel is approximated by a four-corner polygon with geodesic edges on the WGS84 ellipsoid.',
                      'Raster boundary curvature between corners, terrain slope, elevation and semantic accuracy are not measured.']
     else:raise ValueError('Area method must be nominal or geodesic.')
     mask=np.frombuffer(foreground,dtype=np.uint8).reshape(h,w)
-    with rasterio.io.MemoryFile() as output:
+    with rasterio.Env(GDAL_TIFF_INTERNAL_MASK=True),rasterio.io.MemoryFile() as output:
         with output.open(driver='GTiff',width=w,height=h,count=1,dtype='uint8',crs=crs.to_wkt(),
                          transform=transform,compress='deflate',nodata=None) as dataset:
             dataset.write(mask,1)
+            if validity_enabled:dataset.write_mask(np.frombuffer(valid,dtype=np.uint8).reshape(h,w))
             dataset.update_tags(GeoMaskLab_evidence_sha256=hashlib.sha256(bundle).hexdigest(),
-                                foreground_encoding='0=background;255=foreground;all pixels valid')
+                                foreground_encoding='0=background;255=foreground;validity in internal mask' if validity_enabled else '0=background;255=foreground;all pixels valid')
         mask_tiff=output.read()
     record={'schema':SCHEMA,'software_version':VERSION,
         'source_bundle_sha256':hashlib.sha256(bundle).hexdigest(),'source_geotiff_sha256':hashlib.sha256(raster).hexdigest(),
@@ -153,6 +164,12 @@ def measure_geospatial(bundle,raster,*,method='nominal'):
             'coverage_of_image_area':foreground_area/image_area},
         'semantic_accuracy_verified':False,'pixel_alignment':'Exact RGB pixel equality with embedded evidence; no resampling.',
         'dependencies':{'rasterio':rasterio.__version__,'pyproj':pyproj.__version__}}
+    if validity_enabled:
+        record['analysis_config']=result['analysis_config']
+        record['measurements'].update(valid_image_pixels=valid.count(255),valid_region_pixels=effective.count(255),
+            valid_image_area_m2=valid_image_area,valid_region_area_m2=valid_region_area,
+            coverage_of_valid_image_area=foreground_area/valid_image_area if valid_image_area else None,
+            coverage_of_valid_region_area=foreground_area/valid_region_area if valid_region_area else None)
     return record,mask_tiff
 
 
@@ -189,6 +206,7 @@ def verify_geospatial_packet(payload):
         raise ValueError('Geospatial record requires area_model, grid and measurements objects.')
     method={'projected_nominal':'nominal','wgs84_geodesic_corners':'geodesic'}.get(recorded.get('area_model',{}).get('method'))
     replay,_=measure_geospatial(files['evidence.zip'],files['source.tif'],method=method)
+    if recorded.get('analysis_config')!=replay.get('analysis_config'):raise ValueError('Geospatial analysis configuration does not replay.')
     np,rasterio,pyproj=dependencies()
     for name in ('source_bundle_sha256','source_geotiff_sha256','image_sha256','task','area_model','assumptions',
                  'semantic_accuracy_verified','pixel_alignment','schema'):
@@ -219,7 +237,7 @@ def verify_geospatial_packet(payload):
                 exported.count!=1 or exported.dtypes!=('uint8',) or exported.read(1).tobytes()!=expected or
                 list(tuple(exported.transform)[:6])!=grid['transform'] or exported.crs is None or
                 pyproj.CRS.from_wkt(exported.crs.to_wkt())!=grid_crs or
-                np.any(exported.dataset_mask()!=255)):
+                exported.dataset_mask().tobytes()!=valid_image(source,(grid['width'],grid['height'])).tobytes()):
             raise ValueError('Exported GeoTIFF mask does not match the measured grid and foreground.')
     return {'verified':True,'schema':SCHEMA,'area_model':recorded['area_model'],'measurements':values,
             'scope':'Physical-area model replay and pixel alignment; no terrain or semantic accuracy claim'}

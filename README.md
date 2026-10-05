@@ -33,7 +33,8 @@ geomasklab --version
 
 You can also install the distributed wheel directly. It contains the headless
 core and JSON Schemas; source-only browser assets and examples are supplied in
-the source archive. This release candidate is **1.0.0rc2**. PyPI publication,
+the source archive. The latest published candidate is **1.0.0rc2**; the current
+development build is **1.0.0rc3.dev1**, adding declared pixel validity. PyPI publication,
 confirmed creator metadata, stable tagging and archival DOI remain pending.
 
 ## A real geospatial example

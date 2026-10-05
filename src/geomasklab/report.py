@@ -26,6 +26,14 @@ def build_report(payload):
         ('Execution', result.get('execution_kind', result['mode'])),
         ('Review status', result.get('semantic_review', {}).get('state', 'pending')),
     ]
+    if 'validity_measurements' in stats:
+        v=stats['validity_measurements']
+        rows.extend([('Valid whole-image denominator',f'{v["valid_image_pixels"]:,} px'),
+                     ('Valid selected-region denominator',f'{v["valid_region_pixels"]:,} px'),
+                     ('Coverage of valid whole image',percent(v['coverage_of_valid_image'])),
+                     ('Coverage within valid region',percent(v['coverage_of_valid_region'])),
+                     ('Excluded region pixels',f'{v["excluded_region_pixels"]:,} px'),
+                     ('Validity declaration',json.dumps(result['analysis_config']['validity']))])
     image = Image.open(io.BytesIO(files['original.png'])).convert('RGB')
     mask = Image.open(io.BytesIO(files['mask.png'])).convert('L')
     overlay = Image.composite(Image.blend(image, Image.new('RGB', image.size, (69, 213, 152)), .48), image, mask)

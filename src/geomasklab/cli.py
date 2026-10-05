@@ -27,12 +27,21 @@ def main(argv=None):
     recalc.add_argument('bundle',type=Path);recalc.add_argument('--output',type=Path,required=True)
     recalc.add_argument('--scope',choices=['all','left','right','top','bottom'],default='all')
     recalc.add_argument('--roi',type=int,nargs=4,metavar=('X1','Y1','X2','Y2'))
+    validity=recalc.add_mutually_exclusive_group()
+    validity.add_argument('--valid-mask',type=Path,help='Replace validity with an aligned binary PNG; white means included.')
+    validity.add_argument('--all-valid',action='store_true',help='Explicitly reset validity to all image pixels in a new version.')
+    recalc.add_argument('--valid-source',help='Provenance and rationale for an explicit validity mask.')
     create=sub.add_parser('create',help='Create evidence from an aligned external binary mask.')
     create.add_argument('--image',type=Path,required=True);create.add_argument('--mask',type=Path,required=True)
     create.add_argument('--target',required=True,help='Positive semantic label; 1-64 ASCII letters/digits/underscores/hyphens.')
     create.add_argument('--source',required=True);create.add_argument('--output',type=Path,required=True)
     create.add_argument('--provider-info',type=Path,help='Optional provider sidecar whose mask hash must match.')
     create.add_argument('--aligned',action='store_true',required=True,help='Assert alignment with the normalized displayed image.')
+    create.add_argument('--valid-mask',type=Path,help='Optional aligned binary validity PNG; white means included.')
+    create.add_argument('--valid-source',help='Provenance and rationale for an explicit validity mask.')
+    create.add_argument('--scope',choices=['all','left','right','top','bottom'],default='all')
+    create.add_argument('--roi',type=int,nargs=4,metavar=('X1','Y1','X2','Y2'))
+    create.add_argument('--invert',action='store_true',help='Measure the target complement within the declared valid domain.')
     assess=sub.add_parser('evaluate',help='Assess a saved result against supplied positive-target labels.')
     assess.add_argument('bundle',type=Path);assess.add_argument('reference',type=Path)
     assess.add_argument('--source',required=True);assess.add_argument('--target',required=True)
@@ -76,7 +85,7 @@ def main(argv=None):
     segment.add_argument('--argv-json',type=Path,help='JSON executable argument array containing {image} and {output}.')
     segment.add_argument('--timeout',type=float,default=300)
     schema=sub.add_parser('schema',help='Print a packaged JSON Schema.')
-    schema.add_argument('kind',choices=['manifest','result','statistics','geospatial','zonal','signature'],default='manifest',nargs='?')
+    schema.add_argument('kind',choices=['manifest','manifest-v2','analysis','validity','result','statistics','geospatial','zonal','signature'],default='manifest',nargs='?')
     args=parser.parse_args(argv)
     try:
         if args.command=='verify':
@@ -88,11 +97,18 @@ def main(argv=None):
         elif args.command=='recalc':
             raw=args.bundle.read_bytes();facts,_=load_verified_bundle(raw)
             roi={'xyxy':args.roi,'source':'imported','image_size':[facts['width'],facts['height']]} if args.roi else None
-            raw=recalculate_evidence(raw,scope=args.scope,roi=roi);write(args.output,raw)
+            from .domain import KEEP_VALIDITY
+            valid=args.valid_mask.read_bytes() if args.valid_mask else None if args.all_valid else KEEP_VALIDITY
+            raw=recalculate_evidence(raw,scope=args.scope,roi=roi,valid_mask=valid,valid_source=args.valid_source);write(args.output,raw)
             out={'output':str(args.output),**verify_bundle(raw)}
         elif args.command=='create':
             info=json.loads(args.provider_info.read_text(encoding='utf-8')) if args.provider_info else None
-            raw=create_evidence(args.image.read_bytes(),args.mask.read_bytes(),target=args.target,source=args.source,aligned=args.aligned,provider_info=info)
+            image=args.image.read_bytes()
+            from PIL import Image,ImageOps
+            with Image.open(io.BytesIO(image)) as im:size=ImageOps.exif_transpose(im).size
+            roi={'xyxy':args.roi,'source':'imported','image_size':list(size)} if args.roi else None
+            raw=create_evidence(image,args.mask.read_bytes(),target=args.target,source=args.source,aligned=args.aligned,provider_info=info,
+                scope=args.scope,roi=roi,valid_mask=args.valid_mask.read_bytes() if args.valid_mask else None,valid_source=args.valid_source,invert=args.invert)
             write(args.output,raw);out={'output':str(args.output),**verify_bundle(raw)}
         elif args.command=='evaluate':
             from .api import timestamp
@@ -167,7 +183,8 @@ def main(argv=None):
             write(Path(str(args.output)+'.provider.json'),json.dumps(product.metadata,indent=2).encode('utf-8'))
             out={'output':str(args.output),'provider':product.metadata}
         else:
-            print(files('geomasklab').joinpath('schemas',args.kind+'-1.0.schema.json').read_text(encoding='utf-8'))
+            filename='manifest-2.0.schema.json' if args.kind=='manifest-v2' else args.kind+'-1.0.schema.json'
+            print(files('geomasklab').joinpath('schemas',filename).read_text(encoding='utf-8'))
             return 0
         print(json.dumps(out,indent=2));return 0
     except (ValueError,KeyError,TypeError,OSError,zipfile.BadZipFile) as error:

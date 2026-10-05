@@ -1,2 +1,2 @@
 """Single source of software and wheel version identity."""
-VERSION = "1.0.0rc2"
+VERSION = "1.0.0rc3.dev1"

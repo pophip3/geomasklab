@@ -24,8 +24,8 @@ def build_bundle(original, run_folder):
         contents[name] = (folder / name).read_bytes()
     if (folder / 'report.md').is_file():
         contents['report.md'] = (folder / 'report.md').read_bytes()
-    if (folder / 'source_mask.png').is_file():
-        contents['source_mask.png'] = (folder / 'source_mask.png').read_bytes()
+    for name in ('source_mask.png','analysis.json','valid_mask.png','source_valid_mask.png'):
+        if (folder / name).is_file():contents[name]=(folder / name).read_bytes()
     return bundle_contents(contents)
 
 
@@ -34,11 +34,17 @@ def bundle_contents(contents):
     if not REQUIRED <= set(contents) or any('/' in n or '\\' in n for n in contents):
         raise ValueError('Evidence contents must include the required flat files.')
     result = json.loads(contents['result.json'])
-    manifest = {'schema': SCHEMA, 'software_version': result.get('software_version','unrecorded'),
+    from .domain import EVIDENCE_SCHEMA
+    manifest = {'schema': EVIDENCE_SCHEMA if 'analysis_config' in result else SCHEMA, 'software_version': result.get('software_version','unrecorded'),
                 'export_generator_version': VERSION,
                 'checksums': {name: {'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
                               for name, raw in contents.items()},
                 'verification_scope': 'file integrity and deterministic pixel arithmetic; not model accuracy or authorship'}
+    if 'analysis_config' in result:
+        v=result['metrics']['validity_measurements']
+        manifest['valid_pixels']={'config_sha256':hashlib.sha256(contents['analysis.json']).hexdigest(),
+            'mask_sha256':hashlib.sha256(contents['valid_mask.png']).hexdigest(),
+            'valid_image_pixels':v['valid_image_pixels'],'valid_region_pixels':v['valid_region_pixels']}
     output = io.BytesIO()
     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:
         for name, raw in contents.items():
@@ -61,7 +67,9 @@ def load_verified_bundle(payload):
         if len(names) > 16 or sum(item.file_size for item in infos) > MAX_BUNDLE_BYTES:
             raise ValueError('Expanded bundle exceeds size limit.')
         manifest = json.loads(archive.read('manifest.json'))
-        if manifest.get('schema') != SCHEMA:
+        from .domain import EVIDENCE_SCHEMA,DOMAIN_FILES
+        schema=manifest.get('schema')
+        if schema not in (SCHEMA,EVIDENCE_SCHEMA):
             raise ValueError('Unsupported bundle schema.')
         checksums = manifest.get('checksums', {})
         if set(checksums) != set(names) - {'manifest.json'}:
@@ -114,6 +122,32 @@ def load_verified_bundle(payload):
                       mask_sha256=checksums['mask.png']['sha256'])
     w,h = original.size
     task = result['task']
+    validity=None;valid_record=None
+    if schema==EVIDENCE_SCHEMA:
+        from .domain import validity_input,configuration,validity_measurements
+        if not {'analysis.json','valid_mask.png'}<=set(contents):raise ValueError('Declared validity files are missing.')
+        if set(contents)-(REQUIRED|{'report.md','source_mask.png'}|DOMAIN_FILES):raise ValueError('Unsupported validity-bundle member.')
+        config=json.loads(contents['analysis.json'])
+        if not isinstance(config,dict):raise ValueError('Analysis configuration must be an object.')
+        declaration=config.get('validity')
+        if not isinstance(declaration,dict):raise ValueError('Validity declaration is missing.')
+        policy=declaration.get('policy')
+        if policy=='explicit_binary_mask':
+            if 'source_valid_mask.png' not in contents:raise ValueError('Source validity mask is missing.')
+            validity,replayed,_=validity_input(contents['source_valid_mask.png'],original.size,declaration.get('source'))
+        elif policy=='all_pixels_declared_valid':
+            if 'source_valid_mask.png' in contents:raise ValueError('All-valid declaration cannot contain a source validity mask.')
+            validity,replayed,_=validity_input(None,original.size)
+        else:raise ValueError('Unknown validity policy.')
+        normalized=load_image('valid_mask.png')
+        if normalized.mode!='L' or normalized.size!=original.size or normalized.tobytes()!=validity.tobytes():
+            raise ValueError('Validity mask normalization does not replay.')
+        expected_config=configuration(task,checksums['original.png']['sha256'],original.size,replayed)
+        canonical=lambda obj:json.dumps(obj,sort_keys=True,allow_nan=False)
+        if canonical(config)!=canonical(expected_config) or canonical(result.get('analysis_config'))!=canonical(config):
+            raise ValueError('Analysis configuration does not match realized inputs and conditions.')
+    elif DOMAIN_FILES&set(contents) or 'analysis_config' in result or 'validity_measurements' in stats:
+        raise ValueError('Validity extension requires geomasklab-evidence/2.0.')
     if type(task.get('invert', False)) is not bool:
         raise ValueError('Complement flag must be boolean.')
     if task.get('roi') != stats.get('roi'):
@@ -122,6 +156,9 @@ def load_verified_bundle(payload):
     if 'roi' in options and options['roi'] != stats.get('roi'):
         raise ValueError('Report options and statistics ROI disagree.')
     side = task['side']
+    if validity is not None:
+        from .regions import validate_region
+        validate_region(side,stats.get('roi'),w,h)
     boxes = {'all':(0,0,w,h),'left':(0,0,w//2,h),'right':(w//2,0,w,h),
              'top':(0,0,w,h//2),'bottom':(0,h//2,w,h)}
     if side not in boxes:
@@ -138,6 +175,16 @@ def load_verified_bundle(payload):
         cropped = Image.new('L',(w,h),0)
         cropped.paste(expected.crop((x1,y1,x2,y2)),(x1,y1))
         expected = cropped
+    geometric_expected_area=expected.histogram()[255]
+    if validity is not None:
+        expected,_,valid_record=validity_measurements(positive,task,validity)
+        if json.dumps(stats.get('validity_measurements'),sort_keys=True,allow_nan=False)!=json.dumps(valid_record,sort_keys=True,allow_nan=False):
+            raise ValueError('Validity measurements or denominators do not replay.')
+        expected_summary={'config_sha256':checksums['analysis.json']['sha256'],
+            'mask_sha256':checksums['valid_mask.png']['sha256'],
+            'valid_image_pixels':valid_record['valid_image_pixels'],'valid_region_pixels':valid_record['valid_region_pixels']}
+        if json.dumps(manifest.get('valid_pixels'),sort_keys=True,allow_nan=False)!=json.dumps(expected_summary,sort_keys=True):
+            raise ValueError('Manifest valid-pixel summary does not replay.')
     if expected.tobytes() != mask.tobytes():
         raise ValueError('Scope/complement replay disagrees with saved mask.')
     area = mask.histogram()[255]
@@ -170,7 +217,12 @@ def load_verified_bundle(payload):
     right = positive.crop((w//2,0,w,h)).histogram()[255]
     if distribution['left_pixels'] != left or distribution['right_pixels'] != right:
         raise ValueError('Full-mask distribution disagrees.')
-    if roi and (distribution['roi_inside_pixels'] != area or distribution['roi_outside_pixels'] != left+right-area):
+    inside=geometric_expected_area if validity is not None else area
+    if validity is not None:
+        if distribution.get('basis')!='full_mask_before_scope_and_validity':raise ValueError('Validity distribution basis disagrees.')
+        if roi and (distribution.get('roi_valid_foreground_pixels')!=area or distribution.get('roi_excluded_foreground_pixels')!=inside-area):
+            raise ValueError('ROI validity distribution disagrees.')
+    if roi and (distribution['roi_inside_pixels'] != inside or distribution['roi_outside_pixels'] != left+right-inside):
         raise ValueError('ROI distribution disagrees.')
     candidates=stats.get('candidate_stats')
     if candidates is not None:
@@ -183,11 +235,12 @@ def load_verified_bundle(payload):
         if (type(minimum) is not int or minimum<1 or not isinstance(candidates.get('notice'),str) or
                 saved_fields!=measured_fields):
             raise ValueError('Candidate measurements disagree with saved mask.')
-    facts = {'verified': True, 'schema':SCHEMA, 'files_checked':len(checksums),
+    facts = {'verified': True, 'schema':schema, 'files_checked':len(checksums),
             'pixel_area':area,'area_ratio':area/(w*h),'mode':result['mode'],
             'scope':side,'width':w,'height':h,
             'semantic_review_state':review['state'] if review else 'unrecorded',
             'semantic_accuracy_verified':False,'origin_authenticated':False}
+    if valid_record is not None:facts['validity_measurements']=valid_record
     return facts, contents
 
 

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0rc3.dev1 - 5 October 2026 (development checkpoint)
+
+- Preserve explicit binary validity masks, original upload bytes and realized image-bound analysis configurations.
+- Add validity-aware evidence format 2.0 while replaying legacy format 1.0 under its original rules.
+- Report geometric and valid denominators separately, exclude invalid pixels from complements and return null for empty valid domains.
+- Use the same valid domain in reference scoring, common-domain comparison, polygon statistics and optional geographic area assessment.
+- Add browser import/replace/reset operations, valid-domain ledger fields and a reproducible real NAIP exclusion example.
+- Return an explicit no-common-valid-domain status without a difference image.
+- Keep the five-stage software-freeze target open; no human usability result or stable-release acceptance is inferred.
+
 ## 1.0.0rc2 - 5 October 2026
 
 - Correct reference-packet replay instructions to use the installed CLI and explicit alignment assertion.

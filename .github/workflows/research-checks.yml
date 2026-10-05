@@ -45,6 +45,7 @@ jobs:
       - run: python examples/real_image_handoff.py
       - run: python examples/geospatial_workflow.py
       - run: python examples/naip_zonal_workflow.py
+      - run: python examples/validity_workflow.py --geo
       - run: python examples/signature_workflow.py
       - run: python examples/prepare_handoff_study.py
       - run: python -m pip wheel . --no-deps --wheel-dir dist

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:evidence:manifest:2.0",
+  "title": "GeoMaskLab validity-aware evidence manifest, version 2.0",
+  "type": "object",
+  "required": [
+    "schema",
+    "software_version",
+    "checksums",
+    "valid_pixels"
+  ],
+  "properties": {
+    "schema": {
+      "const": "geomasklab-evidence/2.0"
+    },
+    "software_version": {
+      "type": "string"
+    },
+    "export_generator_version": {
+      "type": "string"
+    },
+    "verification_scope": {
+      "type": "string"
+    },
+    "checksums": {
+      "type": "object",
+      "minProperties": 7,
+      "maxProperties": 15,
+      "required": [
+        "original.png",
+        "full_mask.png",
+        "mask.png",
+        "overlay.png",
+        "result.json",
+        "statistics.json",
+        "run_log.json",
+        "analysis.json",
+        "valid_mask.png"
+      ],
+      "propertyNames": {
+        "pattern": "^[^/\\\\]+$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "sha256",
+          "bytes"
+        ],
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "valid_pixels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "config_sha256",
+        "mask_sha256",
+        "valid_image_pixels",
+        "valid_region_pixels"
+      ],
+      "properties": {
+        "config_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "mask_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "valid_image_pixels": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64000000
+        },
+        "valid_region_pixels": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 64000000
+        }
+      }
+    }
+  },
+  "description": "The outer ZIP contains flat filenames only. Manifest membership, file hashes, expanded sizes and deterministic pixel replay are checked by the core verifier."
+}

@@ -144,7 +144,10 @@ def measure_zones(bundle,geometry,*,coordinates='pixel',raster=None):
     with Image.open(io.BytesIO(files['original.png'])) as image:image=image.convert('RGB')
     task=json.loads(files['result.json'])['task']
     with Image.open(io.BytesIO(files['mask.png'])) as mask:positive=mask.copy()
-    source_domain=constrain(Image.new('L',image.size,255),task['side'],task.get('roi'))
+    from .domain import analysis_domain,selected_region
+    source_domain=analysis_domain(files,image.size,task)
+    geometric_source_domain=selected_region(image.size,task)
+    validity_enabled='analysis.json' in files
     pixel_area=None;grid=None
     if coordinates not in ('pixel','wgs84'):raise ValueError('Coordinate mode must be pixel or wgs84.')
     if coordinates=='wgs84' and raster is None:raise ValueError('WGS84 GeoJSON requires a matching source GeoTIFF.')
@@ -179,11 +182,17 @@ def measure_zones(bundle,geometry,*,coordinates='pixel',raster=None):
     def png(im):
         encoded=io.BytesIO();im.save(encoded,'PNG');return encoded.getvalue()
     for i,(fid,polygons) in enumerate(items,1):
-        domain=ImageChops.darker(rasterize(polygons,image.size),source_domain)
+        geometric_zone=rasterize(polygons,image.size)
+        domain=ImageChops.darker(geometric_zone,source_domain)
         foreground=ImageChops.darker(positive,domain)
         count=foreground.histogram()[255];denominator=domain.histogram()[255]
         row={'zone_id':fid,'foreground_pixels':count,'selected_region_pixels':denominator,'whole_image_pixels':whole,
              'coverage_of_region':count/denominator if denominator else None,'coverage_of_image':count/whole}
+        if validity_enabled:
+            geometric_count=ImageChops.darker(geometric_zone,geometric_source_domain).histogram()[255]
+            row.update(geometric_region_pixels=geometric_count,valid_region_pixels=denominator,
+                       excluded_region_pixels=geometric_count-denominator,
+                       denominator_definition='Zone intersected with saved scope and declared valid pixels.')
         if pixel_area is not None:row.update(foreground_area_m2=count*pixel_area,selected_region_area_m2=denominator*pixel_area,
                                            whole_image_area_m2=whole*pixel_area)
         rows.append(row);masks[f'zone-{i:02d}-domain.png']=png(domain);masks[f'zone-{i:02d}-foreground.png']=png(foreground)
@@ -195,6 +204,7 @@ def measure_zones(bundle,geometry,*,coordinates='pixel',raster=None):
             'zone_aggregation':'Independent features; overlaps may count in more than one zone. Do not sum overlapping zones as a union.',
             'edge_transformation':'Vertex-only WGS84-to-grid transformation; no edge densification.' if coordinates=='wgs84' else 'Pixel coordinates; no geographic transformation.',
             'zones':rows}
+    if validity_enabled:record['analysis_config']=json.loads(files['analysis.json'])
     return record,masks
 
 

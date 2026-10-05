@@ -11,7 +11,7 @@ from .evidence import load_verified_bundle
 
 def provenance_document(payload,*,exporter_version=VERSION):
     """Map files, pixel domain, recorded measurement and immediate derivation."""
-    _,files=load_verified_bundle(payload)
+    facts,files=load_verified_bundle(payload)
     result=json.loads(files['result.json'])
     metrics=json.loads(files['statistics.json'])
     entities={}
@@ -21,7 +21,7 @@ def provenance_document(payload,*,exporter_version=VERSION):
         names[name]=identifier
         entities[identifier]={'prov:label':name,'gml:sha256':hashlib.sha256(raw).hexdigest(),'gml:bytes':len(raw)}
     entities['gml:evidence']={'prov:label':'Verified source evidence ZIP',
-        'gml:sha256':hashlib.sha256(payload).hexdigest(),'gml:format':'geoscope-evidence/1.0',
+        'gml:sha256':hashlib.sha256(payload).hexdigest(),'gml:format':facts['schema'],
         'gml:verificationScope':'Internal consistency; no semantic accuracy or authenticated source claim'}
     entities['gml:domain']={'prov:label':'Explicit measurement domain',
         'gml:definition':json.dumps(result['task'],sort_keys=True,separators=(',',':')),
@@ -51,6 +51,9 @@ def provenance_document(payload,*,exporter_version=VERSION):
         'wasAssociatedWith':{'_:software':{'prov:activity':'gml:mapping','prov:agent':'gml:software'}}}
     if 'source_mask.png' in names:
         doc['wasDerivedFrom']['_:normalized']={'prov:generatedEntity':names['full_mask.png'],'prov:usedEntity':names['source_mask.png']}
+    if 'analysis.json' in names:
+        doc['used']['_:validity']={'prov:activity':'gml:measurement','prov:entity':names['valid_mask.png']}
+        doc['used']['_:configuration']={'prov:activity':'gml:measurement','prov:entity':names['analysis.json']}
     parent=result.get('derived_from')
     if parent:
         entities['gml:parent_evidence']={'prov:label':'Immediate parent evidence (identity only)',

@@ -32,7 +32,10 @@ REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'src/geomasklab/raster_input.py', 'docs/zonal_statistics.md', 'docs/signatures.md',
             'docs/raster_inputs.md', 'examples/naip_zonal_workflow.py',
             'examples/data/naip-denver/source.tif', 'examples/data/naip-denver/provenance.json',
-            'examples/prepare_handoff_study.py', 'evaluation/analyze_handoff_study.py')
+            'examples/prepare_handoff_study.py', 'evaluation/analyze_handoff_study.py',
+            'src/geomasklab/domain.py','src/geomasklab/schemas/analysis-1.0.schema.json',
+            'src/geomasklab/schemas/validity-1.0.schema.json','src/geomasklab/schemas/manifest-2.0.schema.json',
+            'examples/validity_workflow.py')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
                    'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist'}
 FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip', '.whl'}

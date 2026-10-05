@@ -70,7 +70,17 @@ def main():
         assert zones['zones'][0]['foreground_pixels']==9
         assert zones['zones'][0]['selected_region_pixels']==16
         checks.append('Pillow-only polygon-domain packet and numerical replay')
-        for name in ('manifest','result','statistics','geospatial','zonal','signature'):
+        run('-I','-c','from PIL import Image; m=Image.new("L",(7,5)); m.paste(255,(0,0,3,5)); m.save("valid.png")')
+        cli('create','--image','image.png','--mask','mask.png','--target','tree','--source','Installed fixture',
+            '--valid-mask','valid.png','--valid-source','Explicit left-side fixture','--aligned','--output','valid.zip')
+        valid=json.loads(cli('verify','valid.zip'))
+        assert valid['pixel_area']==6 and valid['validity_measurements']['valid_region_pixels']==15
+        empty=json.loads(cli('recalc','valid.zip','--scope','right','--output','empty-valid.zip'))
+        assert empty['validity_measurements']['valid_region_pixels']==0 and empty['validity_measurements']['coverage_of_valid_region'] is None
+        cli('evaluate','valid.zip','mask.png','--source','Installed reference fixture','--target','tree','--aligned','--output','valid-assessment.zip')
+        assert json.loads(cli('verify-assessment','valid-assessment.zip'))['verified']
+        checks.append('Installed validity-aware evidence, empty-domain handling and reference replay')
+        for name in ('manifest','manifest-v2','analysis','validity','result','statistics','geospatial','zonal','signature'):
             schema=json.loads(cli('schema',name));assert schema['$schema'].endswith('2020-12/schema')
         checks.append('Packaged JSON Schema resources')
         scripts=python.parent/('geomasklab.exe' if os.name=='nt' else 'geomasklab')

@@ -21,13 +21,21 @@ $('importMaskBtn').onclick=()=>{
  const sid=state.session.id,parent=state.selected?.id||null;
  modal('Import a prediction mask',`<p>Use a binary mask from another segmentation tool without configuring model services. A new whole-image version will start pending review.</p><form id="maskImportForm" class="review-form">${maskFormFields()}<div class="modal-notice">Use the same orientation and pixel grid as the displayed image. Source information is self-reported. Color-coded, multiclass and probability masks require explicit conversion before import.</div><button class="primary" id="submitMaskImport" type="submit">Import as a new version</button><p id="maskImportStatus" role="status"></p></form>`,'EXTERNAL PREDICTION');
  $('maskTarget').value=state.selected?.task?.target||$('quickTarget').value;
+ const fields=document.createElement('div');fields.innerHTML='<label for="importValidityFile">Optional validity PNG · white includes, black excludes</label><input id="importValidityFile" type="file" accept="image/png,.png"><label for="importValiditySource">Validity source and exclusion rationale</label><textarea id="importValiditySource" maxlength="1000" rows="2"></textarea><p class="mask-input-hint">Without a validity mask, all pixels are declared valid. Prediction and validity masks have separate roles.</p>';
+ $('submitMaskImport').before(fields);
+ $('importValidityFile').onchange=()=>{$('importValiditySource').required=!!$('importValidityFile').files.length;};
  $('maskImportForm').onsubmit=async e=>{
   e.preventDefault();if(state.busy)return;const form=e.currentTarget,file=$('maskFile').files[0];
   if(!file||file.size>12*1024*1024)return toast('Choose a binary PNG mask no larger than 12 MB.');
   const target=$('maskTarget').value,source=$('maskSource').value;
+  const validFile=$('importValidityFile').files[0],validSource=$('importValiditySource').value;
+  if(validFile&&validFile.size>12*1024*1024)return toast('Choose a validity PNG no larger than 12 MB.');
+  if(!validFile&&validSource.trim())return toast('Choose a validity mask for the supplied validity source.');
   state.busy=true;$('submitMaskImport').disabled=true;$('maskImportStatus').textContent='Validating mask pixels and saving a separate version…';refreshWorkbench();
   try{
-   const result=await api('/api/import-mask',{session_id:sid,parent_run_id:parent,target,source,aligned:true,mask:await maskFileData(file)});
+   const request={session_id:sid,parent_run_id:parent,target,source,aligned:true,mask:await maskFileData(file)};
+   if(validFile){request.valid_mask=await maskFileData(validFile);request.valid_source=validSource;}
+   const result=await api('/api/import-mask',request);
    if(state.session?.id===sid){localStorage.setItem('geoscope-selected-'+sid,result.id);await showSession(await api('/api/session/'+sid));}
    if($('maskImportForm')===form)closeModal();toast('External mask imported. Review is pending; no inference was performed.');
   }catch(error){if($('maskImportForm')===form){$('maskImportStatus').textContent=error.message;$('submitMaskImport').disabled=false;}toast(error.message);}

@@ -136,6 +136,24 @@
           "whole_image_area_m2": {
             "type": "number",
             "minimum": 0
+          },
+          "geometric_region_pixels": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64000000
+          },
+          "valid_region_pixels": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64000000
+          },
+          "excluded_region_pixels": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 64000000
+          },
+          "denominator_definition": {
+            "type": "string"
           }
         },
         "dependentRequired": {
@@ -145,6 +163,145 @@
           ]
         }
       }
+    },
+    "analysis_config": {
+      "title": "GeoMaskLab realized analysis configuration",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema": {
+          "const": "geomasklab-analysis-config/1.0"
+        },
+        "image_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "image_size": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "coordinate_system": {
+          "const": "normalized_image_pixels"
+        },
+        "scope": {
+          "enum": [
+            "all",
+            "left",
+            "right",
+            "top",
+            "bottom"
+          ]
+        },
+        "roi": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+        },
+        "invert": {
+          "type": "boolean"
+        },
+        "connectivity": {
+          "const": 8
+        },
+        "validity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "policy",
+            "source",
+            "upload_sha256",
+            "alignment_user_assertion",
+            "origin_authenticated"
+          ],
+          "properties": {
+            "policy": {
+              "enum": [
+                "explicit_binary_mask",
+                "all_pixels_declared_valid"
+              ]
+            },
+            "source": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "maxLength": 1000
+            },
+            "upload_sha256": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "alignment_user_assertion": {
+              "const": true
+            },
+            "origin_authenticated": {
+              "const": false
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "policy": {
+                    "const": "explicit_binary_mask"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "source": {
+                    "type": "string"
+                  },
+                  "upload_sha256": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  }
+                }
+              },
+              "else": {
+                "properties": {
+                  "source": {
+                    "type": "null"
+                  },
+                  "upload_sha256": {
+                    "type": "null"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "schema",
+        "image_sha256",
+        "image_size",
+        "coordinate_system",
+        "scope",
+        "roi",
+        "target",
+        "invert",
+        "connectivity",
+        "validity"
+      ]
     }
   }
 }

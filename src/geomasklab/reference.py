@@ -11,7 +11,7 @@ from PIL import Image, ImageChops, ImageOps
 from .evidence import load_verified_bundle
 from .masks import binary_png, source_text
 from .contract import VERSION
-from .comparison import selected_region
+from .domain import analysis_domain
 
 
 def evaluate_reference(bundle, reference, *, source, target, independent, created_at):
@@ -34,7 +34,7 @@ def evaluate_reference(bundle, reference, *, source, target, independent, create
         pred = im.copy()
     with Image.open(io.BytesIO(files['original.png'])) as im:
         original = im.convert('RGB')
-    domain = selected_region(pred.size, task)
+    domain = analysis_domain(files,pred.size,task)
     # Convert positive-target labels to the same meaning as the saved output.
     scoped_ref = ImageChops.multiply(ImageOps.invert(ref) if task.get('invert') else ref, domain)
     tp = ImageChops.multiply(pred, scoped_ref)
@@ -71,6 +71,9 @@ def evaluate_reference(bundle, reference, *, source, target, independent, create
               'interpretation': 'Pixel agreement against the supplied reference inside the saved result scope. '
                   'Reference quality, independence, alignment and representativeness require external validation. '
                   'One image does not establish general model accuracy; undefined ratios are null.'}
+    if 'analysis_config' in result:
+        record['analysis_config']=result['analysis_config']
+        record['domain_definition']='Selected geometric region intersected with saved declared valid pixels.'
     return record, output.getvalue()
 
 

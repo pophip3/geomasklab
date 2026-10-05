@@ -1,6 +1,6 @@
 """Explicit offline analysis of a verified full-image prediction.
 
-This operation changes only the spatial scope. It does not call a model,
+This operation changes the spatial scope or declared pixel validity. It does not call a model,
 interpret a new semantic request, or turn an imported prediction into truth.
 """
 from copy import deepcopy
@@ -13,6 +13,8 @@ from PIL import Image, ImageOps
 from .evidence import load_verified_bundle
 from .contract import VERSION
 from .review import initial_review
+from .domain import (KEEP_VALIDITY, validity_input, configuration,
+                     valid_image, validity_measurements, add_validity_statistics)
 
 SCOPE_NAMES = {'all': 'Whole image', 'left': 'Left half', 'right': 'Right half',
                'top': 'Top half', 'bottom': 'Bottom half'}
@@ -43,8 +45,8 @@ def validate_region(side, roi, width, height):
 
 
 def prepare_analysis(payload, side, roi, *, run_id, created_at, version,
-                     statistics, constrain):
-    """Verify first, then return a derived record and an explicit file allowlist."""
+                     statistics, constrain, valid_mask=KEEP_VALIDITY, valid_source=None):
+    """Verify first, then derive a domain, retaining validity unless replaced."""
     start = time.perf_counter()
     facts, source_files = load_verified_bundle(payload)
     source = json.loads(source_files['result.json'])
@@ -61,12 +63,26 @@ def prepare_analysis(payload, side, roi, *, run_id, created_at, version,
     task.update(side=side, roi=roi, scope_rule='deterministic_pixel_scope')
     positive = ImageOps.invert(full) if task.get('invert') else full
     mask = constrain(positive, side, roi)
+    domain_files={};config=None;valid=None
+    if valid_mask is KEEP_VALIDITY:
+        if valid_source is not None:raise ValueError('A validity source requires an explicit valid mask.')
+        if source.get('analysis_config') is not None:
+            valid=valid_image(source_files,image.size)
+            declaration=deepcopy(source['analysis_config']['validity'])
+            domain_files={name:source_files[name] for name in ('valid_mask.png','source_valid_mask.png') if name in source_files}
+    else:
+        valid,declaration,domain_files=validity_input(valid_mask,image.size,valid_source)
+    if valid is not None:
+        mask,_,_=validity_measurements(positive,task,valid)
+        config=configuration(task,source['provenance']['image_sha256'],image.size,declaration)
+        domain_files['analysis.json']=json.dumps(config,indent=2).encode()
     metrics = statistics(mask, side, roi, positive)
+    if valid is not None:add_validity_statistics(metrics,positive,task,valid)
     metrics['scope_label'] = SCOPE_NAMES[side]
     metrics['spatial_rule'] = 'Deterministic pixel crop; area_ratio uses the whole image as its denominator.'
     overlay = image.copy()
     overlay.paste(Image.blend(image, Image.new('RGB', image.size, (69, 213, 152)), .48), (0, 0), mask)
-    files = {'full_mask.png': source_files['full_mask.png']}
+    files = {'full_mask.png': source_files['full_mask.png'],**domain_files}
     if 'source_mask.png' in source_files:
         files['source_mask.png'] = source_files['source_mask.png']
     for name, value in (('mask.png', mask), ('overlay.png', overlay)):
@@ -113,6 +129,13 @@ def prepare_analysis(payload, side, roi, *, run_id, created_at, version,
             {'step': 3, 'name': 'Create a separate result version', 'state': 'completed',
              'detail': 'Retained prediction provenance and reset semantic review to pending.'}]}
     result['duration_ms'] = round((time.perf_counter() - start) * 1000, 2)
+    if config is not None:
+        result['analysis_config']=config
+        result['query']=f'Recalculate the {scope_text} and declared validity from the saved {task["target"]} mask.'
+        v=metrics['validity_measurements']
+        coverage='undefined (no valid pixels)' if v['coverage_of_valid_region'] is None else f'{v["coverage_of_valid_region"]*100:.2f}%'
+        result['message']+=f' Valid-region coverage: {coverage}; denominator: {v["valid_region_pixels"]:,} pixels; excluded: {v["excluded_region_pixels"]:,} pixels.'
+        result['trace'][1]['detail']='Applied the declared region and valid pixels to the original full-image mask; no model inference.'
     if source.get('external_mask'):
         result['external_mask'] = deepcopy(source['external_mask'])
     return result, files
@@ -153,7 +176,12 @@ def region_report(session, result):
              '- Integrity checks do not authenticate the source or establish semantic accuracy.',
              '- Coverage is measured in image pixels, not square meters or hectares.',
              '- Recalculating a region cannot correct a missed target or an inaccurate boundary.',
-             '- Replay: python export_bundle.py <bundle.zip>', '']
+             '- Replay: geomasklab verify <bundle.zip>', '']
+    if 'validity_measurements' in m:
+        lines.extend(['## Declared validity', '',
+                      json.dumps(result['analysis_config'],indent=2),
+                      json.dumps(m['validity_measurements'],indent=2),
+                      'Validity is a user-declared analysis condition, not an accuracy assessment.', ''])
     if result.get('imported_evidence'):
         lines.extend(['## Evidence handoff', '', '- Import did not run models.',
                       '- Single-run imports do not restore the complete branch history.', ''])

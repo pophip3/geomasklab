@@ -68,6 +68,10 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
     ]
     if roi:
         lines.append(f'- Full-mask foreground inside/outside the ROI: {metrics["distribution"]["roi_inside_pixels"]:,} / {metrics["distribution"]["roi_outside_pixels"]:,} pixels')
+    if 'validity_measurements' in metrics:
+        lines.extend(['', '## Declared validity', '',
+                      recorded(result['analysis_config']),recorded(metrics['validity_measurements']),
+                      'Validity is a user-declared analysis condition, not an accuracy assessment.'])
     lines += ['', '## Review and reproduction', '',
         f'- Semantic review state: {review["state"]}; decisions are self-reported, not authenticated.',
         f'- Recorded review events: {recorded(review["events"])}',
@@ -76,7 +80,7 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
         f'- Image/mask dimensions match: {metrics["width"] == session["width"] and metrics["height"] == session["height"]}',
         f'- Spatial check: {metrics["spatial_check"]}',
         '- Bundle files: original.png, full_mask.png, mask.png, overlay.png, statistics.json, result.json, run_log.json, report.md and manifest.json.',
-        '- Offline verification: `python export_bundle.py path/to/evidence.zip`.',
+        '- Offline verification: `geomasklab verify path/to/evidence.zip`.',
         '- Verification replays scope, complement and pixel measurements. It does not authenticate authors or establish semantic accuracy.',
         '- Measurements use image pixels, not square meters, hectares or geographic coordinates.',
         '- Review target identity, omissions, false positives and component boundaries separately.',
