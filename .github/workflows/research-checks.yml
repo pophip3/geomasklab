@@ -25,6 +25,7 @@ jobs:
       - run: python evaluation/run_integrity_matrix.py
       - run: python evaluation/recompute_historical.py
       - run: python examples/reproduce_example.py
+      - run: python examples/recalculate_region.py reviewer-output/right.zip
       - run: python -m pip install --no-deps label-studio-sdk==2.1.2
       - run: python examples/compare_handoff.py
       - run: python label_studio_export.py reviewer-output/right.zip --output workflow-output/label-studio

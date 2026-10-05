@@ -95,3 +95,20 @@ documented separately; it exposes substantial misses and false positives. The
 quick walkthrough does not claim to reproduce that model experiment or its
 semantic performance. Changes to model behavior require development images and
 a new frozen evaluation before making new performance claims.
+# Offline investigation of a saved mask
+
+After selecting a mask result, click **Recalculate region (offline)**. Choose
+the whole image, one image half, or the current rectangle ROI. To use another
+rectangle, draw it on the image before opening the dialog. The target and
+complement remain fixed; this operation creates a separate result version with
+pending review and does not call model services. It works on imported evidence.
+
+The main coverage value uses the whole image as its denominator. The separate
+**Within-region coverage** value uses the selected region. Older records without
+these fields show that the value was not recorded; they remain importable.
+
+For a model-free CLI check, run `python reviewer_demo.py`, followed by
+`python examples/recalculate_region.py reviewer-output/right.zip`. The script
+checks four saved-mask analyses against direct Pillow crops. It does not
+measure neural prediction accuracy. See [software scope](software_scope.md).
+

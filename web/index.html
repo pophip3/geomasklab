@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>观域 GeoScope · 遥感分割实验工作台</title><link rel="stylesheet" href="styles.css?v=0.5.0"><link rel="stylesheet" href="competition.css?v=0.9.0-dev.2"><link rel="stylesheet" href="v07.css?v=0.9.0-dev.2-handoff1"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GeoMaskLab · Segmentation Workbench</title><link rel="stylesheet" href="styles.css?v=0.5.0"><link rel="stylesheet" href="competition.css?v=0.9.0-dev.2"><link rel="stylesheet" href="v07.css?v=0.9.0-dev.2-handoff1"></head>
 <body>
 <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg"><defs>
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
@@ -20,7 +20,7 @@
 </defs></svg>
 <div class="app">
   <header class="topbar">
-    <div class="brand"><a class="brand-mark" href="/" aria-label="观域工作台"><span></span><span></span><span></span></a><strong>观域<span>GeoScope</span></strong><div class="brand-divider"></div><span class="top-caption">遥感分割实验工作台</span></div>
+    <div class="brand"><a class="brand-mark" href="/" aria-label="GeoMaskLab workbench"><span></span><span></span><span></span></a><strong>GeoMaskLab<span>Research Workbench</span></strong><div class="brand-divider"></div><span class="top-caption">遥感分割实验工作台</span></div>
     <nav class="top-nav" aria-label="主导航"><button class="active" id="workspaceBtn">工作台</button><button id="galleryBtn">选择影像</button><button id="historyBtn">实验记录</button><button id="aboutBtn">系统说明</button></nav>
     <div class="top-actions"><span class="version-tag">研究预览版</span><button class="text-button" id="connectionBtn"><span class="status-dot amber"></span><span id="connectionLabel">演示模式</span><svg><use href="#i-settings"/></svg></button></div>
   </header>
@@ -49,17 +49,17 @@
         <div class="results-body"><div class="result-title"><span class="eyebrow" id="resultEyebrow">COVERAGE ANALYSIS</span><h3 id="resultTitle">等待目标提取</h3><p id="resultSubtitle">运行一条任务，结果将在这里呈现</p></div>
         <div class="answer-card" id="answerCard" hidden><p id="answerText"></p><small>RemoteAgent 直接理解影像 · 未调用 RemoteSAM</small></div>
         <div class="coverage-card" id="coverageCard"><span>占整幅影像比例</span><div class="coverage-number"><strong id="ratioValue">—</strong><b>%</b><svg viewBox="0 0 64 64" class="coverage-ring"><circle cx="32" cy="32" r="26"/><circle id="ringValue" cx="32" cy="32" r="26" stroke-dasharray="0 164"/></svg></div><div class="coverage-track"><i id="coverageBar"></i></div><small>像素级统计 · 整图作为分母</small></div>
-        <dl class="metrics" id="metricsPanel"><div><dt>目标像素面积</dt><dd id="areaValue">— <small>px</small></dd></div><div><dt>分析范围</dt><dd id="scopeValue">—</dd></div><div><dt>候选区域</dt><dd id="candidateValue">—</dd></div><div><dt>执行模式</dt><dd id="qualityValue">—</dd></div><div><dt>影像总像素</dt><dd id="totalValue">480,000</dd></div><div><dt>执行耗时</dt><dd id="timeValue">—</dd></div></dl>
+        <button class="secondary" id="recalculateBtn" type="button" disabled>Recalculate region (offline)</button><p class="composer-note">Within-region coverage: <strong id="regionCoverage">—</strong></p><dl class="metrics" id="metricsPanel"><div><dt>目标像素面积</dt><dd id="areaValue">— <small>px</small></dd></div><div><dt>分析范围</dt><dd id="scopeValue">—</dd></div><div><dt>候选区域</dt><dd id="candidateValue">—</dd></div><div><dt>执行模式</dt><dd id="qualityValue">—</dd></div><div><dt>影像总像素</dt><dd id="totalValue">480,000</dd></div><div><dt>执行耗时</dt><dd id="timeValue">—</dd></div></dl>
         <details class="checks" id="checksPanel"><summary><span>结果验证</span><b id="checkCount">0 / 3</b></summary><div id="checksList"><p class="pending"><span>○</span> 结果与原始影像对齐</p><p class="pending"><span>○</span> 空间条件完成检查</p><p class="pending"><span>○</span> 统计与产物已生成</p></div><small>检查通过不代表语义或边界完全正确</small></details>
         <div class="semantic-review" id="reviewPanel" hidden><strong id="reviewState">待人工复核</strong><p id="reviewSummary">检查目标语义、漏检、误检和边界后记录决定。</p><button class="secondary" id="reviewBtn">记录人工复核</button></div>
         <div class="artifact-box" id="artifactBox"><div><svg><use href="#i-layers"/></svg><strong>结果可追溯、可导出</strong></div><p id="artifactText">原图 · 蒙版 · 叠加图 · 统计 · 日志</p><div class="artifact-actions"><button class="primary" id="exportBtn" disabled><svg><use href="#i-down"/></svg>导出实验包</button><button id="reportBtn" class="secondary" disabled>实验报告</button><button id="detailBtn" class="text-button">查看依据 <span>↗</span></button></div></div></div>
       </section>
     </div>
     <details class="execution-panel"><summary class="execution-top"><div><span class="status-dot" id="executionDot"></span><h2>查看智能体执行过程</h2><span id="runLabel">等待实验开始</span></div><span class="expand-hint">任务理解 → 工具执行 → 结果验证　⌄</span></summary><div id="trace" class="trace-steps"><div class="trace-placeholder"><svg><use href="#i-target"/></svg><span>执行后可在这里查看每一步依据。</span></div></div><button class="text-button log-button" id="logBtn">查看完整日志 <span>↗</span></button></details>
-    <footer class="page-footer"><span><i></i> GEOSCOPE LAB <b>·</b> RemoteAgent 决策 · Harness 校验 · RemoteSAM 感知</span><span>结果可验证 · 过程可追溯</span></footer>
+    <footer class="page-footer"><span><i></i> GEOMASKLAB <b>·</b> RemoteAgent 决策 · Harness 校验 · RemoteSAM 感知</span><span>结果可验证 · 过程可追溯</span></footer>
   </main>
 </div>
-<dialog id="modal"><div class="modal-header"><div><span class="eyebrow" id="modalEyebrow">GEOSCOPE LAB</span><h2 id="modalTitle"></h2></div><button id="closeModal" class="icon-button" aria-label="关闭"><svg><use href="#i-x"/></svg></button></div><div id="modalBody"></div></dialog>
+<dialog id="modal"><div class="modal-header"><div><span class="eyebrow" id="modalEyebrow">GEOMASKLAB</span><h2 id="modalTitle"></h2></div><button id="closeModal" class="icon-button" aria-label="关闭"><svg><use href="#i-x"/></svg></button></div><div id="modalBody"></div></dialog>
 <div id="toast" role="status" hidden></div>
-<script src="app.js?v=0.9.0-dev.2-handoff2"></script>
+<script src="app.js?v=0.9.0-dev.3-region"></script>
 </body></html>

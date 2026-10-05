@@ -1,6 +1,23 @@
-# GeoScope Workbench — SoftwareX preparation
+# GeoMaskLab Workbench
 
-Private development preview, version **0.9.0-dev.2**. This repository is separate
+> A traceable workbench for remote-sensing segmentation and region-specific pixel measurements.
+
+[![License: pending](https://img.shields.io/badge/license-pending-lightgrey)](Licence.txt)
+[![Research software checks](https://github.com/pophip3/geoscope-softwarex/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geoscope-softwarex/actions/workflows/research-checks.yml)
+
+## Documentation website
+
+For the software's purpose, installation, examples, model configuration and
+evidence-review workflow, see the English [documentation website source](docs/site/index.html).
+Public hosting is being checked; a live website link will be added after it is verified.
+
+## Development status
+
+**GeoMaskLab** is the research software's working name. The existing repository
+URL and evidence schema identifiers are retained for compatibility; see the
+[name decision and search limits](docs/product_name.md).
+
+Private development preview, version **0.9.0-dev.3**. This repository is separate
 from the competition repository. It is not a submitted manuscript or an approved
 open-source release. The user has authorized publication of their competition
 code in a modified research version. The original competition repository stays
@@ -8,7 +25,24 @@ unchanged. Formal licensing remains unresolved. A frozen 60-image real-model
 application evaluation of an earlier commit is complete, with the limitations below.
 Software completion and reviewer usability take priority over further manuscript editing.
 
-GeoScope Workbench records bounded image-segmentation experiments: a language
+The version 1.0 [functional scope and application context](docs/software_scope.md)
+are now defined. GeoMaskLab is a local browser workbench for traceable segmentation
+and region-specific pixel measurements. See the
+[published SoftwareX repository inspection](docs/softwarex_repository_reference.md)
+and [source-first distribution decision](docs/distribution_plan.md).
+
+Use **Recalculate region (offline)** on a saved result to create a new spatial
+analysis without model services. The target and complement are retained, the
+full-mask bytes are preserved, and the derived result starts a separate pending
+review. Whole-image coverage and within-region coverage have distinct, verified
+denominators; this operation cannot correct an inaccurate prediction.
+
+```sh
+python reviewer_demo.py
+python examples/recalculate_region.py reviewer-output/right.zip
+```
+
+GeoMaskLab Workbench records bounded image-segmentation experiments: a language
 planner proposes one allowed action; a deterministic executor binds the image,
 checks target and task options, requests a mask, applies pixel scopes, measures
 coverage, and preserves experiment branches. Existing RemoteAgent/RemoteSAM models
@@ -66,8 +100,8 @@ It does not restore ancestors absent from this single-result export or trust
 foreign inference-cache hints. A new inference request still needs configured services.
 
 Five procedural cases passed an actual roundtrip through the official **Label
-Studio SDK 2.1.2 brush converter**, as well as GeoScope handoff/reload/export.
-Four controlled inconsistent-metadata cases were rejected by GeoScope even after
+Studio SDK 2.1.2 brush converter**, as well as GeoMaskLab handoff/reload/export.
+Four controlled inconsistent-metadata cases were rejected by GeoMaskLab even after
 their file checksums were regenerated. This demonstrates additional domain checks,
 not a defect in Label Studio or superior segmentation. A previously run live
 development-image bundle also restored exactly, without new inference. See the
@@ -92,7 +126,7 @@ timings are not a speed comparison because the operations perform different work
 Copy `.env.example` to `.env`, configure actual compatible endpoints, model ID,
 checkpoint revision and credentials, then restart. The planner endpoint implements
 OpenAI-compatible multimodal chat completions and returns one restricted `T_call`
-or one `<answer>` block. The mask endpoint implements the documented GeoScope JSON
+or one `<answer>` block. The mask endpoint implements the documented GeoMaskLab JSON
 contract. External service deployments and model licenses must be checked
 separately. Health checks do not establish inference quality.
 

@@ -135,7 +135,7 @@ class IntegrationTests(unittest.TestCase):
                 self.assertIn('候选连通区域', report)
             with opener.open(endpoint+result['report_url']) as response:
                 self.assertEqual(response.status, 200)
-                self.assertIn('GeoScope 实验报告', response.read().decode('utf-8'))
+                self.assertIn(server.capabilities()['name'], response.read().decode('utf-8'))
             self.assertIsNone(server.get_session('../../anything'))
         finally:
             httpd.shutdown(); httpd.server_close(); thread.join()

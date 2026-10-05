@@ -121,6 +121,22 @@ def load_verified_bundle(payload):
     ratio = stats.get('area_ratio')
     if not isinstance(ratio,(int,float)) or not math.isfinite(ratio) or not math.isclose(ratio,area/(w*h),rel_tol=1e-12,abs_tol=1e-12):
         raise ValueError('Coverage denominator or ratio is incorrect.')
+    if 'scope_area_pixels' in stats or 'scope_area_ratio' in stats:
+        # Older bundles contain only whole-image coverage and remain readable.
+        x1,y1,x2,y2=boxes[side]
+        if roi:
+            rx1,ry1,rx2,ry2=roi['xyxy']
+            x1,y1,x2,y2=max(x1,rx1),max(y1,ry1),min(x2,rx2),min(y2,ry2)
+        selected_area=max(0,x2-x1)*max(0,y2-y1)
+        within=stats.get('scope_area_ratio')
+        if type(stats.get('scope_area_pixels')) is not int or stats['scope_area_pixels']!=selected_area:
+            raise ValueError('Selected-region denominator is incorrect.')
+        if selected_area:
+            if (type(within) not in (int,float) or not math.isfinite(within) or
+                not math.isclose(within,area/selected_area,rel_tol=1e-12,abs_tol=1e-12)):
+                raise ValueError('Within-region coverage is incorrect.')
+        elif 'scope_area_ratio' not in stats or within is not None:
+            raise ValueError('An empty analysis scope must have null coverage.')
     if stats.get('scope') != side or stats.get('ground_area_available') is not False or stats.get('unit') != 'pixel':
         raise ValueError('Spatial interpretation is inconsistent.')
     distribution = stats['distribution']

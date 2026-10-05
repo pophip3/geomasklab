@@ -1,4 +1,4 @@
-"""GeoScope prototype: traceable sessions, real geometry, explicit demo/live modes."""
+"""GeoMaskLab prototype: traceable sessions, real geometry, explicit demo/live modes."""
 from __future__ import annotations
 import base64
 import csv
@@ -11,7 +11,7 @@ import threading
 import time
 import uuid
 import zipfile
-from pixel_geometry import candidate_statistics
+from pixel_geometry import candidate_statistics, scope_area_pixels
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -38,10 +38,10 @@ TARGETS = {'building': '建筑', 'aircraft': '飞机', 'road': '道路', 'water'
 DESCRIPTIONS = {'building':'all buildings','aircraft':'all planes','road':'all roads','water':'water bodies','tree':'trees and vegetation','ship':'all ships'}
 SAMPLES = {
  'urban': {'name': '合成街区流程样例', 'file': 'urban.png', 'target': 'building', 'size': [800,600],
-  'source': 'GeoScope fixtures.py 程序生成的合成街区；仅演示像素运算，不是遥感观测或模型预测。',
+  'source': 'GeoMaskLab fixtures.py 程序生成的合成街区；仅演示像素运算，不是遥感观测或模型预测。',
   'scene': '这是一幅包含建筑、道路和集中绿地的合成街区流程图。可以提取建筑区域，比较影像两侧的覆盖占比。此说明为样例预置文本，并非模型看图结果。'},
  'airport': {'name': '合成飞机流程样例', 'file': 'airport.jpg', 'target': 'aircraft', 'size': [800,800],
-  'source': 'GeoScope fixtures.py 程序生成的合成飞机图形；仅演示像素运算，不是遥感观测或模型预测。',
+  'source': 'GeoMaskLab fixtures.py 程序生成的合成飞机图形；仅演示像素运算，不是遥感观测或模型预测。',
   'scene': '这幅合成流程图包含两个飞机形状。可以提取左侧或右侧飞机并计算像素覆盖。此说明为样例预置文本，并非模型看图结果。'},
 }
 
@@ -75,6 +75,7 @@ def foreground_area(mask):
 
 def statistics(mask,side,roi=None,full_mask=None):
     w,h=mask.size; area=sum(mask.histogram()[1:]); bbox=mask.getbbox()
+    scope_area=scope_area_pixels(w,h,side,roi)
     full=full_mask if full_mask is not None else mask
     left=foreground_area(full.crop((0,0,w//2,h)))
     right=foreground_area(full.crop((w//2,0,w,h)))
@@ -83,6 +84,7 @@ def statistics(mask,side,roi=None,full_mask=None):
         distribution['roi_inside_pixels']=area
         distribution['roi_outside_pixels']=left+right-area
     return {'pixel_area':area,'total_pixels':w*h,'area_ratio':area/(w*h),'bbox_xyxy':list(bbox) if bbox else None,
+            'scope_area_pixels':scope_area,'scope_area_ratio':area/scope_area if scope_area else None,
             'width':w,'height':h,'scope':side,'scope_label':SIDES[side], 'unit':'pixel',
             'spatial_rule':'像素范围裁切；面积比例的分母始终为整幅影像',
             'spatial_check':mask.tobytes()==constrain(mask,side,roi).tobytes(),
@@ -90,6 +92,9 @@ def statistics(mask,side,roi=None,full_mask=None):
 
 def experiment_report(session, result):
     """Build a readable report strictly from persisted, deterministic run fields."""
+    if result.get('execution_kind') == 'saved_mask_region_analysis':
+        from region_analysis import region_report
+        return region_report(session, result)
     metrics=result['metrics']; task=result['task']; candidates=metrics['candidate_stats']
     options=result.get('task_options',{})
     service=result.get('service_metadata') or {}
@@ -103,7 +108,7 @@ def experiment_report(session, result):
     roi=options.get('roi')
     quality=options.get('effective_quality_mode') or '服务未确认'
     review=result.get('semantic_review') or initial_review()
-    lines=[f'# GeoScope 实验报告：{session["name"]}', '',
+    lines=[f'# GeoMaskLab 实验报告：{session["name"]}', '',
            f'- 实验编号：{result["id"]}',f'- 运行状态：{result["status"]}（语义与边界仍需人工复核）',
            f'- 输入影像：{session["width"]} × {session["height"]} 像素',
            f'- 数据来源：{session["source"]}',f'- 用户任务：{result["query"]}',
@@ -336,6 +341,49 @@ def review_result(s, payload):
         save_json(DATA/s['id']/'session.json',public_session(s))
         return result
     finally: s['lock'].release()
+
+
+def recalculate_region(s, payload):
+    """Create a separate spatial-analysis version without invoking model services."""
+    from export_bundle import build_bundle
+    from region_analysis import prepare_analysis
+    if set(payload)-{'session_id','run_id','scope','roi'}:
+        raise ValueError('Offline region analysis accepts only a source run and spatial scope; it cannot change the semantic target.')
+    rid=payload.get('run_id')
+    if not isinstance(rid,str) or not SID_RE.fullmatch(rid):
+        raise ValueError('Invalid source run ID.')
+    if not s['lock'].acquire(blocking=False):
+        raise ValueError('This session is busy. Wait for the current operation to finish.')
+    try:
+        source=next((r for r in s['runs'] if r['id']==rid),None)
+        if not source or not source.get('mask_url'):
+            raise ValueError('Select an existing mask result in this session.')
+        source_folder=DATA/s['id']/rid
+        bundle=build_bundle(DATA/s['id']/'original.png',source_folder)
+        runid=uid()
+        result,files=prepare_analysis(bundle,payload.get('scope','all'),payload.get('roi'),
+            run_id=runid,created_at=now(),version=len(s['runs'])+1,
+            statistics=statistics,constrain=constrain)
+        if result['session_id']!=s['id'] or result['parent_run_id']!=rid:
+            raise ValueError('The saved result does not belong to this session.')
+        base=f'/experiments/{s["id"]}/{runid}'
+        result.update(mask_url=base+'/mask.png',overlay_url=base+'/overlay.png',
+            export_url=f'/api/export/{s["id"]}/{runid}',report_url=f'/api/report/{s["id"]}/{runid}')
+        report=experiment_report(s,result)
+        folder=DATA/s['id']/runid
+        folder.mkdir()
+        for name,raw in files.items(): (folder/name).write_bytes(raw)
+        save_json(folder/'statistics.json',result['metrics'])
+        save_json(folder/'result.json',{k:v for k,v in result.items() if k!='trace'})
+        save_json(folder/'run_log.json',result['trace'])
+        (folder/'report.md').write_text(report,encoding='utf-8')
+        s['runs'].append(result)
+        task=result['task']
+        s['context']={key:task.get(key) for key in ('target','side','invert','roi','quality_mode')}
+        save_json(DATA/s['id']/'session.json',public_session(s))
+        return result
+    finally:
+        s['lock'].release()
 
 def run_batch(p, progress=None, batch_id=None):
     ids=p.get('session_ids')
@@ -668,6 +716,10 @@ class Handler(SimpleHTTPRequestHandler):
             if self.path=='/api/check-services': return self.json(inspect_services())
             if self.path=='/api/session': return self.json(new_session(p.get('sample','urban'),p.get('image'),p.get('name')))
             if self.path=='/api/import': return self.json(import_evidence(p))
+            if self.path=='/api/recalculate-region':
+                s=get_session(p.get('session_id'))
+                if not s: raise ValueError('Session not found. Select an image first.')
+                return self.json(recalculate_region(s,p))
             if self.path=='/api/run':
                 s=get_session(p.get('session_id'))
                 if not s: raise ValueError('实验不存在，请重新选择影像')
@@ -684,5 +736,5 @@ class Handler(SimpleHTTPRequestHandler):
 
 if __name__=='__main__':
     port=int(os.environ.get('GEO_PORT','4180'))
-    print(f'GeoScope: http://127.0.0.1:{port}',flush=True)
+    print(f'GeoMaskLab: http://127.0.0.1:{port}',flush=True)
     ThreadingHTTPServer(('127.0.0.1',port),Handler).serve_forever()

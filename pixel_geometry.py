@@ -1,6 +1,25 @@
 """Deterministic connected-component measurements, independent of model services."""
 from collections import deque
 
+
+def scope_area_pixels(width, height, side, roi=None):
+    """Return the selected rectangle's area, including odd-sized half images.
+
+    Coordinates are zero-based and the upper bounds are exclusive. An empty
+    half-image can have zero pixels; its coverage ratio must be reported as null.
+    """
+    boxes = {'all': (0, 0, width, height), 'left': (0, 0, width // 2, height),
+             'right': (width // 2, 0, width, height),
+             'top': (0, 0, width, height // 2),
+             'bottom': (0, height // 2, width, height)}
+    if side not in boxes:
+        raise ValueError('Unknown analysis scope.')
+    x1, y1, x2, y2 = boxes[side]
+    if roi:
+        rx1, ry1, rx2, ry2 = roi['xyxy']
+        x1, y1, x2, y2 = max(x1, rx1), max(y1, ry1), min(x2, rx2), min(y2, ry2)
+    return max(0, x2 - x1) * max(0, y2 - y1)
+
 def candidate_statistics(mask, min_area_pixels=1):
     """Eight-connected candidate regions on the final, spatially constrained mask."""
     w,h=mask.size

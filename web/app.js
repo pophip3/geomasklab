@@ -16,7 +16,7 @@ let toastTimer;
 function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3800);}
 async function api(path,payload){const response=await fetch(path,payload?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}:{});const data=await response.json();if(!response.ok)throw new Error(data.error||'请求失败');return data;}
 function loadImage(url){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('影像加载失败'));image.src=url;});}
-function modal(title,html,eyebrow='GEOSCOPE LAB'){$('modalTitle').textContent=title;$('modalEyebrow').textContent=eyebrow;$('modalBody').innerHTML=html;if(!$('modal').open)$('modal').showModal();}
+function modal(title,html,eyebrow='GEOMASKLAB'){$('modalTitle').textContent=title;$('modalEyebrow').textContent=eyebrow;$('modalBody').innerHTML=html;if(!$('modal').open)$('modal').showModal();}
 function closeModal(){$('modal').close();}
 $('closeModal').onclick=closeModal;
 $('modal').addEventListener('click',e=>{if(e.target===$('modal')){const r=$('modal').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
@@ -71,7 +71,7 @@ function updateMode(){
  $('provenanceLabel').textContent=state.mode==='demo'?(state.session?.sample?'内置样例 · 预置标注演示':'上传影像 · 需连接模型'):'模型模式 · 实际服务调用';
  $('composerNote').textContent=state.mode==='demo'?'当前为流程演示，未调用模型':'上传影像将发送至你配置的模型服务';
  if(state.session?.imported_evidence)$('provenanceLabel').textContent='导入记录 · 导入时未运行模型';
- if(state.session?.imported_evidence&&state.mode==='demo')$('composerNote').textContent='导入记录可直接复核；新增分割任务需要切换到模型模式。';
+ if(state.session?.imported_evidence&&state.mode==='demo')$('composerNote').textContent='Imported evidence supports offline review and region recalculation. New segmentation requests require model services.';
 }
 
 $('importBtn').onclick=()=>{if(state.busy)return toast('请等待当前任务完成');$('bundleInput').click();};
@@ -88,6 +88,7 @@ $('bundleInput').onchange=async e=>{
  finally{state.busy=false;$('importBtn').disabled=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
 };
 function resetMetrics(){
+ $('recalculateBtn').disabled=true;$('regionCoverage').textContent='—';
  $('reviewPanel').hidden=true;
  $('answerCard').hidden=true;$('coverageCard').hidden=false;$('metricsPanel').hidden=false;$('checksPanel').hidden=false;
  $('resultEyebrow').textContent='COVERAGE ANALYSIS';$('artifactText').textContent='原图 · 蒙版 · 叠加图 · 统计 · 日志';
@@ -97,6 +98,7 @@ function resetMetrics(){
  $('checksList').innerHTML=['结果与原始影像对齐','空间条件完成检查','统计与产物已生成'].map(s=>`<p class="pending"><span>○</span>${s}</p>`).join('');$('checkCount').textContent='0 / 3';$('exportBtn').disabled=true;$('reportBtn').disabled=true;
 }
 function renderAnswer(run){
+ $('recalculateBtn').disabled=true;$('regionCoverage').textContent='—';
  $('reviewPanel').hidden=true;
  $('answerCard').hidden=false;$('coverageCard').hidden=true;$('metricsPanel').hidden=true;$('checksPanel').hidden=true;
  $('resultEyebrow').textContent='IMAGE UNDERSTANDING';$('resultTitle').textContent='影像理解已完成';
@@ -184,7 +186,7 @@ $('imageCanvas').addEventListener('mouseleave',()=>{$('coordinateLabel').textCon
 
 function addMessage(role,text,kind='',run=null){
  const d=document.createElement('div');d.className=`message ${role} ${kind}`;
- d.innerHTML=`<div class="message-label"><span>${role==='user'?'YOU':'GEOSCOPE'}</span><span>${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="bubble"></div>`;
+ d.innerHTML=`<div class="message-label"><span>${role==='user'?'YOU':'GEOMASKLAB'}</span><span>${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="bubble"></div>`;
  d.querySelector('.bubble').textContent=text;
  if(run?.mask_url){
   const target=targetLabel(run),next=run.task.side==='left'?'右':'左';
@@ -219,10 +221,16 @@ async function selectRun(run){
   localStorage.setItem('geoscope-selected-'+state.session.id,run.id);
   $('ratioValue').textContent=ratio.toFixed(2);$('areaValue').innerHTML=number(m.pixel_area)+' <small>px</small>';$('scopeValue').textContent=run.task.roi?'矩形研究区':sideNames[run.task.side];$('timeValue').textContent=run.duration_ms+' ms';
   $('candidateValue').textContent=m.candidate_stats?`${number(m.candidate_stats.candidate_count)} 个`:'旧结果未统计';
+  $('regionCoverage').textContent=m.scope_area_ratio==null?'Not recorded or empty scope':`${(m.scope_area_ratio*100).toFixed(2)}% (${number(m.scope_area_pixels)} px)`;
+  $('recalculateBtn').disabled=false;
   $('qualityValue').textContent=run.mode==='demo'?'预置演示':qualityNames[run.task?.effective_quality_mode]||'服务未确认';
   $('resultTitle').textContent=(run.task.roi?'框选区域 · ':sideNames[run.task.side])+targetLabel(run);$('resultSubtitle').textContent=`V${run.version} · ${run.mode==='demo'?'预置演示标注，非模型输出':'模型输出，需人工复核'}`;
   if(run.imported_evidence)$('resultSubtitle').textContent+=` · 导入记录（来源 V${run.imported_evidence.source_version}），未重新推理`;
   if(run.imported_evidence)$('timeValue').textContent=run.duration_ms+' ms（来源运行）';
+  if(run.execution_kind==='saved_mask_region_analysis'){
+   $('resultSubtitle').textContent=`V${run.version} · Offline region analysis · No model inference · Source ${run.source_prediction.mode}`;
+   $('qualityValue').textContent='Saved mask';
+  }
   $('resultStatus').textContent=runStateLabel(run);
   const category=run.capability||state.status?.capabilities?.targets?.[run.task.target];
   if(category?.level==='experimental')$('resultSubtitle').textContent+=' · 实验类别，精度尚未验证';
@@ -279,6 +287,30 @@ $('query').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.prev
 document.addEventListener('click',e=>{const experiment=e.target.closest('[data-session]');if(experiment)openExperiment(experiment.dataset.session);const prompt=e.target.closest('[data-prompt]');if(prompt)run(prompt.dataset.prompt);const v=e.target.closest('[data-run]');if(v&&!state.busy){const r=state.session.runs.find(x=>x.id===v.dataset.run);if(r?.mask_url){selectRun(r);closeModal();}}});
 function download(url){const a=document.createElement('a');a.href=url;a.download='';document.body.append(a);a.click();a.remove();}
 $('exportBtn').onclick=()=>{if(state.selected){download(state.selected.export_url);toast('实验包已开始下载，包含影像、蒙版、统计、日志和报告');}};
+$('recalculateBtn').onclick=()=>{
+ if(state.busy||!state.selected?.mask_url)return;
+ const sessionId=state.session.id,sourceId=state.selected.id;
+ const roi=state.roi?JSON.parse(JSON.stringify(state.roi)):null;
+ modal('Recalculate a region from the saved mask',
+  `<p>This operation changes the spatial scope only. It uses the original full-image mask and does not call model services.</p>
+   <form id="regionForm"><label for="regionScope">Analysis scope</label>
+   <select id="regionScope"><option value="all">Whole image</option><option value="left">Left half</option><option value="right">Right half</option><option value="top">Top half</option><option value="bottom">Bottom half</option>${roi?'<option value="roi">Current rectangle ROI</option>':''}</select>
+   <p>${roi?`Current rectangle: ${escape(JSON.stringify(roi.xyxy))}.`:'To analyze a rectangle, close this dialog and draw an ROI on the image first.'}</p>
+   <p>The semantic target and complement setting are retained. The new result will have a separate review record.</p>
+   <button id="saveRegion" class="primary" type="submit">Create result version</button></form>`,'OFFLINE REGION ANALYSIS');
+ $('regionScope').value=roi?'roi':state.selected.task.side;
+ $('regionForm').onsubmit=async e=>{
+  e.preventDefault();if(state.busy)return;
+  const choice=$('regionScope').value;state.busy=true;
+  $('saveRegion').disabled=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
+  try{
+   const result=await api('/api/recalculate-region',{session_id:sessionId,run_id:sourceId,scope:choice==='roi'?'all':choice,roi:choice==='roi'?roi:null});
+   if(state.session.id===sessionId){state.session.runs.push(result);state.last=result;addMessage('user',result.query);addMessage('assistant',result.message,'',result);await selectRun(result);}
+   closeModal();toast('Created a separate result version without model inference.');
+  }catch(error){toast(error.message);if($('saveRegion'))$('saveRegion').disabled=false;}
+  finally{state.busy=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
+ };
+};
 $('reportBtn').onclick=()=>{if(state.selected?.report_url)download(state.selected.report_url);};
 function gallery(){
  if(state.busy)return toast('请等待当前任务完成');
@@ -376,7 +408,7 @@ async function connections(){
  };
 }
 $('connectionBtn').onclick=connections;
-$('aboutBtn').onclick=()=>modal('让一个问题，成为可复查的实验',`<p>观域 GeoScope 是辅助研究者提取、检查和复核像素结果的工作台。</p><h3>建议体验顺序</h3><p>选择影像 → 框选研究区 → 选择快速或分块细化模式 → 提取目标 → 查看候选区域与统计 → 下载实验报告。也可用“批量实验”处理多张影像。</p><h3>类别与质量</h3><p>建筑、飞机为重点应用；道路、水体、植被、船舶为实验功能。分块细化可能改善小目标，也可能产生误检，名称不保证更高精度。所有模型结果都需要人工复核。</p><h3>目前已经能做什么</h3><p>真实影像上传、RemoteAgent任务规划、Harness校验、RemoteSAM分割、确定性几何统计、结果复核、上下文继承、版本恢复、批量运行和产物导出。</p><h3>当前边界</h3><p>演示模式使用预置标注，不代表真实模型精度；模型模式需要实际服务连通。候选区域按最终范围内的蒙版计算。像素面积不是地理面积，验证检查也不等于语义或边界正确。</p><p>实验文件保存在本机experiments目录。刷新页面或重启服务后可恢复实验，也可从历史记录重新打开。</p>`,'ABOUT THE PROTOTYPE');
+$('aboutBtn').onclick=()=>modal('让一个问题，成为可复查的实验',`<p>观域 GeoMaskLab 是辅助研究者提取、检查和复核像素结果的工作台。</p><h3>建议体验顺序</h3><p>选择影像 → 框选研究区 → 选择快速或分块细化模式 → 提取目标 → 查看候选区域与统计 → 下载实验报告。也可用“批量实验”处理多张影像。</p><h3>类别与质量</h3><p>建筑、飞机为重点应用；道路、水体、植被、船舶为实验功能。分块细化可能改善小目标，也可能产生误检，名称不保证更高精度。所有模型结果都需要人工复核。</p><h3>目前已经能做什么</h3><p>真实影像上传、RemoteAgent任务规划、Harness校验、RemoteSAM分割、确定性几何统计、结果复核、上下文继承、版本恢复、批量运行和产物导出。</p><h3>当前边界</h3><p>演示模式使用预置标注，不代表真实模型精度；模型模式需要实际服务连通。候选区域按最终范围内的蒙版计算。像素面积不是地理面积，验证检查也不等于语义或边界正确。</p><p>实验文件保存在本机experiments目录。刷新页面或重启服务后可恢复实验，也可从历史记录重新打开。</p>`,'ABOUT THE PROTOTYPE');
 
 async function init(){
  try{

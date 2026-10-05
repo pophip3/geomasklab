@@ -1,6 +1,6 @@
 {
   "schema": "geoscope-workflow-study/1.0",
-  "software_version": "0.9.0-dev.2",
+  "software_version": "0.9.0-dev.3",
   "third_party": {
     "component": "label_studio_sdk.converter.brush",
     "package_version": "2.1.2",
@@ -23,8 +23,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "pending",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.017187,
-      "geoscope_import_seconds_observed": 0.085458
+      "sdk_converter_seconds_observed": 0.018641,
+      "geoscope_import_seconds_observed": 0.071239
     },
     {
       "case": "left_branch",
@@ -34,8 +34,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "pending",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.014916,
-      "geoscope_import_seconds_observed": 0.088286
+      "sdk_converter_seconds_observed": 0.014649,
+      "geoscope_import_seconds_observed": 0.080887
     },
     {
       "case": "right",
@@ -45,8 +45,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "accepted",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.013299,
-      "geoscope_import_seconds_observed": 0.079979
+      "sdk_converter_seconds_observed": 0.013053,
+      "geoscope_import_seconds_observed": 0.078924
     },
     {
       "case": "roi",
@@ -56,8 +56,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "pending",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.010255,
-      "geoscope_import_seconds_observed": 0.045934
+      "sdk_converter_seconds_observed": 0.010317,
+      "geoscope_import_seconds_observed": 0.059601
     },
     {
       "case": "whole",
@@ -67,8 +67,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "pending",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.019391,
-      "geoscope_import_seconds_observed": 0.133891
+      "sdk_converter_seconds_observed": 0.019323,
+      "geoscope_import_seconds_observed": 0.133666
     }
   ],
   "controlled_faults": [

@@ -1,0 +1,66 @@
+{
+  "schema": "geoscope-region-study/1.0",
+  "software_version": "0.9.0-dev.3",
+  "source_bundle_sha256": "3ce2dbf444602c8191d22b373bd9cf41ba56d4074c262b5b39cad07989bf151c",
+  "source_mode": "demo",
+  "passed": true,
+  "cases": [
+    {
+      "scope": "whole",
+      "foreground_pixels": 75350,
+      "whole_image_pixels": 480000,
+      "whole_image_coverage": 0.15697916666666667,
+      "selected_region_pixels": 480000,
+      "within_region_coverage": 0.15697916666666667,
+      "reference_pillow_crop_exact": true,
+      "input_and_full_mask_bytes_preserved": true,
+      "bundle_verified": true,
+      "semantic_review_state": "pending",
+      "inference_performed": false
+    },
+    {
+      "scope": "left",
+      "foreground_pixels": 38000,
+      "whole_image_pixels": 480000,
+      "whole_image_coverage": 0.07916666666666666,
+      "selected_region_pixels": 240000,
+      "within_region_coverage": 0.15833333333333333,
+      "reference_pillow_crop_exact": true,
+      "input_and_full_mask_bytes_preserved": true,
+      "bundle_verified": true,
+      "semantic_review_state": "pending",
+      "inference_performed": false
+    },
+    {
+      "scope": "right",
+      "foreground_pixels": 37350,
+      "whole_image_pixels": 480000,
+      "whole_image_coverage": 0.0778125,
+      "selected_region_pixels": 240000,
+      "within_region_coverage": 0.155625,
+      "reference_pillow_crop_exact": true,
+      "input_and_full_mask_bytes_preserved": true,
+      "bundle_verified": true,
+      "semantic_review_state": "pending",
+      "inference_performed": false
+    },
+    {
+      "scope": "rectangle",
+      "foreground_pixels": 12650,
+      "whole_image_pixels": 480000,
+      "whole_image_coverage": 0.026354166666666668,
+      "selected_region_pixels": 120000,
+      "within_region_coverage": 0.10541666666666667,
+      "reference_pillow_crop_exact": true,
+      "input_and_full_mask_bytes_preserved": true,
+      "bundle_verified": true,
+      "semantic_review_state": "pending",
+      "inference_performed": false
+    }
+  ],
+  "limits": [
+    "The reference is a direct Pillow crop, not a comparison of model accuracy.",
+    "Saved-mask recalculation does not improve semantic predictions or correct boundaries.",
+    "Procedural fixtures demonstrate software behavior, not accuracy on Earth observation data."
+  ]
+}
