@@ -14,6 +14,9 @@ authentication. Start it with `python quickstart.py`.
 | `GET /api/sessions` | None | Up to 100 saved image sessions, newest first |
 | `POST /api/session` | `sample` (`urban` or `airport`), or base64/data-URL `image`; optional `name` | New session with normalized RGB image and empty result history |
 | `GET /api/session/{id}` | Saved session ID | Session, results and selected task context |
+| `POST /api/session/update` | `session_id`; one or more of `name`, `notes`, `pinned` | Updated experiment metadata; result artifacts stay unchanged |
+| `POST /api/compare-results` | `session_id`, distinct masked `run_a` / `run_b` | Verified common-region mask agreement, difference PNG as base64 and provenance; no inference |
+| `GET /api/ledger/{id}` | Session ID | UTF-8 CSV with BOM; all requests, failures, both coverage denominators and review states |
 | `POST /api/run` | `session_id`, `query`, `mode` (`demo` or `live`); optional parent, scope, ROI, quality mode | One run result; inspect its `status` before assuming a mask exists |
 | `POST /api/review` | `session_id`, `run_id`, `decision`, `reviewer`, `note` | Updated self-reported review history for the exact image/mask |
 | `POST /api/import` | Base64/data-URL `bundle`; optional file `name` | A verified single-result evidence bundle in a new session |
@@ -61,6 +64,13 @@ and `inference_performed=false`. Their local duration and original prediction
 provenance are separate; changing scope does not improve a model prediction.
 
 ## Input limits and errors
+
+Experiment names contain 1–120 characters, notes at most 4,000, and pins must
+be boolean. Metadata updates cannot edit source images or run histories. The
+library returns mask/pending counts, notes and pins for up to 100 recent sessions.
+Version comparison requires exact image bytes, equal target/complement semantics
+and verified measurements. Agreement is evaluated inside intersecting scopes;
+IoU/Dice are null for an empty union. This is not accuracy against ground truth.
 
 Images and evidence bundles are limited to 12 MB; images to 16 million pixels.
 Task text is limited to 1,800 characters, reviewer labels to 100 characters and

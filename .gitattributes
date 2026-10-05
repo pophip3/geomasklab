@@ -1,5 +1,13 @@
 # Historical table hashes describe exact UTF-8 bytes with LF line endings.
 # Enforce the same checkout bytes on Windows, Linux and macOS.
+*.py text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf
 evaluation/historical/*.csv text eol=lf
 
 # Frozen application receipts preserve their recorded byte hashes.

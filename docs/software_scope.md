@@ -1,7 +1,8 @@
 # GeoMaskLab software scope and use context
 
-Decision date: 5 October 2026. This document fixes the intended version 1.0
-functional scope. The implementation remains a development build; this decision
+Decision date: 5 October 2026. This document describes the intended version 1.0
+functional scope. Feature acceptance was reopened in 1.0.0-dev.4 for comparison,
+experiment management and interface improvements. The implementation remains a development build; this decision
 does not certify publication readiness or establish novelty.
 
 ## Product definition

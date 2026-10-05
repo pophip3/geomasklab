@@ -3,6 +3,19 @@
 Entries describe implemented source changes. A release candidate is a software
 artifact; it does not imply journal submission, acceptance or a permanent DOI.
 
+## 1.0.0-dev.4 — 5 October 2026
+
+- Reopened feature acceptance before manuscript work; no final release is claimed.
+- Added verified version comparisons on common selected regions, difference PNGs,
+  downloadable JSON and explicit distinction between mask agreement and accuracy.
+- Added editable experiment names/notes/pins, search and library review filters.
+- Added a complete CSV ledger with failures, both coverage denominators and literal
+  spreadsheet text cells, plus six backend/HTTP acceptance tests.
+- Redesigned the image workspace with a slate canvas, mint accents, responsive
+  cards and larger controls. Added explicit-target/scope quick segmentation.
+- Added an animated, pausable English workflow guide with reduced-motion support,
+  a self-contained offline user manual and Windows/POSIX convenience launchers.
+
 ## 1.0.0-rc.1 — 5 October 2026
 
 - Adopted GeoMaskLab as the release name and froze the version 1.0 scope.

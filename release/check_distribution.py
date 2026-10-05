@@ -81,6 +81,21 @@ def main():
                 page = response.read().decode('utf-8')
             if 'GeoMaskLab' not in page or '<html lang="en">' not in page:
                 raise ValueError('English browser interface missing')
+            with urllib.request.urlopen(f'http://127.0.0.1:{port}/help.html', timeout=2) as response:
+                help_page = response.read().decode('utf-8')
+            if '<html lang="en">' not in help_page or 'Compare result versions' not in help_page:
+                raise ValueError('Offline English user guide missing')
+            ids = set(re.findall(r'id="([^"]+)"', help_page))
+            if not set(re.findall(r'href="#([^"]+)"', help_page)).issubset(ids):
+                raise ValueError('Offline guide has broken section links')
+            launcher = ([os.environ.get('COMSPEC', 'cmd.exe'), '/d', '/c', str(root/'bin/geomasklab.cmd')]
+                        if os.name == 'nt' else ['sh', str(root/'bin/geomasklab.sh')])
+            launch_environment = {**environment, 'PATH': str(Path(args.python).resolve().parent)
+                                  + os.pathsep + environment.get('PATH', '')}
+            result = subprocess.run(launcher+['--help'], cwd=destination, env=launch_environment,
+                                    capture_output=True, text=True, encoding='utf-8', check=True, timeout=15)
+            if '--port' not in result.stdout:
+                raise ValueError('Distributed platform launcher failed argument forwarding')
         finally:
             process.terminate()
             process.communicate(timeout=10)
@@ -88,6 +103,7 @@ def main():
               'source_hashes_checked': len(manifest['files']), 'reviewer_cases': 5,
               'saved_mask_region_example': 'passed', 'new_generated_text': 'English',
               'isolated_server_startup_and_interface': 'passed',
+              'offline_user_guide': 'passed', 'platform_launcher': 'passed',
               'python': args.python, 'duration_seconds': round(time.perf_counter()-started, 3),
               'limits': 'Existing interpreter/dependencies; no clean OS or live model installation claimed.'}
     if args.output:

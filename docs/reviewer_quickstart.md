@@ -1,6 +1,6 @@
 # Reviewer quick start
 
-Version 1.0.0-rc.1 is an MIT-licensed release candidate. Final creator metadata and an archive DOI remain pending.
+Version 1.0.0-dev.4 continues MIT-licensed software development. Final creator metadata and an archive DOI remain pending.
 
 ## Requirements and commands
 

@@ -16,7 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'requirements.txt', 'requirements-reviewer.txt', '.env.example',
             'quickstart.py', 'reviewer_demo.py', 'fixtures.py', 'web/index.html',
-            'docs/reviewer_quickstart.md', 'docs/model_services.md')
+            'docs/reviewer_quickstart.md', 'docs/model_services.md', 'web/help.html',
+            'bin/geomasklab.cmd', 'bin/geomasklab.sh')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
                    'node_modules', 'weights', 'checkpoints', 'pretrained_weights'}
 FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip'}

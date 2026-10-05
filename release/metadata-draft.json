@@ -1,7 +1,7 @@
 {
   "status": "draft; not an archival deposit",
   "title": "GeoMaskLab: A traceable workbench for remote-sensing segmentation and region-specific pixel measurements",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-dev.4",
   "resource_type": "software",
   "license": "MIT",
   "repository": "https://github.com/pophip3/geoscope-softwarex",

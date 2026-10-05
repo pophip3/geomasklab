@@ -52,7 +52,7 @@ async function showSession(session){
   localStorage.setItem('geoscope-session',session.id);
   if(session.runs.length){
    $('chat').innerHTML='';
-   for(const r of session.runs){addMessage('user',r.query);addMessage('assistant',r.message,r.status==='failed'?'warning':'',r);}
+   for(const r of session.runs){addMessage('user',r.query,'',null,r.created_at||null);addMessage('assistant',r.message,r.status==='failed'?'warning':'',r);}
    state.last=session.runs.at(-1);
    const remembered=localStorage.getItem('geoscope-selected-'+session.id);
    const selected=session.runs.find(r=>r.id===remembered&&r.mask_url)||[...session.runs].reverse().find(r=>r.mask_url);
@@ -184,9 +184,11 @@ $('zoomIn').onclick=()=>{state.zoom=Math.min(3,state.zoom+.25);draw();};$('zoomO
 $('imageCanvas').addEventListener('mousemove',e=>{const r=e.target.getBoundingClientRect();const x=Math.floor((e.clientX-r.left)/r.width*e.target.width),y=Math.floor((e.clientY-r.top)/r.height*e.target.height);$('coordinateLabel').textContent=`X ${x} · Y ${y} px`;});
 $('imageCanvas').addEventListener('mouseleave',()=>{$('coordinateLabel').textContent=`${state.session.width} × ${state.session.height} px`;});
 
-function addMessage(role,text,kind='',run=null){
+function addMessage(role,text,kind='',run=null,recordedAt=run?.created_at){
  const d=document.createElement('div');d.className=`message ${role} ${kind}`;
- d.innerHTML=`<div class="message-label"><span>${role==='user'?'YOU':'GEOMASKLAB'}</span><span>${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="bubble"></div>`;
+ const date=recordedAt?new Date(recordedAt):!run&&recordedAt===undefined?new Date():null;
+ const clock=date&&Number.isFinite(date.getTime())?date.toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'Time unavailable';
+ d.innerHTML=`<div class="message-label"><span>${role==='user'?'YOU':'GEOMASKLAB'}</span><span>${escape(clock)}</span></div><div class="bubble"></div>`;
  d.querySelector('.bubble').textContent=text;
  if(run?.mask_url){
   const target=targetLabel(run),next=run.task.side==='left'?'right':'left';

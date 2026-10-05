@@ -18,8 +18,10 @@ measurement and review decision. External models supply masks; a deterministic
 executor validates requests, measures pixels, preserves result versions and
 exports evidence that another researcher can check without model services.
 
-**Version 1.0.0-rc.1** freezes the version 1.0 feature scope for release acceptance.
-It is a release candidate, not a submitted or accepted SoftwareX publication.
+**Version 1.0.0-dev.4** continues software development with verified mask-version
+comparison, experiment management and an expanded English interface. The earlier
+release candidate is superseded for feature acceptance. This development build
+does not imply a submitted or accepted SoftwareX publication.
 Final creator metadata, archive DOI and current journal-guide verification remain
 pending. The original competition repository is preserved.
 
@@ -62,6 +64,11 @@ pin is provided in `requirements-reviewer.txt`. Procedural assets are generated
 by `fixtures.py`; they are diagrams with exact fixture masks, **not satellite
 observations, real-image ground truth or neural predictions**.
 
+After installing dependencies, convenience launchers are `bin\geomasklab.cmd`
+on Windows and `sh bin/geomasklab.sh` on Linux/macOS. Both accept `--port 4182`
+and prefer a root `.venv` interpreter. The bundled [offline user guide](web/help.html)
+is also available at `/help.html` on the local server. It needs no remote assets.
+
 ## Reviewer example and expected output
 
 `reviewer_demo.py` executes five offline examples, checks exact pixel counts,
@@ -99,6 +106,19 @@ and full-mask bytes.
 5. Export an evidence ZIP; import it into a new session for independent inspection.
 6. Use **Recalculate region (offline)** to derive another spatial analysis from
    a verified full mask, with separate pending review and no new inference.
+7. **Compare versions** verifies two results and shows shared/A-only/B-only
+   foreground within their common selected region. Export comparison JSON and PNG.
+8. Name, annotate and pin investigations in the searchable **Experiments** library;
+   export the complete result ledger as CSV, including failed requests and both
+   coverage denominators. Missing measurements remain blank.
+
+Comparison requires identical input-image bytes, semantic target and complement
+settings. Agreement IoU/Dice compare masks, not independent ground truth; empty
+unions and disjoint regions have undefined agreement. Full-prediction equality is
+reported separately so a scope change is not mistaken for a prediction change.
+Experiment notes are editable metadata and do not rewrite historical bundles.
+The animated **Workflow guide** is illustrative, can be paused and respects the
+system's reduced-motion setting. It does not display invented inference progress.
 
 Changing scope preserves the semantic target/complement and cannot correct an
 inaccurate prediction. Whole-image coverage is `A / (W × H)`; within-region

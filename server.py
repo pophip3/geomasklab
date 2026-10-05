@@ -154,6 +154,9 @@ def session_index():
         if s:
             items.append({k:s[k] for k in ('id','name','created_at','width','height')})
             items[-1]['run_count']=len(s['runs'])
+            items[-1].update(notes=s.get('notes',''),pinned=s.get('pinned',False),
+                mask_count=sum(bool(r.get('mask_url')) for r in s['runs']),
+                pending_count=sum(bool(r.get('mask_url')) and r.get('semantic_review',{}).get('state','pending')=='pending' for r in s['runs']))
     return sorted(items,key=lambda item:item['created_at'],reverse=True)[:100]
 
 def binary_mask(mask):
@@ -571,6 +574,16 @@ class Handler(SimpleHTTPRequestHandler):
         path=self.path.split('?')[0]
         if path=='/api/status': return self.json({**settings_status(),'samples':SAMPLES,'version':VERSION,'capabilities':capabilities()})
         if path=='/api/sessions': return self.json({'sessions':session_index()})
+        if path.startswith('/api/ledger/'):
+            s=get_session(path.rsplit('/',1)[-1])
+            if not s: return self.json({'error':'Experiment not found.'},404)
+            from experiment_management import ledger_csv
+            with s['lock']: raw=ledger_csv(s).encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type','text/csv; charset=utf-8')
+            self.send_header('Content-Disposition',f'attachment; filename="geomasklab_{s["id"]}_results.csv"')
+            self.send_header('Content-Length',str(len(raw)));self.end_headers()
+            return self.wfile.write(raw)
         if path.startswith('/api/batch/'):
             bid=path.rsplit('/',1)[-1]
             if not SID_RE.fullmatch(bid): return self.json({'error':'Invalid batch ID.'},404)
@@ -586,7 +599,7 @@ class Handler(SimpleHTTPRequestHandler):
             if not file.is_file(): return self.send_error(404)
             raw=file.read_bytes(); self.send_response(200)
             self.send_header('Content-Type','text/csv; charset=utf-8')
-            self.send_header('Content-Disposition',f'attachment; filename="geoscope_batch_{bid}.csv"')
+            self.send_header('Content-Disposition',f'attachment; filename="geomasklab_batch_{bid}.csv"')
             self.send_header('Content-Length',str(len(raw))); self.end_headers(); return self.wfile.write(raw)
         if path.startswith('/api/session/'):
             sid=path.rsplit('/',1)[-1]; s=get_session(sid)
@@ -600,7 +613,7 @@ class Handler(SimpleHTTPRequestHandler):
             s=get_session(sid)
             if not s: return self.send_error(404)
             with s['lock']: raw=build_bundle(DATA/sid/'original.png',folder)
-            self.send_response(200); self.send_header('Content-Type','application/zip'); self.send_header('Content-Disposition',f'attachment; filename="geoscope_{rid}.zip"'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); return self.wfile.write(raw)
+            self.send_response(200); self.send_header('Content-Type','application/zip'); self.send_header('Content-Disposition',f'attachment; filename="geomasklab_{rid}.zip"'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); return self.wfile.write(raw)
         if path.startswith('/api/report/'):
             parts=path.split('/'); sid,rid=parts[-2:]
             if len(parts)!=5 or not SID_RE.fullmatch(sid) or not SID_RE.fullmatch(rid): return self.send_error(404)
@@ -611,7 +624,7 @@ class Handler(SimpleHTTPRequestHandler):
             with s['lock']: raw=file.read_bytes()
             self.send_response(200)
             self.send_header('Content-Type','text/markdown; charset=utf-8')
-            self.send_header('Content-Disposition',f'attachment; filename="geoscope_{rid}_report.md"')
+            self.send_header('Content-Disposition',f'attachment; filename="geomasklab_{rid}_report.md"')
             self.send_header('Content-Length',str(len(raw))); self.end_headers(); return self.wfile.write(raw)
         if path.startswith('/experiments/'):
             parts=path.strip('/').split('/')
@@ -628,6 +641,31 @@ class Handler(SimpleHTTPRequestHandler):
             if self.path=='/api/check-services': return self.json(inspect_services())
             if self.path=='/api/session': return self.json(new_session(p.get('sample','urban'),p.get('image'),p.get('name')))
             if self.path=='/api/import': return self.json(import_evidence(p))
+            if self.path=='/api/session/update':
+                s=get_session(p.get('session_id'))
+                if not s: raise ValueError('Experiment not found.')
+                from experiment_management import metadata_changes
+                changes=metadata_changes(p)
+                if not s['lock'].acquire(blocking=False): raise ValueError('This experiment is busy.')
+                try:
+                    s.update(changes)
+                    save_json(DATA/s['id']/'session.json',public_session(s))
+                    return self.json(public_session(s))
+                finally: s['lock'].release()
+            if self.path=='/api/compare-results':
+                s=get_session(p.get('session_id'))
+                if not s: raise ValueError('Experiment not found.')
+                a,b=p.get('run_a'),p.get('run_b')
+                if a==b: raise ValueError('Choose two different result versions.')
+                selected=[next((r for r in s['runs'] if r['id']==rid and r.get('mask_url')),None) for rid in (a,b)]
+                if not all(selected): raise ValueError('Choose two valid mask results from this experiment.')
+                from export_bundle import build_bundle
+                from result_comparison import compare_bundles
+                if not s['lock'].acquire(blocking=False): raise ValueError('This experiment is busy.')
+                try:
+                    bundles=[build_bundle(DATA/s['id']/'original.png',DATA/s['id']/r['id']) for r in selected]
+                    return self.json(compare_bundles(*bundles))
+                finally: s['lock'].release()
             if self.path=='/api/recalculate-region':
                 s=get_session(p.get('session_id'))
                 if not s: raise ValueError('Session not found. Select an image first.')
