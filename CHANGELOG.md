@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0rc3 - 5 October 2026 (software candidate)
+
+- Complete the five connected mask-evidence operations with shared core/CLI/browser calculations.
+- Add explicit intersection/identical comparison policies, separate condition explanations, foreground accounting and replayable comparison ZIPs.
+- Inspect stable 8-connected candidates, pixel-center centroids and independent image/region/invalid-boundary flags without editing source masks.
+- Add explicit-manifest offline batches with isolated failures, atomic sample artifacts, cooperative cancellation, crash-safe advisory locks and verified exact-identity resume.
+- Report separate macro and pixel-weighted coverage; retain successful zeros and omit undefined domains and failures correctly.
+- Add browser packet replay, batch-result reopening, English reports/schemas and a real NAIP end-to-end example with independent pixel-set checks.
+- Keep human handoff, semantic accuracy and stable DOI/creator metadata as separately evidenced release gates.
+
 ## 1.0.0rc3.dev1 - 5 October 2026 (development checkpoint)
 
 - Preserve explicit binary validity masks, original upload bytes and realized image-bound analysis configurations.

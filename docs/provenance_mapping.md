@@ -32,4 +32,6 @@ mapping from the source bundle and rejects any difference.
 Share both the evidence ZIP and this JSON file. The JSON supplies interoperable
 metadata; the ZIP retains the bytes necessary for deterministic pixel replay.
 PROV serialization alone neither verifies a segmentation model nor authenticates
-an author. A full RO-Crate profile and signatures are deferred.
+an author. A full RO-Crate profile remains deferred. Optional detached
+[trusted-key signatures](signatures.md) authenticate exact bundle bytes under an
+external trust policy; they do not establish semantic correctness.

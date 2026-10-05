@@ -35,7 +35,12 @@ REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'examples/prepare_handoff_study.py', 'evaluation/analyze_handoff_study.py',
             'src/geomasklab/domain.py','src/geomasklab/schemas/analysis-1.0.schema.json',
             'src/geomasklab/schemas/validity-1.0.schema.json','src/geomasklab/schemas/manifest-2.0.schema.json',
-            'examples/validity_workflow.py')
+            'examples/validity_workflow.py','examples/five_step_workflow.py',
+            'src/geomasklab/comparison.py','src/geomasklab/components.py','src/geomasklab/batch.py',
+            'src/geomasklab/schemas/comparison-2.0.schema.json','src/geomasklab/schemas/components-1.0.schema.json',
+            'src/geomasklab/schemas/batch-manifest-1.0.schema.json','workbench/offline_workflows.py',
+            'workbench/web/offline-tools.js','workbench/web/offline-tools.css',
+            'docs/fair_comparison.md','docs/component_inspection.md','docs/manifest_batch.md')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
                    'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist'}
 FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip', '.whl'}

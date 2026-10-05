@@ -44,7 +44,8 @@ def main():
             if (root/name).exists():
                 raise ValueError(f'Unexpected local artifact: {name}')
         commands = [['reviewer_demo.py'], ['examples/recalculate_region.py', 'reviewer-output/right.zip'],
-                    ['examples/reference_workflow.py'], ['examples/real_image_handoff.py']]
+                    ['examples/reference_workflow.py'], ['examples/real_image_handoff.py'],
+                    ['examples/five_step_workflow.py']]
         for command in commands:
             result = subprocess.run([args.python, *command], cwd=root, env=environment,
                                     text=True, encoding='utf-8', capture_output=True, check=True)
@@ -53,6 +54,9 @@ def main():
         reviewer = json.loads((root/'reviewer-output/summary.json').read_text(encoding='utf-8'))
         if not reviewer['passed'] or len(reviewer['results']) != 5:
             raise ValueError('Reviewer workflow did not complete five cases')
+        five=json.loads((root/'five-step-output/summary.json').read_text(encoding='utf-8'))
+        if not five['passed'] or five['software_version']!=manifest['version'] or not five['batch']['offline_packet_replay']:
+            raise ValueError('Connected five-step example did not replay for the candidate version')
         for archive in (root/'reviewer-output').glob('*.zip'):
             with zipfile.ZipFile(archive) as z:
                 for name in z.namelist():
@@ -82,6 +86,11 @@ def main():
                 page = response.read().decode('utf-8')
             if 'GeoMaskLab' not in page or '<html lang="en">' not in page:
                 raise ValueError('English browser interface missing')
+            if not all(identifier in page for identifier in ('inspectComponentsBtn','offlineBatchBtn','verifyPacketBtn')):
+                raise ValueError('Connected browser workflow controls are missing')
+            for asset in ('offline-tools.js','offline-tools.css'):
+                with urllib.request.urlopen(f'http://127.0.0.1:{port}/'+asset,timeout=2) as response:
+                    if not response.read():raise ValueError('New workflow asset is missing: '+asset)
             with urllib.request.urlopen(f'http://127.0.0.1:{port}/help.html', timeout=2) as response:
                 help_page = response.read().decode('utf-8')
             if '<html lang="en">' not in help_page or 'Compare result versions' not in help_page:
@@ -104,6 +113,7 @@ def main():
               'source_hashes_checked': len(manifest['files']), 'reviewer_cases': 5,
               'saved_mask_region_example': 'passed', 'external_mask_reference_example': 'passed',
               'real_image_color_baseline_handoff': 'passed', 'new_generated_text': 'English',
+              'real_naip_connected_five_step_example': 'passed',
               'isolated_server_startup_and_interface': 'passed',
               'offline_user_guide': 'passed', 'platform_launcher': 'passed',
               'python': args.python, 'duration_seconds': round(time.perf_counter()-started, 3),

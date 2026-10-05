@@ -49,6 +49,26 @@ def main(argv=None):
     assess.add_argument('--independent',action='store_true');assess.add_argument('--output',type=Path,required=True)
     packet=sub.add_parser('verify-assessment',help='Replay scores and check a reference-assessment packet.')
     packet.add_argument('packet',type=Path)
+    compare=sub.add_parser('compare',help='Compare verified masks on an explicit common valid domain.')
+    compare.add_argument('a',type=Path);compare.add_argument('b',type=Path)
+    compare.add_argument('--domain-policy',choices=['intersection','identical'],default='intersection')
+    compare.add_argument('--output',type=Path,required=True,help='Source-bound comparison ZIP with an English report.')
+    comparecheck=sub.add_parser('verify-comparison',help='Replay both evidence sources and comparison differences.')
+    comparecheck.add_argument('packet',type=Path)
+    inspect=sub.add_parser('inspect',help='Inspect 8-connected candidates and clipping boundaries without changing masks.')
+    inspect.add_argument('bundle',type=Path);inspect.add_argument('--output',type=Path,required=True)
+    inspect.add_argument('--min-area-pixels',type=int,default=1)
+    inspect.add_argument('--boundary-filter',choices=['all','touching','interior'],default='all')
+    inspectcheck=sub.add_parser('verify-components',help='Replay candidate attributes and selection artifacts.')
+    inspectcheck.add_argument('packet',type=Path)
+    batch=sub.add_parser('batch',help='Process explicitly paired image/mask samples with failure isolation.')
+    batch.add_argument('manifest',type=Path);batch.add_argument('--output',type=Path,required=True)
+    batch.add_argument('--base-dir',type=Path,help='Root for relative manifest paths; defaults to the manifest folder.')
+    batch.add_argument('--resume',action='store_true',help='Resume only an identical batch with verified completed outputs.')
+    batchcheck=sub.add_parser('verify-batch',help='Replay successful artifacts and batch aggregation in a directory or ZIP.')
+    batchcheck.add_argument('batch',type=Path)
+    batchexport=sub.add_parser('export-batch',help='Export verified batch artifacts, excluding local debug logs.')
+    batchexport.add_argument('batch',type=Path);batchexport.add_argument('--output',type=Path,required=True)
     provenance=sub.add_parser('provenance',help='Map verified evidence to PROV-JSON.')
     provenance.add_argument('bundle',type=Path);provenance.add_argument('--output',type=Path,required=True)
     provcheck=sub.add_parser('verify-provenance',help='Check a PROV-JSON mapping against its source evidence.')
@@ -85,7 +105,7 @@ def main(argv=None):
     segment.add_argument('--argv-json',type=Path,help='JSON executable argument array containing {image} and {output}.')
     segment.add_argument('--timeout',type=float,default=300)
     schema=sub.add_parser('schema',help='Print a packaged JSON Schema.')
-    schema.add_argument('kind',choices=['manifest','manifest-v2','analysis','validity','result','statistics','geospatial','zonal','signature'],default='manifest',nargs='?')
+    schema.add_argument('kind',choices=['manifest','manifest-v2','analysis','validity','result','statistics','geospatial','zonal','signature','comparison','comparison-packet','components','batch'],default='manifest',nargs='?')
     args=parser.parse_args(argv)
     try:
         if args.command=='verify':
@@ -118,6 +138,37 @@ def main(argv=None):
             write(args.output,evaluation_packet(record,difference,raw,ref))
             out={'output':str(args.output),'counts':record['counts'],'metrics':record['metrics']}
         elif args.command=='verify-assessment':out=verify_reference_packet(args.packet.read_bytes())
+        elif args.command=='compare':
+            from .comparison import comparison_packet,verify_comparison_packet
+            raw=comparison_packet(args.a.read_bytes(),args.b.read_bytes(),domain_policy=args.domain_policy)
+            out=verify_comparison_packet(raw);write(args.output,raw);out['output']=str(args.output)
+        elif args.command=='verify-comparison':
+            from .comparison import verify_comparison_packet
+            out=verify_comparison_packet(args.packet.read_bytes())
+        elif args.command=='inspect':
+            from .components import component_packet,verify_component_packet
+            raw=component_packet(args.bundle.read_bytes(),min_area_pixels=args.min_area_pixels,boundary_filter=args.boundary_filter)
+            out=verify_component_packet(raw);write(args.output,raw);out['output']=str(args.output)
+        elif args.command=='verify-components':
+            from .components import verify_component_packet
+            out=verify_component_packet(args.packet.read_bytes())
+        elif args.command=='batch':
+            from .batch import run_batch
+            import threading
+            import signal
+            cancelled=threading.Event()
+            previous=signal.getsignal(signal.SIGINT)
+            signal.signal(signal.SIGINT,lambda *_:cancelled.set())
+            try:
+                out=run_batch(json.loads(args.manifest.read_text(encoding='utf-8')),base_dir=args.base_dir or args.manifest.parent,
+                    output_dir=args.output,resume=args.resume,cancel=cancelled.is_set)
+            finally:signal.signal(signal.SIGINT,previous)
+        elif args.command=='verify-batch':
+            from .batch import verify_batch,verify_batch_packet
+            out=verify_batch(args.batch) if args.batch.is_dir() else verify_batch_packet(args.batch.read_bytes())
+        elif args.command=='export-batch':
+            from .batch import batch_packet
+            raw=batch_packet(args.batch);write(args.output,raw);out={'output':str(args.output),'verification':'passed'}
         elif args.command=='provenance':
             from .provenance import provenance_document
             write(args.output,json.dumps(provenance_document(args.bundle.read_bytes()),indent=2).encode('utf-8'))
@@ -183,10 +234,14 @@ def main(argv=None):
             write(Path(str(args.output)+'.provider.json'),json.dumps(product.metadata,indent=2).encode('utf-8'))
             out={'output':str(args.output),'provider':product.metadata}
         else:
-            filename='manifest-2.0.schema.json' if args.kind=='manifest-v2' else args.kind+'-1.0.schema.json'
+            filename={'manifest-v2':'manifest-2.0.schema.json','comparison':'comparison-2.0.schema.json',
+                      'components':'components-1.0.schema.json','batch':'batch-manifest-1.0.schema.json'}.get(args.kind,args.kind+'-1.0.schema.json')
             print(files('geomasklab').joinpath('schemas',filename).read_text(encoding='utf-8'))
             return 0
-        print(json.dumps(out,indent=2));return 0
+        print(json.dumps(out,indent=2))
+        if args.command=='batch':
+            return 130 if out['status']=='cancelled' else 2 if out.get('failed_count') else 0
+        return 0
     except (ValueError,KeyError,TypeError,OSError,zipfile.BadZipFile) as error:
         print('Operation failed: '+str(error),file=sys.stderr);return 1
 

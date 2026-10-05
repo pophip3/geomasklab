@@ -1,0 +1,817 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:comparison:2.0",
+  "title": "GeoMaskLab fair result comparison",
+  "description": "Saved prediction agreement on an explicit realized valid domain. Counts and accounting are replayed from both verified source bundles. Optional inline PNGs appear only in UI/API responses; persisted comparison.json omits them. JSON Schema checks types and availability, while the verifier checks pixel arithmetic and image identity.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "operation_software_version",
+    "status",
+    "domain_policy",
+    "pixel_diff_available",
+    "inference_performed",
+    "semantic_accuracy_measured",
+    "image_sha256",
+    "source_a_sha256",
+    "source_b_sha256",
+    "image_size",
+    "target",
+    "invert",
+    "change_kind",
+    "selected_regions_equal",
+    "selected_valid_domains_equal",
+    "valid_masks_equal",
+    "analysis_domain_policy",
+    "mask_agreement_iou",
+    "mask_agreement_dice",
+    "full_prediction_pixels_equal",
+    "foreground_change_accounting",
+    "a",
+    "b",
+    "difference_classes",
+    "legend",
+    "explanation",
+    "interpretation",
+    "common_scope_pixels",
+    "a_foreground_in_common_scope",
+    "b_foreground_in_common_scope",
+    "shared_foreground_pixels",
+    "a_domain_pixels",
+    "b_domain_pixels",
+    "a_domain_excluded_from_comparison_pixels",
+    "b_domain_excluded_from_comparison_pixels",
+    "a_only_pixels",
+    "b_only_pixels",
+    "changed_pixels"
+  ],
+  "properties": {
+    "schema": {
+      "const": "geomasklab-result-comparison/2.0"
+    },
+    "operation_software_version": {
+      "$ref": "#/$defs/software_version"
+    },
+    "status": {
+      "enum": [
+        "Compared",
+        "No_Common_Valid_Domain"
+      ]
+    },
+    "domain_policy": {
+      "enum": [
+        "intersection",
+        "identical"
+      ]
+    },
+    "pixel_diff_available": {
+      "type": "boolean"
+    },
+    "inference_performed": {
+      "const": false
+    },
+    "semantic_accuracy_measured": {
+      "const": false
+    },
+    "image_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "source_a_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "source_b_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "image_size": {
+      "$ref": "#/$defs/image_size"
+    },
+    "target": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"
+    },
+    "invert": {
+      "type": "boolean"
+    },
+    "change_kind": {
+      "enum": [
+        "Identical_Realized_Analysis",
+        "Analysis_Conditions_Only",
+        "Prediction_Only",
+        "Prediction_And_Analysis_Conditions"
+      ]
+    },
+    "selected_regions_equal": {
+      "type": "boolean"
+    },
+    "selected_valid_domains_equal": {
+      "type": "boolean"
+    },
+    "valid_masks_equal": {
+      "type": "boolean"
+    },
+    "analysis_domain_policy": {
+      "enum": [
+        "Intersection of both selected regions and both declared valid masks.",
+        "Identical realized selected valid domains required."
+      ]
+    },
+    "mask_agreement_iou": {
+      "$ref": "#/$defs/nullable_ratio"
+    },
+    "mask_agreement_dice": {
+      "$ref": "#/$defs/nullable_ratio"
+    },
+    "full_prediction_pixels_equal": {
+      "type": "boolean"
+    },
+    "foreground_change_accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "saved_total_delta_pixels",
+        "common_domain_delta_pixels",
+        "excluded_domain_delta_pixels",
+        "identity",
+        "causal_attribution"
+      ],
+      "properties": {
+        "saved_total_delta_pixels": {
+          "type": "integer",
+          "minimum": -64000000,
+          "maximum": 64000000
+        },
+        "common_domain_delta_pixels": {
+          "type": "integer",
+          "minimum": -64000000,
+          "maximum": 64000000
+        },
+        "excluded_domain_delta_pixels": {
+          "type": "integer",
+          "minimum": -64000000,
+          "maximum": 64000000
+        },
+        "identity": {
+          "const": "saved_total_delta = common_domain_delta + excluded_domain_delta"
+        },
+        "causal_attribution": {
+          "const": false
+        }
+      }
+    },
+    "a": {
+      "$ref": "#/$defs/source_summary"
+    },
+    "b": {
+      "$ref": "#/$defs/source_summary"
+    },
+    "difference_png_base64": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+    },
+    "difference_classes_png_base64": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+    },
+    "difference_classes": {
+      "const": {
+        "0": "Outside common valid domain",
+        "1": "Common background",
+        "2": "Common foreground",
+        "3": "Removed foreground (A only)",
+        "4": "Added foreground (B only)"
+      }
+    },
+    "legend": {
+      "const": {
+        "a_only": "#4c83ff",
+        "b_only": "#f0ad4e",
+        "shared": "#45c5a1"
+      }
+    },
+    "explanation": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "interpretation": {
+      "const": "Mask agreement uses the explicitly chosen common valid domain. Agreement is not ground-truth accuracy. Excluded-domain accounting is not a causal decomposition of model and configuration effects."
+    },
+    "common_scope_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "a_foreground_in_common_scope": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "b_foreground_in_common_scope": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "shared_foreground_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "a_domain_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "b_domain_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "a_domain_excluded_from_comparison_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "b_domain_excluded_from_comparison_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "a_only_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "b_only_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    },
+    "changed_pixels": {
+      "$ref": "#/$defs/pixel_count"
+    }
+  },
+  "$defs": {
+    "pixel_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 64000000
+    },
+    "nullable_ratio": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "software_version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._+-]*$"
+    },
+    "image_size": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 64000000
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "roi": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "xyxy",
+            "source",
+            "image_size"
+          ],
+          "properties": {
+            "xyxy": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 64000000
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            "source": {
+              "enum": [
+                "drawn",
+                "imported"
+              ]
+            },
+            "image_size": {
+              "$ref": "#/$defs/image_size"
+            }
+          }
+        }
+      ]
+    },
+    "source_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "version",
+        "software_version",
+        "scope",
+        "roi",
+        "foreground_pixels",
+        "whole_image_coverage",
+        "geometric_region_pixels",
+        "valid_image_pixels",
+        "valid_region_pixels",
+        "coverage_of_valid_region",
+        "foreground_excluded_from_comparison_pixels",
+        "validity_policy"
+      ],
+      "properties": {
+        "run_id": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{12}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "software_version": {
+          "$ref": "#/$defs/software_version"
+        },
+        "scope": {
+          "enum": [
+            "all",
+            "left",
+            "right",
+            "top",
+            "bottom"
+          ]
+        },
+        "roi": {
+          "$ref": "#/$defs/roi"
+        },
+        "foreground_pixels": {
+          "$ref": "#/$defs/pixel_count"
+        },
+        "whole_image_coverage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "geometric_region_pixels": {
+          "$ref": "#/$defs/pixel_count"
+        },
+        "valid_image_pixels": {
+          "$ref": "#/$defs/pixel_count"
+        },
+        "valid_region_pixels": {
+          "$ref": "#/$defs/pixel_count"
+        },
+        "coverage_of_valid_region": {
+          "$ref": "#/$defs/nullable_ratio"
+        },
+        "foreground_excluded_from_comparison_pixels": {
+          "$ref": "#/$defs/pixel_count"
+        },
+        "validity_policy": {
+          "enum": [
+            "all_pixels_declared_valid",
+            "explicit_binary_mask"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "valid_region_pixels": {
+                "const": 0
+              }
+            },
+            "required": [
+              "valid_region_pixels"
+            ]
+          },
+          "then": {
+            "properties": {
+              "coverage_of_valid_region": {
+                "type": "null"
+              },
+              "foreground_pixels": {
+                "const": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "coverage_of_valid_region": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "dependentRequired": {
+    "difference_png_base64": [
+      "difference_classes_png_base64"
+    ],
+    "difference_classes_png_base64": [
+      "difference_png_base64"
+    ]
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "No_Common_Valid_Domain"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "common_scope_pixels": {
+            "const": 0
+          },
+          "a_foreground_in_common_scope": {
+            "const": 0
+          },
+          "b_foreground_in_common_scope": {
+            "const": 0
+          },
+          "shared_foreground_pixels": {
+            "const": 0
+          },
+          "a_only_pixels": {
+            "const": 0
+          },
+          "b_only_pixels": {
+            "const": 0
+          },
+          "changed_pixels": {
+            "const": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "common_scope_pixels": {
+            "minimum": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "pixel_diff_available": {
+            "const": false
+          }
+        },
+        "required": [
+          "pixel_diff_available"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "No_Common_Valid_Domain"
+          },
+          "mask_agreement_iou": {
+            "type": "null"
+          },
+          "mask_agreement_dice": {
+            "type": "null"
+          },
+          "difference_png_base64": {
+            "type": "null"
+          },
+          "difference_classes_png_base64": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "status": {
+            "const": "Compared"
+          },
+          "difference_png_base64": {
+            "type": "string"
+          },
+          "difference_classes_png_base64": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "No_Common_Valid_Domain"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "pixel_diff_available": {
+            "const": false
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "pixel_diff_available": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "domain_policy": {
+            "const": "identical"
+          }
+        },
+        "required": [
+          "domain_policy"
+        ]
+      },
+      "then": {
+        "properties": {
+          "selected_valid_domains_equal": {
+            "const": true
+          },
+          "analysis_domain_policy": {
+            "const": "Identical realized selected valid domains required."
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "analysis_domain_policy": {
+            "const": "Intersection of both selected regions and both declared valid masks."
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "full_prediction_pixels_equal": {
+            "const": true
+          }
+        },
+        "required": [
+          "full_prediction_pixels_equal"
+        ]
+      },
+      "then": {
+        "properties": {
+          "change_kind": {
+            "enum": [
+              "Identical_Realized_Analysis",
+              "Analysis_Conditions_Only"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "change_kind": {
+            "enum": [
+              "Prediction_Only",
+              "Prediction_And_Analysis_Conditions"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selected_regions_equal": {
+            "const": true
+          },
+          "valid_masks_equal": {
+            "const": true
+          },
+          "full_prediction_pixels_equal": {
+            "const": true
+          }
+        },
+        "required": [
+          "selected_regions_equal",
+          "valid_masks_equal",
+          "full_prediction_pixels_equal"
+        ]
+      },
+      "then": {
+        "properties": {
+          "change_kind": {
+            "const": "Identical_Realized_Analysis"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selected_regions_equal": {
+            "const": true
+          },
+          "valid_masks_equal": {
+            "const": true
+          },
+          "full_prediction_pixels_equal": {
+            "const": false
+          }
+        },
+        "required": [
+          "selected_regions_equal",
+          "valid_masks_equal",
+          "full_prediction_pixels_equal"
+        ]
+      },
+      "then": {
+        "properties": {
+          "change_kind": {
+            "const": "Prediction_Only"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "shared_foreground_pixels": {
+            "const": 0
+          },
+          "a_only_pixels": {
+            "const": 0
+          },
+          "b_only_pixels": {
+            "const": 0
+          }
+        },
+        "required": [
+          "shared_foreground_pixels",
+          "a_only_pixels",
+          "b_only_pixels"
+        ]
+      },
+      "then": {
+        "properties": {
+          "mask_agreement_iou": {
+            "type": "null"
+          },
+          "mask_agreement_dice": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "mask_agreement_iou": {
+            "type": "number"
+          },
+          "mask_agreement_dice": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "change_kind": {
+            "const": "Identical_Realized_Analysis"
+          }
+        },
+        "required": [
+          "change_kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "full_prediction_pixels_equal": {
+            "const": true
+          },
+          "selected_regions_equal": {
+            "const": true
+          },
+          "valid_masks_equal": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "change_kind": {
+            "const": "Prediction_Only"
+          }
+        },
+        "required": [
+          "change_kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "full_prediction_pixels_equal": {
+            "const": false
+          },
+          "selected_regions_equal": {
+            "const": true
+          },
+          "valid_masks_equal": {
+            "const": true
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "change_kind": {
+            "const": "Analysis_Conditions_Only"
+          }
+        },
+        "required": [
+          "change_kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "full_prediction_pixels_equal": {
+            "const": true
+          }
+        },
+        "anyOf": [
+          {
+            "properties": {
+              "selected_regions_equal": {
+                "const": false
+              }
+            }
+          },
+          {
+            "properties": {
+              "valid_masks_equal": {
+                "const": false
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "change_kind": {
+            "const": "Prediction_And_Analysis_Conditions"
+          }
+        },
+        "required": [
+          "change_kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "full_prediction_pixels_equal": {
+            "const": false
+          }
+        },
+        "anyOf": [
+          {
+            "properties": {
+              "selected_regions_equal": {
+                "const": false
+              }
+            }
+          },
+          {
+            "properties": {
+              "valid_masks_equal": {
+                "const": false
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

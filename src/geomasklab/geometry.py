@@ -1,6 +1,8 @@
 """Deterministic connected-component measurements, independent of model services."""
 from collections import deque
 
+MAX_COMPONENTS = 100_000
+
 
 def scope_area_pixels(width, height, side, roi=None):
     """Return the selected rectangle's area, including odd-sized half images.
@@ -29,6 +31,8 @@ def candidate_statistics(mask, min_area_pixels=1):
     raw_count=0
     for seed,value in enumerate(pixels):
         if not value or seen[seed]: continue
+        if raw_count>=MAX_COMPONENTS:
+            raise ValueError('Mask statistics exceed the 100,000-component limit; use a smaller analysis region.')
         raw_count+=1
         seen[seed]=1
         queue=deque([seed])

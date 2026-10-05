@@ -1,6 +1,6 @@
 # Release and archival preparation
 
-The current software is a release candidate, `1.0.0rc1`. Automated software
+The current software is a release candidate, `1.0.0rc3`. Automated software
 checks and real-data arithmetic are distinct from confirmed creator attribution
 and observed human-study results.
 

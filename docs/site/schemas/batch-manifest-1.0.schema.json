@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pophip3.github.io/geomasklab/schemas/batch-manifest-1.0.schema.json",
+  "title": "GeoMaskLab explicit offline batch manifest",
+  "description": "Every row pairs an image, positive-target mask and optional validity/reference explicitly. Runtime validation also rejects portable reserved names, case-insensitive duplicate IDs, unsafe resolved paths and symlink escapes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "samples"],
+  "properties": {
+    "schema": {"const": "geomasklab-batch-manifest/1.0"},
+    "samples": {
+      "type": "array", "minItems": 1, "maxItems": 128,
+      "items": {"$ref": "#/$defs/sample"}
+    }
+  },
+  "$defs": {
+    "path": {"type": "string", "minLength": 1, "maxLength": 1024, "description": "Relative to the declared base directory; forward slashes; no absolute paths, backslashes, drive prefixes, dot segments or traversal."},
+    "source": {"type": "string", "minLength": 1},
+    "roi": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object", "additionalProperties": false,
+          "required": ["xyxy", "source", "image_size"],
+          "properties": {
+            "xyxy": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "integer", "minimum": 0}},
+            "source": {"enum": ["drawn", "imported"]},
+            "image_size": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 1}}
+          }
+        }
+      ]
+    },
+    "reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "source", "independent"],
+      "properties": {
+        "path": {"$ref": "#/$defs/path"},
+        "source": {"$ref": "#/$defs/source"},
+        "independent": {"type": "boolean", "description": "User assertion; software does not authenticate independence."},
+        "target": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"}
+      }
+    },
+    "sample": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "image", "mask", "target", "source", "aligned"],
+      "dependentRequired": {"valid_mask": ["valid_source"], "valid_source": ["valid_mask"]},
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$"},
+        "image": {"$ref": "#/$defs/path"},
+        "mask": {"$ref": "#/$defs/path"},
+        "target": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_-]{0,63}$"},
+        "source": {"$ref": "#/$defs/source"},
+        "aligned": {"const": true},
+        "scope": {"enum": ["all", "left", "right", "top", "bottom"]},
+        "roi": {"$ref": "#/$defs/roi"},
+        "invert": {"type": "boolean"},
+        "image_source": {"$ref": "#/$defs/source"},
+        "valid_mask": {"$ref": "#/$defs/path"},
+        "valid_source": {"$ref": "#/$defs/source"},
+        "reference": {"$ref": "#/$defs/reference"}
+      }
+    }
+  }
+}

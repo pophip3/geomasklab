@@ -1,13 +1,28 @@
 # Version 1.0 functional contract
 
-Decision date: 5 October 2026. Current development implementation: 1.0.0rc3.dev1.
+Decision date: 5 October 2026. Current software candidate: 1.0.0rc3.
 
 The software freeze target consists of five connected operations: declared pixel
 validity and realized configuration, fair result comparison, reliable manifest-based
 batch execution, candidate-component inspection and one shared-core browser workflow.
-Each operation requires new acceptance against the eventual fixed candidate.
-This development checkpoint implements the validity foundation; it does not mark
-all five operations, user handoff testing or final-release acceptance complete.
+All five operations are implemented in the core, CLI and source workbench.
+Automated acceptance must use the same fixed candidate artifacts. Actual human
+handoff testing, confirmed creators and stable-release metadata remain separate
+release gates; implementation alone does not establish those outcomes.
+
+## Five connected operations
+
+| Operation | Implemented contract |
+| --- | --- |
+| Valid pixels/configuration | Source-bound image, region and explicit validity; complement excludes invalid pixels; null empty-domain ratios |
+| Fair comparison | Intersection or identical-domain policy; source/geometry/validity explanations; shared/excluded accounting and replay packet |
+| Manifest batch | Explicit pairs; atomic samples; isolated failures; cooperative cancel, crash-safe locks and verified identity-bound resume; macro/micro means |
+| Candidate inspection | Stable 8-connected IDs, bounding boxes, pixel-center centroids and independent boundary flags; source-preserving filters |
+| Browser workflow | The same core creates, compares, inspects, batches and replays packets; completed batch samples reopen as normal evidence |
+
+The real NAIP `examples/five_step_workflow.py` exercises the connected operations
+and checks independent pixel sets. Its perturbed baseline/reference is a protocol
+fixture, not an independent segmentation-accuracy result.
 
 ## Core contribution
 

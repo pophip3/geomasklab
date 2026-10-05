@@ -17,6 +17,21 @@ REQUIRED = {'original.png','full_mask.png','mask.png','overlay.png',
             'result.json','statistics.json','run_log.json'}
 
 
+def _same_value(actual, expected):
+    """Compare replayed values while keeping booleans distinct from numbers.
+
+    Integer measurements require JSON integers. Float quantities accept finite
+    JSON numbers, retaining numeric compatibility for older serialized records.
+    """
+    if isinstance(expected,dict):
+        return isinstance(actual,dict) and set(actual)==set(expected) and all(_same_value(actual[key],value) for key,value in expected.items())
+    if isinstance(expected,list):
+        return isinstance(actual,list) and len(actual)==len(expected) and all(_same_value(a,b) for a,b in zip(actual,expected))
+    if type(expected) is float:
+        return type(actual) in (int,float) and math.isfinite(actual) and actual==expected
+    return type(actual) is type(expected) and actual==expected
+
+
 def build_bundle(original, run_folder):
     folder = Path(run_folder)
     contents = {'original.png': Path(original).read_bytes()}
@@ -67,17 +82,18 @@ def load_verified_bundle(payload):
         if len(names) > 16 or sum(item.file_size for item in infos) > MAX_BUNDLE_BYTES:
             raise ValueError('Expanded bundle exceeds size limit.')
         manifest = json.loads(archive.read('manifest.json'))
+        if not isinstance(manifest,dict):raise ValueError('Evidence manifest must be a JSON object.')
         from .domain import EVIDENCE_SCHEMA,DOMAIN_FILES
         schema=manifest.get('schema')
         if schema not in (SCHEMA,EVIDENCE_SCHEMA):
             raise ValueError('Unsupported bundle schema.')
         checksums = manifest.get('checksums', {})
-        if set(checksums) != set(names) - {'manifest.json'}:
+        if not isinstance(checksums,dict) or set(checksums) != set(names) - {'manifest.json'}:
             raise ValueError('Manifest membership mismatch.')
         contents = {name: archive.read(name) for name in checksums}
     for name, raw in contents.items():
         saved = checksums[name]
-        if len(raw) != saved['bytes'] or hashlib.sha256(raw).hexdigest() != saved['sha256']:
+        if not isinstance(saved,dict) or type(saved.get('bytes')) is not int or len(raw) != saved['bytes'] or hashlib.sha256(raw).hexdigest() != saved.get('sha256'):
             raise ValueError('Checksum mismatch: ' + name)
     def load_image(name):
         with Image.open(io.BytesIO(contents[name])) as image:
@@ -93,7 +109,7 @@ def load_verified_bundle(payload):
             raise ValueError('Mask is not a binary L-mode image.')
     result = json.loads(contents['result.json'])
     stats = json.loads(contents['statistics.json'])
-    if result.get('metrics') != stats:
+    if not isinstance(result,dict) or not isinstance(stats,dict) or not _same_value(result.get('metrics'),stats):
         raise ValueError('Recorded metrics disagree.')
     if result['provenance']['image_sha256'] != checksums['original.png']['sha256']:
         raise ValueError('Input identity mismatch.')
@@ -150,10 +166,10 @@ def load_verified_bundle(payload):
         raise ValueError('Validity extension requires geomasklab-evidence/2.0.')
     if type(task.get('invert', False)) is not bool:
         raise ValueError('Complement flag must be boolean.')
-    if task.get('roi') != stats.get('roi'):
+    if not _same_value(task.get('roi'),stats.get('roi')):
         raise ValueError('Task and statistics ROI disagree.')
     options=result.get('task_options') or {}
-    if 'roi' in options and options['roi'] != stats.get('roi'):
+    if 'roi' in options and not _same_value(options['roi'],stats.get('roi')):
         raise ValueError('Report options and statistics ROI disagree.')
     side = task['side']
     if validity is not None:
@@ -169,6 +185,8 @@ def load_verified_bundle(payload):
     expected.paste(positive.crop(box),box[:2])
     roi = stats.get('roi')
     if roi:
+        if 'image_size' in roi and not _same_value(roi['image_size'],[w,h]):
+            raise ValueError('ROI image dimensions disagree with the source image.')
         x1,y1,x2,y2 = roi['xyxy']
         if not all(type(x) is int for x in (x1,y1,x2,y2)) or not (0<=x1<x2<=w and 0<=y1<y2<=h):
             raise ValueError('Invalid ROI coordinates.')
@@ -189,10 +207,10 @@ def load_verified_bundle(payload):
         raise ValueError('Scope/complement replay disagrees with saved mask.')
     area = mask.histogram()[255]
     bbox = list(mask.getbbox()) if mask.getbbox() else None
-    if (stats.get('pixel_area'),stats.get('total_pixels'),stats.get('width'),stats.get('height'),stats.get('bbox_xyxy')) != (area,w*h,w,h,bbox):
+    if not _same_value([stats.get('pixel_area'),stats.get('total_pixels'),stats.get('width'),stats.get('height'),stats.get('bbox_xyxy')],[area,w*h,w,h,bbox]):
         raise ValueError('Pixel statistics disagree with saved mask.')
     ratio = stats.get('area_ratio')
-    if not isinstance(ratio,(int,float)) or not math.isfinite(ratio) or not math.isclose(ratio,area/(w*h),rel_tol=1e-12,abs_tol=1e-12):
+    if type(ratio) not in (int,float) or not math.isfinite(ratio) or not math.isclose(ratio,area/(w*h),rel_tol=1e-12,abs_tol=1e-12):
         raise ValueError('Coverage denominator or ratio is incorrect.')
     if 'scope_area_pixels' in stats or 'scope_area_ratio' in stats:
         # Older bundles contain only whole-image coverage and remain readable.
@@ -215,14 +233,14 @@ def load_verified_bundle(payload):
     distribution = stats['distribution']
     left = positive.crop((0,0,w//2,h)).histogram()[255]
     right = positive.crop((w//2,0,w,h)).histogram()[255]
-    if distribution['left_pixels'] != left or distribution['right_pixels'] != right:
+    if not _same_value([distribution['left_pixels'],distribution['right_pixels']],[left,right]):
         raise ValueError('Full-mask distribution disagrees.')
     inside=geometric_expected_area if validity is not None else area
     if validity is not None:
         if distribution.get('basis')!='full_mask_before_scope_and_validity':raise ValueError('Validity distribution basis disagrees.')
-        if roi and (distribution.get('roi_valid_foreground_pixels')!=area or distribution.get('roi_excluded_foreground_pixels')!=inside-area):
+        if roi and not _same_value([distribution.get('roi_valid_foreground_pixels'),distribution.get('roi_excluded_foreground_pixels')],[area,inside-area]):
             raise ValueError('ROI validity distribution disagrees.')
-    if roi and (distribution['roi_inside_pixels'] != inside or distribution['roi_outside_pixels'] != left+right-inside):
+    if roi and not _same_value([distribution['roi_inside_pixels'],distribution['roi_outside_pixels']],[inside,left+right-inside]):
         raise ValueError('ROI distribution disagrees.')
     candidates=stats.get('candidate_stats')
     if candidates is not None:
@@ -233,7 +251,7 @@ def load_verified_bundle(payload):
         saved_fields={k:v for k,v in candidates.items() if k!='notice'}
         measured_fields={k:v for k,v in measured.items() if k!='notice'}
         if (type(minimum) is not int or minimum<1 or not isinstance(candidates.get('notice'),str) or
-                saved_fields!=measured_fields):
+                not _same_value(saved_fields,measured_fields)):
             raise ValueError('Candidate measurements disagree with saved mask.')
     facts = {'verified': True, 'schema':schema, 'files_checked':len(checksums),
             'pixel_area':area,'area_ratio':area/(w*h),'mode':result['mode'],

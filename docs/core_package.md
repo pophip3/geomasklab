@@ -158,3 +158,21 @@ separately trusted public key. Export their shape with `geomasklab schema signat
 [Raster preparation](raster_inputs.md) records explicit bands, window and scaling
 before geospatial measurement. Headless targets are explicit ASCII labels;
 the browser retains its six category selectors.
+
+## Connected comparison, inspection and batches
+
+The installed commands `compare`, `inspect`, `batch`, `export-batch` and their
+verification counterparts call the same core operations as the source workbench.
+Comparison packets retain two exact evidence sources and the chosen domain policy.
+Inspection filters generate a separate candidate layer and preserve all source pixels.
+Batch manifests pair inputs explicitly and pin byte identities, settings and software
+version before processing. Cancellation is cooperative; resume replays completed
+artifacts before reuse. Macro and micro coverage retain distinct definitions.
+
+See [fair comparison](fair_comparison.md), [candidate inspection](component_inspection.md)
+and [manifest batch](manifest_batch.md). Run `examples/five_step_workflow.py` for the
+real NAIP integration case and independent arithmetic checks.
+
+Fragmented masks exceeding 100,000 8-connected components are refused before
+materializing an unbounded statistics list. Pixel/file limits are admission bounds,
+not a claim that every pattern up to 64 million pixels is supported.

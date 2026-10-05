@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:comparison-packet:1.0",
+  "title": "GeoMaskLab comparison packet manifest",
+  "description": "Validate manifest.json in a flat comparison ZIP. A packet embeds two exact source evidence ZIPs, a comparison record and an English HTML report. Both difference PNGs are included together only when the common valid domain is nonempty. The verifier checks expanded limits, exact membership, hashes and full deterministic replay. Internal consistency is not origin authentication.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "checksums"
+  ],
+  "properties": {
+    "schema": {
+      "const": "geomasklab-comparison-packet/1.0"
+    },
+    "checksums": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source-a.zip",
+        "source-b.zip",
+        "comparison.json",
+        "report.html"
+      ],
+      "minProperties": 4,
+      "maxProperties": 6,
+      "properties": {
+        "source-a.zip": {
+          "$ref": "#/$defs/checksum"
+        },
+        "source-b.zip": {
+          "$ref": "#/$defs/checksum"
+        },
+        "comparison.json": {
+          "$ref": "#/$defs/checksum"
+        },
+        "report.html": {
+          "$ref": "#/$defs/checksum"
+        },
+        "difference.png": {
+          "$ref": "#/$defs/checksum"
+        },
+        "difference-classes.png": {
+          "$ref": "#/$defs/checksum"
+        }
+      },
+      "dependentRequired": {
+        "difference.png": [
+          "difference-classes.png"
+        ],
+        "difference-classes.png": [
+          "difference.png"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "checksum": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "bytes"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 536870912
+        }
+      }
+    }
+  }
+}

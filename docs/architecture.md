@@ -10,12 +10,15 @@ pretending to perform neural inference.
 | --- | --- |
 | `src/geomasklab/api.py`, `measurements.py`, `geometry.py` | Pure evidence creation, explicit domains and deterministic pixel measurements |
 | `src/geomasklab/evidence.py`, `regions.py`, `review.py` | Bundle replay, saved-mask derivation and hash-bound review |
+| `src/geomasklab/domain.py`, `comparison.py` | Realized validity/configuration, explicit comparison policy and source-bound difference replay |
+| `src/geomasklab/components.py`, `batch.py` | Non-mutating boundary inspection and explicit paired batches with atomic sample artifacts and verified resume |
 | `src/geomasklab/provenance.py`, `geospatial.py` | Standard provenance mapping and optional matched-grid physical-area assessment |
 | `src/geomasklab/zonal.py`, `signing.py`, `raster_input.py` | Polygon-domain replay, detached trusted-key signatures and explicit raster-window rendering |
 | `src/geomasklab/providers.py` | Local RGB baseline and fresh-output executable adapter |
 | `src/geomasklab/report.py`, `cli.py`, `schemas/` | Verified standalone reports, installed commands and versioned metadata schemas |
 | `quickstart.py`, `workbench/runtime_config.py` | Startup, local settings and dependency guidance |
 | `workbench/server.py` | HTTP routing, session locks, bounded task orchestration and persistence |
+| `workbench/offline_workflows.py` | Thin installed-core adapters for comparison/inspection packets and background offline-batch jobs |
 | `workbench/planner_protocol.py`, `workbench/agent_bridge.py` | Literal planner parsing, target alignment, service adapter and bounded tool feedback |
 | `workbench/task_grammar.py`, `workbench/v07_contract.py` | Explicit task intent, ROI, quality mode and batch constraints |
 | `workbench/service_transport.py` | JSON HTTP transport, proxy handling and service inspection |

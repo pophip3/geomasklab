@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:component-packet:1.0",
+  "title": "GeoMaskLab candidate component packet manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "checksums"],
+  "properties": {
+    "schema": {"const": "geomasklab-component-packet/1.0"},
+    "checksums": {
+      "type": "object", "additionalProperties": false,
+      "required": ["evidence.zip", "inspection.json", "components.csv", "selection.png", "report.md"],
+      "properties": {
+        "evidence.zip": {"$ref": "#/$defs/checksum"},
+        "inspection.json": {"$ref": "#/$defs/checksum"},
+        "components.csv": {"$ref": "#/$defs/checksum"},
+        "selection.png": {"$ref": "#/$defs/checksum"},
+        "report.md": {"$ref": "#/$defs/checksum"}
+      }
+    }
+  },
+  "$defs": {
+    "checksum": {
+      "type": "object", "additionalProperties": false, "required": ["bytes", "sha256"],
+      "properties": {"bytes": {"type": "integer", "minimum": 0}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+    }
+  }
+}

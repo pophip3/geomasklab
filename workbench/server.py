@@ -633,6 +633,27 @@ class Handler(SimpleHTTPRequestHandler):
         raw=json.dumps(value,ensure_ascii=False).encode(); self.send_response(status); self.send_header('Content-Type','application/json; charset=utf-8'); self.send_header('Cache-Control','no-store'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); self.wfile.write(raw)
     def do_GET(self):
         path=self.path.split('?')[0]
+        if path.startswith(('/api/comparison-export/','/api/component-export/')):
+            identifier=path.rsplit('/',1)[-1]
+            if not re.fullmatch(r'[a-f0-9]{24}',identifier):return self.send_error(404)
+            kind='comparisons' if path.startswith('/api/comparison-export/') else 'inspections'
+            file=DATA/kind/(identifier+'.zip')
+            if not file.is_file():return self.send_error(404)
+            raw=file.read_bytes();self.send_response(200)
+            self.send_header('Content-Type','application/zip')
+            self.send_header('Content-Disposition',f'attachment; filename="geomasklab-{kind}-{identifier}.zip"')
+            self.send_header('Content-Length',str(len(raw)));self.end_headers();return self.wfile.write(raw)
+        if path.startswith(('/api/offline-batch/','/api/offline-batch-export/')):
+            from workbench.offline_workflows import get_offline_batch,export_offline_batch
+            try:
+                identifier=path.rsplit('/',1)[-1]
+                if path.startswith('/api/offline-batch/'):
+                    return self.json(get_offline_batch(DATA,identifier))
+                raw=export_offline_batch(DATA,identifier)
+                self.send_response(200);self.send_header('Content-Type','application/zip')
+                self.send_header('Content-Disposition',f'attachment; filename="geomasklab-batch-{identifier}.zip"')
+                self.send_header('Content-Length',str(len(raw)));self.end_headers();return self.wfile.write(raw)
+            except (ValueError,KeyError,OSError):return self.json({'error':'Offline batch is unavailable or its saved artifacts failed verification.'},400)
         if path=='/api/status': return self.json({**settings_status(),'samples':SAMPLES,'version':VERSION,'capabilities':capabilities()})
         if path=='/api/sessions': return self.json({'sessions':session_index()})
         if path.startswith('/api/reference-export/'):
@@ -706,8 +727,32 @@ class Handler(SimpleHTTPRequestHandler):
     def do_POST(self):
         try:
             length=int(self.headers.get('Content-Length','0'))
-            if length<=0 or length>18*1024*1024: raise ValueError('Unsupported request size.')
+            limit=48*1024*1024 if self.path=='/api/offline-batch/start' else 18*1024*1024
+            if length<=0 or length>limit: raise ValueError('Unsupported request size.')
             p=json.loads(self.rfile.read(length))
+            if self.path.startswith('/api/offline-batch/'):
+                from workbench.offline_workflows import start_offline_batch,cancel_offline_batch,resume_offline_batch,offline_batch_evidence
+                if self.path=='/api/offline-batch/start':return self.json(start_offline_batch(DATA,p))
+                if self.path=='/api/offline-batch/cancel':return self.json(cancel_offline_batch(DATA,p.get('id')))
+                if self.path=='/api/offline-batch/resume':return self.json(resume_offline_batch(DATA,p.get('id')))
+                if self.path=='/api/offline-batch/open-result':
+                    raw=offline_batch_evidence(DATA,p.get('id'),p.get('sample_id'))
+                    return self.json(import_evidence({'bundle':base64.b64encode(raw).decode('ascii'),'name':'Batch sample '+str(p.get('sample_id'))}))
+            if self.path=='/api/verify-review-packet':
+                from workbench.offline_workflows import verify_uploaded_packet
+                return self.json(verify_uploaded_packet(p.get('packet')))
+            if self.path=='/api/inspect-components':
+                s=get_session(p.get('session_id'))
+                if not s:raise ValueError('Experiment not found.')
+                selected=next((r for r in s['runs'] if r['id']==p.get('run_id') and r.get('mask_url')),None)
+                if not selected:raise ValueError('Select a saved mask result before inspecting candidates.')
+                from workbench.export_bundle import build_bundle
+                from workbench.offline_workflows import save_inspection
+                if not s['lock'].acquire(blocking=False):raise ValueError('This experiment is busy.')
+                try:
+                    bundle=build_bundle(DATA/s['id']/'original.png',DATA/s['id']/selected['id'])
+                    return self.json(save_inspection(DATA,bundle,min_area_pixels=p.get('min_area_pixels',1),boundary_filter=p.get('boundary_filter','all')))
+                finally:s['lock'].release()
             if self.path=='/api/check-services': return self.json(inspect_services())
             if self.path=='/api/session': return self.json(new_session(p.get('sample','urban'),p.get('image'),p.get('name')))
             if self.path=='/api/import': return self.json(import_evidence(p))
@@ -734,11 +779,11 @@ class Handler(SimpleHTTPRequestHandler):
                 selected=[next((r for r in s['runs'] if r['id']==rid and r.get('mask_url')),None) for rid in (a,b)]
                 if not all(selected): raise ValueError('Choose two valid mask results from this experiment.')
                 from workbench.export_bundle import build_bundle
-                from workbench.result_comparison import compare_bundles
+                from workbench.offline_workflows import save_comparison
                 if not s['lock'].acquire(blocking=False): raise ValueError('This experiment is busy.')
                 try:
                     bundles=[build_bundle(DATA/s['id']/'original.png',DATA/s['id']/r['id']) for r in selected]
-                    return self.json(compare_bundles(*bundles))
+                    return self.json(save_comparison(DATA,bundles,domain_policy=p.get('domain_policy','intersection')))
                 finally: s['lock'].release()
             if self.path=='/api/recalculate-region':
                 s=get_session(p.get('session_id'))

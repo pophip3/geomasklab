@@ -5,9 +5,10 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Software checks](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml)
 
-GeoMaskLab binds a binary mask to its image, target, spatial scope and coverage
-denominators. Create an evidence ZIP, change its region without model inference,
-and let a colleague replay the measurement offline. The headless core requires
+GeoMaskLab binds a binary mask to its image, target, spatial scope, declared valid
+pixels and coverage denominators. Compare results under explicit conditions,
+inspect clipping boundaries, process paired samples reliably and let a colleague
+replay the measurement offline. The headless core requires
 only **Python 3.10+ and Pillow**. The optional browser workbench uses the same core.
 
 ## Official website
@@ -33,9 +34,29 @@ geomasklab --version
 
 You can also install the distributed wheel directly. It contains the headless
 core and JSON Schemas; source-only browser assets and examples are supplied in
-the source archive. The latest published candidate is **1.0.0rc2**; the current
-development build is **1.0.0rc3.dev1**, adding declared pixel validity. PyPI publication,
+the source archive. The current software candidate is **1.0.0rc3**; fixed artifacts
+are listed on the [Releases page](https://github.com/pophip3/geomasklab/releases). PyPI publication,
 confirmed creator metadata, stable tagging and archival DOI remain pending.
+
+## One connected offline workflow
+
+```sh
+python examples/five_step_workflow.py
+geomasklab verify-comparison five-step-output/comparison.zip
+geomasklab verify-components five-step-output/components.zip
+geomasklab verify-batch five-step-output/batch.zip
+```
+
+This real NAIP example declares valid pixels, compares a controlled mask
+perturbation, inspects clipped components, processes explicitly paired inputs
+and replays each exported operation. Independent pixel sets check the arithmetic.
+One deliberate missing-input failure and one empty valid domain demonstrate
+failure isolation and undefined coverage; the perturbed mask is a software fixture.
+The English report is `five-step-output/index.html`. Add `--geo` after installing
+the geo extra to check matching nominal square-metre measurements.
+
+The mask workflow and source preservation are reproducible. Semantic accuracy
+and actual human handoff value require separate studies.
 
 ## A real geospatial example
 
@@ -76,6 +97,8 @@ geomasklab create --image image.png --mask mask.png --target building --source "
 geomasklab verify evidence.zip
 geomasklab recalc evidence.zip --roi 10 10 80 80 --output roi.zip
 geomasklab report roi.zip --output roi.html
+geomasklab compare evidence.zip roi.zip --domain-policy intersection --output comparison.zip
+geomasklab inspect roi.zip --min-area-pixels 10 --output components.zip
 ```
 
 Inputs are a single image and an exactly aligned binary PNG, with explicit
@@ -94,6 +117,12 @@ to declared square-metre area models and a georeferenced mask export.
 [Raster windows and scaling](docs/raster_inputs.md) prepare explicit multiband/high-bit-depth inputs.
 [Reference assessment](docs/reference_evaluation.md) adds supplied reference masks,
 scoped confusion counts and a separately replayable assessment packet.
+[Fair comparison](docs/fair_comparison.md) distinguishes source-mask changes from
+analysis-condition changes and accounts for foreground outside the shared domain.
+[Candidate inspection](docs/component_inspection.md) exposes stable component IDs,
+bounding boxes and independent image/region/invalid-boundary flags.
+[Explicit manifest batches](docs/manifest_batch.md) provide isolated failures,
+cooperative cancellation, verified resume and separate macro/micro coverage.
 
 ## Optional browser workbench
 
@@ -103,7 +132,10 @@ python quickstart.py
 
 Open `http://127.0.0.1:4180`, or select another port with `--port 4182`.
 Import images, external masks and verified evidence; inspect overlays; recalculate
-regions; review results; and download evidence. Procedural demonstration fixtures
+regions and valid pixels; compare versions under a chosen domain policy; inspect
+candidate boundaries; run an **Offline mask batch**; replay review packets; and
+download evidence. Completed batch samples reopen directly in the same workbench.
+Procedural demonstration fixtures
 are labeled explicitly. Configured external model services are optional:
 [setup and contract](docs/model_services.md). Stop the server with Ctrl+C.
 
@@ -115,6 +147,7 @@ python -m unittest discover -s tests -p "test_*.py" -q
 python reviewer_demo.py
 python examples/reference_workflow.py
 python examples/real_image_handoff.py
+python examples/five_step_workflow.py --geo
 ```
 
 The CI matrix covers Windows, Linux and macOS with Python 3.10 and 3.13; inspect
@@ -130,7 +163,7 @@ replay; they do not replace independent semantic evaluation.
 
 ## Limitations
 
-Core measurements are in pixels. The headless limit is 64 million pixels with bounded file/archive sizes; the browser keeps smaller upload limits. Optional geospatial assessment requires matching
+Core measurements are in pixels. The headless limit is 64 million pixels and 100,000 connected components, with bounded file/archive sizes; the browser keeps smaller upload limits. Optional geospatial assessment requires matching
 8-bit GeoTIFF pixels, valid domains and declared coordinate units. Nominal area
 omits projection distortion; the geodesic corner model omits terrain and edge
 curvature. Polygon domains and separately trusted Ed25519 signatures are supported. Temporal change remains outside this release. Source/alignment assertions and semantic

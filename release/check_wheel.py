@@ -80,7 +80,23 @@ def main():
         cli('evaluate','valid.zip','mask.png','--source','Installed reference fixture','--target','tree','--aligned','--output','valid-assessment.zip')
         assert json.loads(cli('verify-assessment','valid-assessment.zip'))['verified']
         checks.append('Installed validity-aware evidence, empty-domain handling and reference replay')
-        for name in ('manifest','manifest-v2','analysis','validity','result','statistics','geospatial','zonal','signature'):
+        cli('compare','evidence.zip','valid.zip','--domain-policy','intersection','--output','comparison.zip')
+        comparison=json.loads(cli('verify-comparison','comparison.zip'))['comparison']
+        assert comparison['change_kind']=='Analysis_Conditions_Only' and comparison['shared_foreground_pixels']==6
+        assert comparison['changed_pixels']==0 and comparison['foreground_change_accounting']['saved_total_delta_pixels']==-6
+        cli('inspect','valid.zip','--min-area-pixels','2','--boundary-filter','all','--output','components.zip')
+        inspected=json.loads(cli('verify-components','components.zip'))
+        assert inspected['verified']
+        run('-I','-c','import json,zipfile; r=json.loads(zipfile.ZipFile("components.zip").read("inspection.json")); assert r["foreground_pixels"]==6 and r["selected_component_count"]==1 and r["components"][0]["touches_invalid_boundary"]')
+        checks.append('Installed fair-comparison accounting and non-mutating boundary inspection packets')
+        run('-I','-c','import json; sample={"id":"fixture","image":"image.png","mask":"mask.png","target":"tree","source":"Installed independent pixel fixture","aligned":True,"valid_mask":"valid.png","valid_source":"Explicit installed fixture"}; json.dump({"schema":"geomasklab-batch-manifest/1.0","samples":[sample]},open("batch.json","w"))')
+        batch=json.loads(cli('batch','batch.json','--output','batch-results'))
+        assert batch['completed_count']==1 and batch['aggregate']['macro_mean_coverage']==.4
+        cli('batch','batch.json','--output','batch-results','--resume')
+        cli('export-batch','batch-results','--output','batch.zip')
+        replayed=json.loads(cli('verify-batch','batch.zip'));assert replayed['verified'] and replayed['samples'][0]['foreground_pixels']==6
+        checks.append('Installed explicit-manifest batch, verified exact-identity resume and offline packet replay')
+        for name in ('manifest','manifest-v2','analysis','validity','result','statistics','geospatial','zonal','signature','comparison','comparison-packet','components','batch'):
             schema=json.loads(cli('schema',name));assert schema['$schema'].endswith('2020-12/schema')
         checks.append('Packaged JSON Schema resources')
         scripts=python.parent/('geomasklab.exe' if os.name=='nt' else 'geomasklab')
