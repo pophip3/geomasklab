@@ -175,7 +175,13 @@ def load_verified_bundle(payload):
     candidates=stats.get('candidate_stats')
     if candidates is not None:
         minimum=candidates.get('min_area_pixels')
-        if type(minimum) is not int or minimum<1 or candidates!=candidate_statistics(mask,minimum):
+        # Historical bundles localized the notice. Replay numerical and
+        # structural fields while retaining the original prose and file hash.
+        measured=candidate_statistics(mask,minimum) if type(minimum) is int and minimum>=1 else {}
+        saved_fields={k:v for k,v in candidates.items() if k!='notice'}
+        measured_fields={k:v for k,v in measured.items() if k!='notice'}
+        if (type(minimum) is not int or minimum<1 or not isinstance(candidates.get('notice'),str) or
+                saved_fields!=measured_fields):
             raise ValueError('Candidate measurements disagree with saved mask.')
     facts = {'verified': True, 'schema':SCHEMA, 'files_checked':len(checksums),
             'pixel_area':area,'area_ratio':area/(w*h),'mode':result['mode'],

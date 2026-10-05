@@ -84,6 +84,22 @@ class EvidenceHandoffTests(unittest.TestCase):
         self.assertTrue(r['mask_url'].startswith('/experiments/'))
         self.assertTrue(r['export_url'].startswith('/api/export/'))
         self.assertNotIn('mask_cache_key',r)
+
+    def test_localized_candidate_prose_preserves_numeric_verification(self):
+        def localized(files):
+            r=json.loads(files['result.json'])
+            r['metrics']['candidate_stats']['notice']='Historical localized candidate notice.'
+            files['statistics.json']=json.dumps(r['metrics']).encode()
+            files['result.json']=json.dumps(r).encode()
+        historical=rewrite_bundle(self.bundle,localized)
+        self.assertEqual(verify_bundle(historical)['pixel_area'],verify_bundle(self.bundle)['pixel_area'])
+        def forged(files):
+            r=json.loads(files['result.json'])
+            r['metrics']['candidate_stats']['candidates'][0]['area_pixels']+=1
+            files['statistics.json']=json.dumps(r['metrics']).encode()
+            files['result.json']=json.dumps(r).encode()
+        with self.assertRaisesRegex(ValueError,'Candidate measurements'):
+            verify_bundle(rewrite_bundle(historical,forged))
     def test_bad_zip_and_paths_are_rejected(self):
         for raw in (b'not a zip',rewrite_bundle(self.bundle,lambda f:f.update({'../outside':b'no'}))):
             with self.assertRaises(ValueError):self.restore(raw)
