@@ -1,0 +1,256 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:assessment:geospatial:1.0",
+  "title": "GeoMaskLab optional geospatial assessment 1.0",
+  "type": "object",
+  "required": [
+    "schema",
+    "software_version",
+    "source_bundle_sha256",
+    "source_geotiff_sha256",
+    "image_sha256",
+    "grid",
+    "task",
+    "area_model",
+    "assumptions",
+    "measurements",
+    "semantic_accuracy_verified",
+    "pixel_alignment",
+    "dependencies"
+  ],
+  "properties": {
+    "schema": {
+      "const": "geomasklab-geospatial-assessment/1.0"
+    },
+    "software_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_bundle_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "source_geotiff_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "image_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "grid": {
+      "type": "object",
+      "required": [
+        "width",
+        "height",
+        "transform",
+        "crs_wkt",
+        "epsg"
+      ],
+      "properties": {
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "transform": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "number"
+          }
+        },
+        "crs_wkt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "epsg": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "target",
+        "side",
+        "invert"
+      ]
+    },
+    "area_model": {
+      "type": "object",
+      "required": [
+        "method",
+        "unit",
+        "ground_area_corrected"
+      ],
+      "properties": {
+        "method": {
+          "enum": [
+            "projected_nominal",
+            "wgs84_geodesic_corners"
+          ]
+        },
+        "unit": {
+          "const": "m2"
+        },
+        "ground_area_corrected": {
+          "type": "boolean"
+        },
+        "pixel_area_m2": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "axis_units": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "string"
+          }
+        },
+        "axis_unit_to_metre": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "ellipsoid": {
+          "const": "WGS84"
+        }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "const": "projected_nominal"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "pixel_area_m2",
+              "axis_units",
+              "axis_unit_to_metre"
+            ],
+            "properties": {
+              "ground_area_corrected": {
+                "const": false
+              }
+            }
+          },
+          "else": {
+            "required": [
+              "ellipsoid"
+            ],
+            "properties": {
+              "ground_area_corrected": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "assumptions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "measurements": {
+      "type": "object",
+      "required": [
+        "foreground_pixels",
+        "selected_region_pixels",
+        "whole_image_pixels",
+        "foreground_area_m2",
+        "selected_region_area_m2",
+        "whole_image_area_m2",
+        "coverage_of_region_area",
+        "coverage_of_image_area"
+      ],
+      "properties": {
+        "foreground_pixels": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "selected_region_pixels": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "whole_image_pixels": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "foreground_area_m2": {
+          "type": "number",
+          "minimum": 0
+        },
+        "selected_region_area_m2": {
+          "type": "number",
+          "minimum": 0
+        },
+        "whole_image_area_m2": {
+          "type": "number",
+          "minimum": 0
+        },
+        "coverage_of_region_area": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        },
+        "coverage_of_image_area": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "semantic_accuracy_verified": {
+      "const": false
+    },
+    "pixel_alignment": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dependencies": {
+      "type": "object",
+      "required": [
+        "rasterio",
+        "pyproj"
+      ],
+      "properties": {
+        "rasterio": {
+          "type": "string"
+        },
+        "pyproj": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

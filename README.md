@@ -33,7 +33,7 @@ geomasklab --version
 
 You can also install the distributed wheel directly. It contains the headless
 core and JSON Schemas; source-only browser assets and examples are supplied in
-the source archive. This development version is **1.0.0.dev6**. PyPI publication
+the source archive. This development version is **1.0.0.dev7**. PyPI publication
 and a stable release tag remain pending.
 
 ## A complete example
@@ -70,6 +70,9 @@ source bytes, full/scoped masks, metrics, review state, provenance and a manifes
 
 [Core API, providers and JSON Schemas](docs/core_package.md) describe the Python
 interface, format compatibility, local RGB baseline and external-command adapter.
+[PROV-JSON mapping](docs/provenance_mapping.md) exports standard provenance metadata.
+[Optional GeoTIFF assessment](docs/geospatial_assessment.md) binds a matching raster
+to declared square-metre area models and a georeferenced mask export.
 [Reference assessment](docs/reference_evaluation.md) adds supplied reference masks,
 scoped confusion counts and a separately replayable assessment packet.
 
@@ -108,8 +111,10 @@ replay; they do not replace independent semantic evaluation.
 
 ## Limitations
 
-Measurements are in pixels. CRS transformations, georeferenced area and temporal
-change are not implemented in this build. Source/alignment assertions and semantic
+Core measurements are in pixels. Optional geospatial assessment requires matching
+8-bit GeoTIFF pixels, valid domains and declared coordinate units. Nominal area
+omits projection distortion; the geodesic corner model omits terrain and edge
+curvature. Polygon zones, temporal change and signing are deferred. Source/alignment assertions and semantic
 review are self-reported. SHA-256 and replay establish internal consistency, not
 authenticity or target accuracy; a self-consistent replacement bundle can pass.
 Candidate components are not validated object counts. The 60-image model study

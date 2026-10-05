@@ -10,6 +10,7 @@ pretending to perform neural inference.
 | --- | --- |
 | `src/geomasklab/api.py`, `measurements.py`, `geometry.py` | Pure evidence creation, explicit domains and deterministic pixel measurements |
 | `src/geomasklab/evidence.py`, `regions.py`, `review.py` | Bundle replay, saved-mask derivation and hash-bound review |
+| `src/geomasklab/provenance.py`, `geospatial.py` | Standard provenance mapping and optional matched-grid physical-area assessment |
 | `src/geomasklab/providers.py` | Local RGB baseline and fresh-output executable adapter |
 | `src/geomasklab/report.py`, `cli.py`, `schemas/` | Verified standalone reports, installed commands and versioned metadata schemas |
 | `quickstart.py`, `runtime_config.py` | Startup, local settings and dependency guidance |
@@ -62,5 +63,6 @@ Source modules have explicit boundaries, but `server.py` and `web/app.js` still
 coordinate multiple operations. Changes should be small and verified through
 behavioral tests and public API examples rather than an extensive unvalidated
 rewrite. New scientific quantities need specified units, denominators and an
-independent verification path. The version 1.0 scope excludes CRS operations,
-geographic area, model training, manual boundary editing and multi-user hosting.
+independent verification path. Optional geospatial operations are isolated from the core and use declared area
+models. Model training, manual boundary editing and multi-user hosting remain outside
+scope.

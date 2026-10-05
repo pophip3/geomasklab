@@ -27,6 +27,8 @@ Issues = "https://github.com/pophip3/geoscope-softwarex/issues"
 
 [project.optional-dependencies]
 schema = ["jsonschema>=4.18,<5"]
+geo = ["rasterio>=1.3,<2", "pyproj>=3.6,<4"]
+interop = ["prov>=2,<3"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

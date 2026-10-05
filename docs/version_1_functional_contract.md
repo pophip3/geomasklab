@@ -1,6 +1,6 @@
 # Version 1.0 functional contract
 
-Decision date: 5 October 2026. Current implementation: 1.0.0.dev6.
+Decision date: 5 October 2026. Current implementation: 1.0.0.dev7.
 
 ## Core contribution
 
@@ -41,9 +41,10 @@ source/wheel identity and package metadata must be checked before stable tagging
 Current-version live-model inference and an actual human handoff study are separate
 scientific checks, not inferred from core tests or historical model results.
 
-GeoTIFF/CRS operations, physical area, polygon zones, temporal change and signatures
-are deferred until explicit units, coordinate/grid contracts and independent
-boundary tests are complete. The supplied MEP 2.0 prototype was evaluated separately;
+Optional extensions add a replayed PROV-JSON mapping and matched-GeoTIFF area
+assessment, with declared units, CRS, pixel equality, area assumptions and exported
+mask-grid checks. They do not widen the Pillow-only core requirement. Polygon zones,
+temporal change and signatures remain deferred. The supplied MEP 2.0 prototype was evaluated separately;
 it does not replace the compatible geoscope-evidence/1.0 format in this build.
 
 See [software scope](software_scope.md), [core package](core_package.md) and

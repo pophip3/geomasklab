@@ -2,12 +2,14 @@
 
 GeoMaskLab maintains a deliberately bounded version 1.0 feature scope. Discuss
 changes through the repository issue tracker before adding dependencies or
-extending to geographic measurement, new model training or multi-user hosting.
+extending the documented area models, adding model training or multi-user hosting.
 
 ## Development checks
 
 Use Python 3.10 or newer. Install `requirements.txt` and the optional
-`evaluation/requirements-evaluation.txt` for the full test suite. Run:
+`evaluation/requirements-evaluation.txt` for the full test suite. Install
+`python -m pip install ".[schema,geo,interop]"` to exercise optional geospatial
+operations and independent provenance parsing. Run:
 
 ```sh
 python -m unittest discover -s tests -p "test_*.py" -q

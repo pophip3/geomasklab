@@ -90,3 +90,11 @@ Reference scoring is a separate operation described in
 [reference evaluation](reference_evaluation.md). It preserves supplied labels,
 source assertions and scoped confusion counts in a replayable assessment packet.
 It never silently changes review decisions or treats a baseline mask as reference truth.
+
+## Optional standard and geographic extensions
+
+[PROV-JSON mapping](provenance_mapping.md) needs no added runtime dependency.
+`.[interop]` installs an independent parser for interoperability tests.
+[GeoTIFF area assessment](geospatial_assessment.md) uses the optional `.[geo]`
+extra (Rasterio and pyproj). Both work from verified evidence; neither changes
+the core's pixel measurements or its evidence-format identifier.

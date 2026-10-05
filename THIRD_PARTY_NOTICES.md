@@ -16,6 +16,9 @@ account attribution is separate from a confirmed manuscript author list.
 | NumPy | Optional evaluation and brush-conversion study | Installed separately; not needed for the basic workbench | [NumPy license](https://github.com/numpy/numpy/blob/main/LICENSE.txt) |
 | requests | Independent-evaluation HTTP client | Optional evaluation dependency | [requests license](https://github.com/psf/requests/blob/main/LICENSE) |
 | Label Studio SDK 2.1.2 | Optional official brush converter | Installed separately; its application and code are not bundled | [SDK repository and license](https://github.com/HumanSignal/label-studio-sdk) |
+| Rasterio | Optional GeoTIFF input/export; installed separately through the geo extra | Optional; no core import dependency | [Rasterio license](https://github.com/rasterio/rasterio/blob/main/LICENSE.txt) |
+| pyproj | Optional CRS unit conversion and geodesic-corner area | Optional; installed separately | [pyproj license](https://github.com/pyproj4/pyproj/blob/main/LICENSE) |
+| prov | Independent PROV-JSON parser for optional interop tests | Optional test dependency; not vendored | [PROV Python project](https://github.com/trungdong/prov) |
 | RemoteAgent and RemoteSAM | External planner and segmentation services | Their source trees and checkpoints are excluded | [RemoteAgent paper](https://arxiv.org/abs/2604.07765), [RemoteSAM paper](https://arxiv.org/abs/2505.18022); verify the precise deployment/checkpoint license before reuse |
 
 The workbench MIT license does not grant rights to any separately installed

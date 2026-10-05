@@ -50,8 +50,10 @@ Halves split at floor(width/2) or floor(height/2); the remainder belongs to the
 right or bottom. A rectangle cannot be combined with a half in the public offline
 operation. Legacy bundles may omit within-region fields, and remain readable.
 
-Measurements use pixels. GeoTIFF/CRS processing, physical area, polygon zones,
-temporal change and signing remain separate extensions pending validated designs.
+Core measurements use pixels. Optional matched-GeoTIFF assessment adds declared
+projected or WGS84 geodesic-corner area and grid-preserving TIFF export. See
+[its input contract and limits](geospatial_assessment.md). Polygon zones, temporal
+change and signing remain separate extensions pending validated designs.
 Internal replay is distinct from semantic accuracy and authenticity. A completely
 self-consistent replacement bundle can pass without identifying its creator.
 Historical real-image metrics retain their original code and dataset identities.

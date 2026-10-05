@@ -60,7 +60,10 @@ def main():
         cli('segment','image.png','--output','baseline.png')
         assert (work/'baseline.png.provider.json').is_file()
         checks.append('Local reproducible RGB provider')
-        for name in ('manifest','result','statistics'):
+        cli('provenance','evidence.zip','--output','provenance.json')
+        assert json.loads(cli('verify-provenance','evidence.zip','provenance.json'))['verified']
+        checks.append('PROV-JSON export and source-bound replay without extra dependencies')
+        for name in ('manifest','result','statistics','geospatial'):
             schema=json.loads(cli('schema',name));assert schema['$schema'].endswith('2020-12/schema')
         checks.append('Packaged JSON Schema resources')
         scripts=python.parent/('geomasklab.exe' if os.name=='nt' else 'geomasklab')

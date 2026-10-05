@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.0.0.dev7 - 5 October 2026
+
+- Add a source-bound PROV-JSON mapping with independent parser round trips.
+- Add optional matched-GeoTIFF nominal and WGS84 geodesic-corner area assessment.
+- Preserve CRS/affine metadata in exported binary GeoTIFF masks and replay assessments.
+- Reject missing georeferences, mismatched RGB pixels, ambiguous units and nodata domains.
+- Add a current-core historical-mask replay study with separate prediction/analysis identities.
+
+## 1.0.0.dev6 - 5 October 2026
+
+- Extract a Pillow-only, installable headless core with shared browser measurements.
+- Add installed create, verify, recalc, reference-assessment and HTML-report commands.
+- Package Draft 2020-12 schemas while retaining legacy evidence format compatibility.
+- Add a reproducible local RGB baseline and argument-array external mask provider.
+- Include a credited real NASA photograph and reproducible denominator example.
+- Move publication preparation out of the current public source distribution.
+- Validate wheel installation outside the checkout and retain explicit historical-study identities.
+
 Entries describe implemented source changes. A release candidate is a software
 artifact; it does not imply journal submission, acceptance or a permanent DOI.
 
@@ -60,12 +78,3 @@ artifact; it does not imply journal submission, acceptance or a permanent DOI.
 - Added an optional Label Studio SDK brush-prediction bridge and controlled
   artifact/metadata handoff checks; full Label Studio GUI acceptance remains pending.
 - Verified the source version on Windows, Linux and macOS with Python 3.10/3.13.
-# 1.0.0.dev6
-
-- Extract a Pillow-only, installable headless core with shared browser measurements.
-- Add installed create, verify, recalc, reference-assessment and HTML-report commands.
-- Package Draft 2020-12 schemas while retaining legacy evidence format compatibility.
-- Add a reproducible local RGB baseline and argument-array external mask provider.
-- Include a credited real NASA photograph and reproducible denominator example.
-- Move publication preparation out of the current public source distribution.
-- Validate wheel installation outside the checkout and retain explicit historical-study identities.

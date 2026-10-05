@@ -40,6 +40,16 @@ def main(argv=None):
     assess.add_argument('--independent',action='store_true');assess.add_argument('--output',type=Path,required=True)
     packet=sub.add_parser('verify-assessment',help='Replay scores and check a reference-assessment packet.')
     packet.add_argument('packet',type=Path)
+    provenance=sub.add_parser('provenance',help='Map verified evidence to PROV-JSON.')
+    provenance.add_argument('bundle',type=Path);provenance.add_argument('--output',type=Path,required=True)
+    provcheck=sub.add_parser('verify-provenance',help='Check a PROV-JSON mapping against its source evidence.')
+    provcheck.add_argument('bundle',type=Path);provcheck.add_argument('document',type=Path)
+    geo=sub.add_parser('geospatial',help='Assess a pixel result with its matching GeoTIFF (optional geo extra).')
+    geo.add_argument('bundle',type=Path);geo.add_argument('raster',type=Path)
+    geo.add_argument('--method',choices=['nominal','geodesic'],default='nominal')
+    geo.add_argument('--output',type=Path,required=True)
+    geocheck=sub.add_parser('verify-geospatial',help='Replay an optional GeoTIFF area-assessment packet.')
+    geocheck.add_argument('packet',type=Path)
     report=sub.add_parser('report',help='Render verified evidence as a standalone English HTML report.')
     report.add_argument('bundle',type=Path);report.add_argument('--output',type=Path,required=True)
     segment=sub.add_parser('segment',help='Run a local color baseline or an explicit external-command adapter.')
@@ -49,7 +59,7 @@ def main(argv=None):
     segment.add_argument('--argv-json',type=Path,help='JSON executable argument array containing {image} and {output}.')
     segment.add_argument('--timeout',type=float,default=300)
     schema=sub.add_parser('schema',help='Print a packaged JSON Schema.')
-    schema.add_argument('kind',choices=['manifest','result','statistics'],default='manifest',nargs='?')
+    schema.add_argument('kind',choices=['manifest','result','statistics','geospatial'],default='manifest',nargs='?')
     args=parser.parse_args(argv)
     try:
         if args.command=='verify':
@@ -75,6 +85,20 @@ def main(argv=None):
             write(args.output,evaluation_packet(record,difference,raw,ref))
             out={'output':str(args.output),'counts':record['counts'],'metrics':record['metrics']}
         elif args.command=='verify-assessment':out=verify_reference_packet(args.packet.read_bytes())
+        elif args.command=='provenance':
+            from .provenance import provenance_document
+            write(args.output,json.dumps(provenance_document(args.bundle.read_bytes()),indent=2).encode('utf-8'))
+            out={'output':str(args.output),'source_verification':'passed'}
+        elif args.command=='verify-provenance':
+            from .provenance import verify_provenance
+            out=verify_provenance(args.bundle.read_bytes(),json.loads(args.document.read_text(encoding='utf-8')))
+        elif args.command=='geospatial':
+            from .geospatial import geospatial_packet,verify_geospatial_packet
+            raw=geospatial_packet(args.bundle.read_bytes(),args.raster.read_bytes(),method=args.method)
+            out=verify_geospatial_packet(raw);write(args.output,raw);out['output']=str(args.output)
+        elif args.command=='verify-geospatial':
+            from .geospatial import verify_geospatial_packet
+            out=verify_geospatial_packet(args.packet.read_bytes())
         elif args.command=='report':
             from .report import build_report
             write(args.output,build_report(args.bundle.read_bytes()).encode('utf-8'))

@@ -24,7 +24,10 @@ REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'src/geomasklab/schemas/manifest-1.0.schema.json',
             'src/geomasklab/schemas/result-1.0.schema.json',
             'src/geomasklab/schemas/statistics-1.0.schema.json',
-            'examples/real_image_handoff.py', 'examples/data/san-francisco-bay/provenance.json')
+            'examples/real_image_handoff.py', 'examples/data/san-francisco-bay/provenance.json',
+            'src/geomasklab/provenance.py', 'src/geomasklab/geospatial.py',
+            'src/geomasklab/schemas/geospatial-1.0.schema.json', 'examples/geospatial_workflow.py',
+            'docs/provenance_mapping.md', 'docs/geospatial_assessment.md')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
                    'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist'}
 FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip', '.whl'}
