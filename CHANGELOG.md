@@ -60,3 +60,12 @@ artifact; it does not imply journal submission, acceptance or a permanent DOI.
 - Added an optional Label Studio SDK brush-prediction bridge and controlled
   artifact/metadata handoff checks; full Label Studio GUI acceptance remains pending.
 - Verified the source version on Windows, Linux and macOS with Python 3.10/3.13.
+# 1.0.0.dev6
+
+- Extract a Pillow-only, installable headless core with shared browser measurements.
+- Add installed create, verify, recalc, reference-assessment and HTML-report commands.
+- Package Draft 2020-12 schemas while retaining legacy evidence format compatibility.
+- Add a reproducible local RGB baseline and argument-array external mask provider.
+- Include a credited real NASA photograph and reproducible denominator example.
+- Move publication preparation out of the current public source distribution.
+- Validate wheel installation outside the checkout and retain explicit historical-study identities.

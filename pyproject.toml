@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geomasklab"
+dynamic = ["version"]
+description = "Replayable evidence for scoped binary-mask measurements"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+dependencies = ["Pillow>=10,<13"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Image Processing",
+]
+
+[project.scripts]
+geomasklab = "geomasklab.cli:main"
+
+[project.urls]
+Documentation = "https://pophip3.github.io/remote-sensing-workbench-docs/"
+Repository = "https://github.com/pophip3/geoscope-softwarex"
+Issues = "https://github.com/pophip3/geoscope-softwarex/issues"
+
+[project.optional-dependencies]
+schema = ["jsonschema>=4.18,<5"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "geomasklab._version.VERSION"}
+
+[tool.setuptools.package-data]
+geomasklab = ["schemas/*.json"]

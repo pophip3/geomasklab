@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:evidence:manifest:1.0",
+  "title": "GeoMaskLab evidence manifest, version 1.0",
+  "type": "object",
+  "required": [
+    "schema",
+    "software_version",
+    "checksums"
+  ],
+  "properties": {
+    "schema": {
+      "const": "geoscope-evidence/1.0"
+    },
+    "software_version": {
+      "type": "string"
+    },
+    "export_generator_version": {
+      "type": "string"
+    },
+    "verification_scope": {
+      "type": "string"
+    },
+    "checksums": {
+      "type": "object",
+      "minProperties": 7,
+      "maxProperties": 15,
+      "required": [
+        "original.png",
+        "full_mask.png",
+        "mask.png",
+        "overlay.png",
+        "result.json",
+        "statistics.json",
+        "run_log.json"
+      ],
+      "propertyNames": {
+        "pattern": "^[^/\\\\]+$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "sha256",
+          "bytes"
+        ],
+        "properties": {
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "bytes": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "description": "The outer ZIP contains flat filenames only. Manifest membership, file hashes, expanded sizes and deterministic pixel replay are checked by the core verifier."
+}

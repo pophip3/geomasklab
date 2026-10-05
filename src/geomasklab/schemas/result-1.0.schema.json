@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:geomasklab:evidence:result:1.0",
+  "title": "GeoMaskLab result record, version 1.0",
+  "type": "object",
+  "required": [
+    "id",
+    "session_id",
+    "version",
+    "task",
+    "mode",
+    "provenance",
+    "metrics",
+    "full_mask_sha256"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{12}$"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{12}$"
+    },
+    "parent_run_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{12}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "software_version": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "query": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "completed",
+        "needs_review"
+      ]
+    },
+    "mode": {
+      "enum": [
+        "demo",
+        "live",
+        "external"
+      ]
+    },
+    "inference_performed": {
+      "type": "boolean"
+    },
+    "task": {
+      "type": "object",
+      "required": [
+        "target",
+        "side"
+      ],
+      "properties": {
+        "target": {
+          "enum": [
+            "building",
+            "aircraft",
+            "road",
+            "water",
+            "tree",
+            "ship"
+          ]
+        },
+        "side": {
+          "enum": [
+            "all",
+            "left",
+            "right",
+            "top",
+            "bottom"
+          ]
+        },
+        "roi": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "xyxy": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "source": {
+              "enum": [
+                "drawn",
+                "imported"
+              ]
+            },
+            "image_size": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          },
+          "required": [
+            "xyxy",
+            "source",
+            "image_size"
+          ]
+        },
+        "invert": {
+          "type": "boolean"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "image_sha256"
+      ],
+      "properties": {
+        "image_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "planner": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "perception": {
+          "type": "string"
+        }
+      }
+    },
+    "metrics": {
+      "$ref": "urn:geomasklab:evidence:statistics:1.0"
+    },
+    "full_mask_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "external_mask": {
+      "type": "object",
+      "required": [
+        "source",
+        "upload_sha256",
+        "origin_authenticated",
+        "alignment_user_assertion"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "upload_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "origin_authenticated": {
+          "const": false
+        },
+        "alignment_user_assertion": {
+          "const": true
+        }
+      }
+    }
+  },
+  "description": "Result shape for completed segmentation evidence. Source identity and scientific measurements must also pass image replay. Legacy schema names are retained for compatibility."
+}

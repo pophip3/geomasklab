@@ -1,6 +1,20 @@
 # Reviewer quick start
 
-Version 1.0.0-dev.4 continues MIT-licensed software development. Final creator metadata and an archive DOI remain pending.
+Version 1.0.0.dev6 provides an installable Pillow-only replay core and optional source workbench.
+
+## Independent core and real-image example
+
+```sh
+python -m pip install .
+python examples/real_image_handoff.py
+geomasklab verify workflow-output/real-image/right.zip
+geomasklab report workflow-output/real-image/right.zip --output report.html
+```
+
+This example includes a credited real NASA photograph and a reproducible color
+baseline. It checks explicit denominators and source identities; it makes no
+ground-truth or semantic-accuracy claim. The installed wheel provides the core,
+CLI and schemas without starting a server. See [core package](core_package.md).
 
 ## Requirements and commands
 

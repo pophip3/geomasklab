@@ -1,40 +1,21 @@
 # GeoMaskLab
 
-> A traceable workbench for remote-sensing segmentation and region-specific pixel measurements.
+> Replayable measurements and portable evidence for segmentation masks.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Software checks](https://github.com/pophip3/geoscope-softwarex/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geoscope-softwarex/actions/workflows/research-checks.yml)
 
+GeoMaskLab binds a binary mask to its image, target, spatial scope and coverage
+denominators. Create an evidence ZIP, change its region without model inference,
+and let a colleague replay the measurement offline. The headless core requires
+only **Python 3.10+ and Pillow**. The optional browser workbench uses the same core.
+
 ## Official website
 
-For the user guide, coverage definitions, examples and model-service setup, visit
-the [GeoMaskLab documentation website](https://pophip3.github.io/remote-sensing-workbench-docs/).
+Visit the [GeoMaskLab documentation website](https://pophip3.github.io/remote-sensing-workbench-docs/)
+for the workbench guide, examples and service setup.
 
-## Purpose and status
-
-GeoMaskLab helps researchers inspecting RGB remote-sensing image chips retain the
-connection between an image, semantic target, prediction, spatial scope,
-measurement and review decision. External models supply masks; a deterministic
-executor validates requests, measures pixels, preserves result versions and
-exports evidence that another researcher can check without model services.
-
-**Version 1.0.0-dev.5** defines the version 1.0 feature scope and adds external
-binary-mask import and reproducible reference-label evaluation to the English workbench. The earlier
-release candidate is superseded for feature acceptance. This development build
-does not imply a submitted or accepted SoftwareX publication.
-Final creator metadata, archive DOI and current journal-guide verification remain
-pending. The original competition repository is preserved.
-
-Buildings and aircraft are the primary use cases. Road, water, vegetation and
-ship support is experimental. Candidate components are not verified object
-counts. Measurements use pixels, not geographic area. The contribution is a
-traceable workflow; GeoMaskLab does not introduce the external segmentation models.
-
-## Install and run
-
-Use Python 3.10 or newer on Windows, Linux or macOS. Clone this repository or
-extract its source archive, then work from the software root. A virtual
-environment is recommended:
+## Install
 
 ```sh
 git clone https://github.com/pophip3/geoscope-softwarex.git
@@ -42,230 +23,104 @@ cd geoscope-softwarex
 python -m venv .venv
 ```
 
-Activate it on Windows PowerShell with `.\.venv\Scripts\Activate.ps1`, or on
-Linux/macOS with `source .venv/bin/activate`. If your system names the interpreter
-`python3`, use that command. Activation is optional: you can invoke the environment's
-Python executable directly.
+Activate with `.\.venv\Scripts\Activate.ps1` on Windows PowerShell, or
+`source .venv/bin/activate` on Linux/macOS. Then:
 
 ```sh
-python -m pip install -r requirements.txt
-python reviewer_demo.py
+python -m pip install .
+geomasklab --version
+```
+
+You can also install the distributed wheel directly. It contains the headless
+core and JSON Schemas; source-only browser assets and examples are supplied in
+the source archive. This development version is **1.0.0.dev6**. PyPI publication
+and a stable release tag remain pending.
+
+## A complete example
+
+The source includes a credited real NASA photograph and a precomputed, locally
+reproducible RGB color baseline. No account, network, GPU or model weights are needed:
+
+```sh
+python examples/real_image_handoff.py
+geomasklab verify workflow-output/real-image/right.zip
+geomasklab report workflow-output/real-image/right.zip --output report.html
+```
+
+Open `report.html`. The right-half result contains **35,751 foreground pixels**,
+covering **20.7199% of the whole image** or **41.3173% of the selected half**.
+Both denominators are recorded and independently replayed. The example mask is
+a green-color candidate baseline, not human reference labels or validated tree
+ground truth. See [image attribution and processing](examples/data/san-francisco-bay/README.md).
+
+## Bring your own mask
+
+```sh
+geomasklab create --image image.png --mask mask.png --target building --source "My exported binary mask" --aligned --output evidence.zip
+geomasklab verify evidence.zip
+geomasklab recalc evidence.zip --roi 10 10 80 80 --output roi.zip
+geomasklab report roi.zip --output roi.html
+```
+
+Inputs are a single image and an exactly aligned binary PNG, with explicit
+target/source assertions. The PNG may encode positives as 1 or 255. Probabilities,
+multiclass masks, transparent pixels and dimension mismatches are rejected.
+Coordinates refer to the EXIF-normalized displayed RGB image. Outputs retain
+source bytes, full/scoped masks, metrics, review state, provenance and a manifest.
+
+[Core API, providers and JSON Schemas](docs/core_package.md) describe the Python
+interface, format compatibility, local RGB baseline and external-command adapter.
+[Reference assessment](docs/reference_evaluation.md) adds supplied reference masks,
+scoped confusion counts and a separately replayable assessment packet.
+
+## Optional browser workbench
+
+```sh
 python quickstart.py
 ```
 
-Open `http://127.0.0.1:4180`. If the port is occupied, run
-`python quickstart.py --port 4182` and open the printed address. Stop the server
-with Ctrl+C. The interface, accessible labels, generated reports, errors and new
-examples are English. Original user-entered/historical source text is preserved.
+Open `http://127.0.0.1:4180`, or select another port with `--port 4182`.
+Import images, external masks and verified evidence; inspect overlays; recalculate
+regions; review results; and download evidence. Procedural demonstration fixtures
+are labeled explicitly. Configured external model services are optional:
+[setup and contract](docs/model_services.md). Stop the server with Ctrl+C.
 
-Only Pillow is required for the offline workflow. No GPU, account, model weights,
-NumPy, requests or inference endpoint is needed. A reproducible reviewer dependency
-pin is provided in `requirements-reviewer.txt`. Procedural assets are generated
-by `fixtures.py`; they are diagrams with exact fixture masks, **not satellite
-observations, real-image ground truth or neural predictions**.
-
-After installing dependencies, convenience launchers are `bin\geomasklab.cmd`
-on Windows and `sh bin/geomasklab.sh` on Linux/macOS. Both accept `--port 4182`
-and prefer a root `.venv` interpreter. The bundled [offline user guide](web/help.html)
-is also available at `/help.html` on the local server. It needs no remote assets.
-
-## Reviewer example and expected output
-
-`reviewer_demo.py` executes five offline examples, checks exact pixel counts,
-tests branch/review persistence, and verifies five portable ZIPs. It exits
-nonzero on failure and writes `reviewer-output/summary.json` and the bundles.
-
-| Example | Foreground pixels | Whole-image pixels |
-| --- | ---: | ---: |
-| Whole buildings | 75,350 | 480,000 |
-| Right-half buildings | 37,350 | 480,000 |
-| Left-half branch | 38,000 | 480,000 |
-| Rectangle `[80,50,280,250]` | 12,850 | 480,000 |
-| Whole aircraft | 22,532 | 640,000 |
-
-The right-half review is accepted by a clearly labeled **automated procedural
-software check**, not by a human EO reviewer. New results start pending.
-See [the complete reviewer walkthrough](docs/reviewer_quickstart.md).
+## Validation and maintenance
 
 ```sh
-python export_bundle.py reviewer-output/right.zip
-python examples/recalculate_region.py reviewer-output/right.zip
-```
-
-`verified: true` establishes internal file/pixel consistency, not semantic
-accuracy or author identity. The region example verifies whole/left/right/ROI
-analyses using direct Pillow crops without model calls, retaining source image
-and full-mask bytes.
-
-## External masks and reference assessment
-
-Upload an RGB image, then select **Import prediction PNG** to use an existing
-mask from another tool. Declare its target, source and pixel alignment. PNG
-values must be 0/1 or 0/255, with exactly the displayed image dimensions; no
-threshold, class conversion or resizing is inferred. The new version is labeled
-as imported, starts pending review and retains the uploaded source bytes.
-
-Select a result and use **Evaluate reference** with positive-target reference
-labels. Evaluation is restricted to the saved region, records TP/FP/FN/TN and
-IoU, Dice, precision, recall, specificity and pixel accuracy, and shows error
-pixels. Reference provenance and independence are user assertions; the software
-does not authenticate them. Complement results invert reference semantics
-explicitly. Zero denominators remain undefined. One chip does not establish
-general model accuracy, and procedural fixtures do not measure EO accuracy.
-
-The downloadable assessment packet contains both inputs, metrics, error image
-and a hash manifest for offline recomputation. Evaluation never changes the
-prediction or its review decision. Run the complete procedural example:
-
-```sh
-python examples/reference_workflow.py
-python reference_evaluation.py workflow-output/reference-example/prediction.zip workflow-output/reference-example/reference.png --source "Procedural example, not real-image validation" --target building --output workflow-output/recomputed.zip
-```
-
-See [reference evaluation](docs/reference_evaluation.md) and the
-[version 1.0 functional contract](docs/version_1_functional_contract.md).
-
-## Main workflow
-
-1. Choose a procedural image or upload an RGB image for configured live services.
-2. Request one category and a whole image, one pixel half or a rectangle ROI.
-3. Inspect original, overlay and mask views; examine pixel measurements/components.
-4. Record a self-reported semantic review with a label and rationale.
-5. Export an evidence ZIP; import it into a new session for independent inspection.
-6. Use **Recalculate region (offline)** to derive another spatial analysis from
-   a verified full mask, with separate pending review and no new inference.
-7. **Compare versions** verifies two results and shows shared/A-only/B-only
-   foreground within their common selected region. Export comparison JSON and PNG.
-8. Name, annotate and pin investigations in the searchable **Experiments** library;
-   export the complete result ledger as CSV, including failed requests and both
-   coverage denominators. Missing measurements remain blank.
-
-Comparison requires identical input-image bytes, semantic target and complement
-settings. Agreement IoU/Dice compare masks, not independent ground truth; empty
-unions and disjoint regions have undefined agreement. Full-prediction equality is
-reported separately so a scope change is not mistaken for a prediction change.
-Experiment notes are editable metadata and do not rewrite historical bundles.
-The animated **Workflow guide** is illustrative, can be paused and respects the
-system's reduced-motion setting. It does not display invented inference progress.
-
-Changing scope preserves the semantic target/complement and cannot correct an
-inaccurate prediction. Whole-image coverage is `A / (W × H)`; within-region
-coverage is `A / R`, where `R` is the selected region's pixel count. For the
-procedural ROI, these are **2.6771%** and **32.125%**, respectively. They answer
-different questions and are not accuracy scores.
-
-Results retain parent IDs, execution origin, source identities, deterministic
-statistics and review history. Imported single-result bundles cannot restore
-ancestors absent from the export. The verifier replays mask complement, scope,
-coverage, distribution and candidate measurements before reuse. SHA-256 checks
-do not authenticate an author; a manifest can be regenerated.
-
-## Live model services
-
-Copy `.env.example` to `.env`, configure actual compatible endpoints, the model
-identifier and verified revision, then restart. The planner uses OpenAI-compatible
-multimodal chat with one bounded `T_call` or `<answer>` block. The mask service
-uses the documented JSON contract and original-size binary masks. Scene responses
-and masks are separate execution routes. Tiled refinement is a service option,
-not a guarantee of greater accuracy.
-
-[Model-service setup and acceptance](docs/model_services.md) documents the
-settings, request/response expectations and limitations. Model implementations,
-weights and licenses are external. The recorded local deployment and prior
-application study do not establish installation on unrelated reviewer hardware.
-Uploaded images are sent to configured services in live mode; credentials stay
-on the Python server. The server is for trusted local use without multi-user
-authentication.
-
-## Tests and existing-tool evidence
-
-The current suite contains 97 behavioral tests. Six OS/Python CI combinations
-cover Windows/Linux/macOS with Python 3.10/3.13; use the Actions badge to inspect
-the exact commit's result. Full tests add optional evaluation dependencies:
-
-```sh
-python -m pip install -r evaluation/requirements-evaluation.txt
+python -m pip install ".[schema]" -r evaluation/requirements-evaluation.txt
 python -m unittest discover -s tests -p "test_*.py" -q
-python evaluation/run_integrity_matrix.py
-python evaluation/recompute_historical.py
-python examples/reproduce_example.py
+python reviewer_demo.py
+python examples/reference_workflow.py
+python examples/real_image_handoff.py
 ```
 
-The 60-case geometry matrix uses simulated planner/mask transport. It tests
-software behavior, not model accuracy. Frozen historical diagnostics remain
-attributed to their original code/data identities.
+The CI matrix covers Windows, Linux and macOS with Python 3.10 and 3.13; inspect
+the linked workflow for the result at your exact commit. Distribution checks
+also run the installed wheel outside the checkout and verify a committed source
+archive. Tests check arithmetic, provenance, state, malformed inputs and evidence
+replay; they do not replace independent semantic evaluation.
 
-Optional interoperability runs the **actual official Label Studio SDK 2.1.2 brush
-converter** on five examples and four controlled inconsistent-metadata cases:
+- [Architecture](docs/architecture.md) and [software scope](docs/software_scope.md)
+- [Existing-tool workflow study](docs/workflow_study.md)
+- [Historical real-image results and limitations](docs/application_results.md)
+- [Changes](CHANGELOG.md), [contributing](CONTRIBUTING.md) and [local security](SECURITY.md)
 
-```sh
-python -m pip install --no-deps label-studio-sdk==2.1.2
-python examples/compare_handoff.py
-python label_studio_export.py reviewer-output/right.zip --output workflow-output/label-studio
-```
+## Limitations
 
-The bridge exports predictions, not accepted annotations, ground truth or
-invented confidence. The full Label Studio GUI, QGIS and SAMGeo were not
-benchmarked. Different workflow operations are not a speed ranking. See the
-[workflow study and claim boundaries](docs/workflow_study.md).
+Measurements are in pixels. CRS transformations, georeferenced area and temporal
+change are not implemented in this build. Source/alignment assertions and semantic
+review are self-reported. SHA-256 and replay establish internal consistency, not
+authenticity or target accuracy; a self-consistent replacement bundle can pass.
+Candidate components are not validated object counts. The 60-image model study
+belongs to its explicitly recorded earlier commit; its metrics are historical.
+External model inference and a real-user handoff study have not been validated
+for this build. The browser server is intended for trusted local use.
 
-## Prior-version real-image application study
+## License and citation
 
-A frozen study at commit `46ffbbb1898a4b5e8f2ac5974f0bdabace3a94bd` used 30
-LoveDA building and 30 iSAID/DOTA aircraft images, each class containing 20
-positive and 10 empty-target cases. Dataset-provided human pixel labels supplied
-ground truth. Whole-workbench positive-image mean IoU/Dice was
-**22.75%/29.12% for buildings** and **35.23%/47.61% for aircraft**. Empty-target
-false positives occurred in 1/10 and 4/10 images. Nine positive building images
-and one positive aircraft image yielded empty masks. These limitations require
-human inspection and preclude a high-accuracy claim.
-
-All 180 workbench requests/exports completed and matched service masks and
-independent scope reconstruction agreed exactly. Integrity success is separate
-from recognition accuracy. Unknown pretraining exposure/geographic overlap and
-the binary aircraft scoring convention limit generalization claims. See
-[results and limitations](docs/application_results.md),
-[the frozen protocol](docs/application_protocol_v2.md) and
-[metadata/numerical artifacts](evaluation/independent/README.md).
-Raw restricted images/labels are not redistributed.
-
-## Documentation and maintenance
-
-- [Feature scope and application context](docs/software_scope.md)
-- [Architecture and module responsibilities](docs/architecture.md)
-- [Workbench API, inputs/outputs and numerical definitions](docs/api.md)
-- [Published SoftwareX repository inspection](docs/softwarex_repository_reference.md)
-- [Ordered submission requirements](docs/submission_requirements.md)
-- [Fixed-release and DOI archive plan](docs/archive_plan.md)
-- [Change log](CHANGELOG.md), [contributing](CONTRIBUTING.md), [local security](SECURITY.md)
-
-## License, provenance and citation
-
-The modified workbench is licensed under the [MIT License](LICENSE); `Licence.txt`
-contains the same standard text for the journal template convention. Selected
-competition-source provenance, dependencies and data/model boundaries are
-documented in [third-party notices](THIRD_PARTY_NOTICES.md) and `docs/origin.json`.
-The original competition repository remains unchanged. Existing schema and
-repository identifiers are retained for compatibility under the GeoMaskLab name.
-
-For now, reference the exact code commit and version. Creator/contact metadata
-and a final software archive DOI are pending in `release/metadata-draft.json`;
-no DOI badge, confirmed citation author list or article acceptance is implied.
-Use the repository issue tracker for ordinary support and reproducible bug
-reports, without posting private images or credentials.
-
-## Source distribution
-
-From a Git checkout, build an exact committed version and check the extracted
-archive outside the checkout:
-
-```text
-python release/build_source.py --revision HEAD --output GeoMaskLab-source.zip
-python release/check_distribution.py GeoMaskLab-source.zip
-```
-
-The builder includes committed regular files only and rejects local credentials,
-experiments and model weights. `SOURCE-MANIFEST.json` binds every file to a SHA-256
-and the full source commit. The distribution check runs five reviewer cases,
-saved-mask region examples and an isolated local server. It verifies new English
-evidence text; it does not install or evaluate external models.
+Project code is [MIT licensed](LICENSE). [Third-party notices](THIRD_PARTY_NOTICES.md)
+record source attribution and separate image, dataset and dependency terms.
+For reproducible citation, record the software version and exact commit. Confirmed
+creator metadata and an archival DOI will accompany the stable release.
+Use the [issue tracker](https://github.com/pophip3/geoscope-softwarex/issues) for support.

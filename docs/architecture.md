@@ -1,6 +1,6 @@
 # Architecture and maintainability
 
-GeoMaskLab is a locally served browser workbench. Python owns file identity,
+GeoMaskLab has a headless, Pillow-only core and an optional browser workbench. Python owns file identity,
 execution constraints, pixel processing and storage; JavaScript manages the
 interactive display. External model services provide predictions. The default
 offline demonstration substitutes explicit procedural fixtures rather than
@@ -8,6 +8,10 @@ pretending to perform neural inference.
 
 | Module | Responsibility |
 | --- | --- |
+| `src/geomasklab/api.py`, `measurements.py`, `geometry.py` | Pure evidence creation, explicit domains and deterministic pixel measurements |
+| `src/geomasklab/evidence.py`, `regions.py`, `review.py` | Bundle replay, saved-mask derivation and hash-bound review |
+| `src/geomasklab/providers.py` | Local RGB baseline and fresh-output executable adapter |
+| `src/geomasklab/report.py`, `cli.py`, `schemas/` | Verified standalone reports, installed commands and versioned metadata schemas |
 | `quickstart.py`, `runtime_config.py` | Startup, local settings and dependency guidance |
 | `server.py` | HTTP routing, session locks, bounded task orchestration and persistence |
 | `planner_protocol.py`, `agent_bridge.py` | Literal planner parsing, target alignment, service adapter and bounded tool feedback |
@@ -49,6 +53,10 @@ compatibility despite the GeoMaskLab name. Legacy evidence can omit newly added
 within-region fields; missing recorded values are not presented as original
 observations. Raw historical/user text is preserved. Generated interface,
 reports, errors and new examples use English.
+
+Legacy root modules delegate to the src package. The server's external-mask
+creation and all measurements use that same core, preventing a separate GUI
+arithmetic implementation. The wheel excludes source-only browser assets.
 
 Source modules have explicit boundaries, but `server.py` and `web/app.js` still
 coordinate multiple operations. Changes should be small and verified through

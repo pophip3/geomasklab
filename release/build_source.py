@@ -19,10 +19,15 @@ REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'docs/reviewer_quickstart.md', 'docs/model_services.md', 'web/help.html',
             'bin/geomasklab.cmd', 'bin/geomasklab.sh', 'mask_inputs.py',
             'reference_evaluation.py', 'examples/reference_workflow.py',
-            'web/mask-tools.js', 'web/mask-tools.css')
+            'web/mask-tools.js', 'web/mask-tools.css', 'pyproject.toml',
+            'src/geomasklab/api.py', 'src/geomasklab/cli.py', 'src/geomasklab/_version.py',
+            'src/geomasklab/schemas/manifest-1.0.schema.json',
+            'src/geomasklab/schemas/result-1.0.schema.json',
+            'src/geomasklab/schemas/statistics-1.0.schema.json',
+            'examples/real_image_handoff.py', 'examples/data/san-francisco-bay/provenance.json')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
-                   'node_modules', 'weights', 'checkpoints', 'pretrained_weights'}
-FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip'}
+                   'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist'}
+FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip', '.whl'}
 
 
 def git(*args):
@@ -53,7 +58,7 @@ def build(output, revision):
             raise ValueError(f'Required source file missing: {path}')
     if files['LICENSE'] != files['Licence.txt'] or b'MIT License' not in files['LICENSE']:
         raise ValueError('The standard MIT license copies must match')
-    tree = ast.parse(files['product_contract.py'].decode('utf-8'))
+    tree = ast.parse(files['src/geomasklab/_version.py'].decode('utf-8'))
     version = next(ast.literal_eval(n.value) for n in tree.body if isinstance(n, ast.Assign)
                    and any(isinstance(t, ast.Name) and t.id == 'VERSION' for t in n.targets))
     manifest = {'schema': 'geomasklab-source-release/1.0', 'version': version,

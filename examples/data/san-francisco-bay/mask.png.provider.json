@@ -1,0 +1,12 @@
+{
+  "name": "excess-green-rgb",
+  "kind": "local_baseline",
+  "index": "2*G-R-B using 8-bit RGB channels",
+  "foreground_rule": "contrast > threshold",
+  "threshold": 9,
+  "threshold_source": "otsu_integer_lowest_tie",
+  "neural_model": false,
+  "input_grid": "EXIF-normalized RGB",
+  "output_sha256": "d583cb1f74ccd9141499547cbacef250aa528ef98f42f50873887fee45fb9ee7",
+  "semantic_status": "Green-color candidates; vegetation/tree accuracy has not been established."
+}

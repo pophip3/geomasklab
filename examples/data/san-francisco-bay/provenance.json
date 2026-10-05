@@ -1,0 +1,31 @@
+{
+  "image_id": "ISS004-E-10288",
+  "capture_date": "2002-04-21",
+  "credit": "NASA/Johnson Space Center, Earth Sciences and Image Analysis Laboratory",
+  "source_page": "https://science.nasa.gov/earth/earth-observatory/san-francisco-bay-2474/",
+  "download_url": "https://assets.science.nasa.gov/dynamicimage/assets/science/esd/eo/images/imagerecords/2000/2474/ISS004-E-10288_lrg.jpg?crop=faces%2Cfocalpoint&fit=clip&h=3032&w=1998",
+  "usage_terms": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+  "reuse": "Factual educational/software example under NASA media usage guidelines; source credited; no endorsement.",
+  "original_sha256": "94d2912730de346fc9aa7f8bb8237ac21906c5251e34804ae56c09720ca3a8d5",
+  "download_dimensions": [
+    1997,
+    3032
+  ],
+  "processing": {
+    "operation": "RGB conversion; aspect-preserving thumbnail within 512 x 512 pixels",
+    "resampling": "Pillow LANCZOS",
+    "output_dimensions": [
+      337,
+      512
+    ]
+  },
+  "files": {
+    "image.png": "86b22df1e4276a5c2445f83fbe3904beb3fb712490204581ac5f5fedc96e4d79",
+    "mask.png": "d583cb1f74ccd9141499547cbacef250aa528ef98f42f50873887fee45fb9ee7",
+    "mask.png.provider.json": "bd424a5470363e39af176a43ef1da6dc6323c41de3980db2ca301d231e9ab343"
+  },
+  "georeferenced": false,
+  "mask_status": "Precomputed RGB color-contrast baseline; not human annotation or tree ground truth.",
+  "model_training": false,
+  "code_license": "MIT applies to project code and baseline mask, not to the NASA photograph."
+}

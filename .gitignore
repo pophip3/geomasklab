@@ -27,3 +27,6 @@ workflow-output/
 cupy-cache/
 .DS_Store
 Thumbs.db
+build/
+dist/
+*.egg-info/
