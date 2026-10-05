@@ -1,0 +1,4 @@
+# Optional third-party converter comparison; not required by the workbench.
+label-studio-sdk==2.1.2
+numpy>=1.23,<3
+Pillow>=10,<13

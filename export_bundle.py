@@ -8,6 +8,7 @@ import zipfile
 from PIL import Image, ImageOps
 from product_contract import VERSION
 from semantic_review import verify_review
+from pixel_geometry import candidate_statistics
 
 SCHEMA = 'geoscope-evidence/1.0'
 MAX_BUNDLE_BYTES = 96 * 1024 * 1024
@@ -37,8 +38,8 @@ def build_bundle(original, run_folder):
     return output.getvalue()
 
 
-def verify_bundle(payload):
-    """Read ZIP in memory only. Return verified facts or raise ValueError."""
+def load_verified_bundle(payload):
+    """Validate once and return facts and flat file bytes; never extract."""
     if len(payload) > MAX_BUNDLE_BYTES:
         raise ValueError('Bundle exceeds size limit.')
     with zipfile.ZipFile(io.BytesIO(payload)) as archive:
@@ -87,6 +88,13 @@ def verify_bundle(payload):
                       mask_sha256=checksums['mask.png']['sha256'])
     w,h = original.size
     task = result['task']
+    if type(task.get('invert', False)) is not bool:
+        raise ValueError('Complement flag must be boolean.')
+    if task.get('roi') != stats.get('roi'):
+        raise ValueError('Task and statistics ROI disagree.')
+    options=result.get('task_options') or {}
+    if 'roi' in options and options['roi'] != stats.get('roi'):
+        raise ValueError('Report options and statistics ROI disagree.')
     side = task['side']
     boxes = {'all':(0,0,w,h),'left':(0,0,w//2,h),'right':(w//2,0,w,h),
              'top':(0,0,w,h//2),'bottom':(0,h//2,w,h)}
@@ -122,11 +130,22 @@ def verify_bundle(payload):
         raise ValueError('Full-mask distribution disagrees.')
     if roi and (distribution['roi_inside_pixels'] != area or distribution['roi_outside_pixels'] != left+right-area):
         raise ValueError('ROI distribution disagrees.')
-    return {'verified': True, 'schema':SCHEMA, 'files_checked':len(checksums),
+    candidates=stats.get('candidate_stats')
+    if candidates is not None:
+        minimum=candidates.get('min_area_pixels')
+        if type(minimum) is not int or minimum<1 or candidates!=candidate_statistics(mask,minimum):
+            raise ValueError('Candidate measurements disagree with saved mask.')
+    facts = {'verified': True, 'schema':SCHEMA, 'files_checked':len(checksums),
             'pixel_area':area,'area_ratio':area/(w*h),'mode':result['mode'],
             'scope':side,'width':w,'height':h,
             'semantic_review_state':review['state'] if review else 'unrecorded',
             'semantic_accuracy_verified':False,'origin_authenticated':False}
+    return facts, contents
+
+
+def verify_bundle(payload):
+    """Return verified pixel facts, not accuracy or authenticated origin."""
+    return load_verified_bundle(payload)[0]
 
 
 if __name__ == '__main__':

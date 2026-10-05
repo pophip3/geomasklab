@@ -11,7 +11,7 @@ import threading
 import time
 import uuid
 import zipfile
-from collections import deque
+from pixel_geometry import candidate_statistics
 from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -88,42 +88,6 @@ def statistics(mask,side,roi=None,full_mask=None):
             'spatial_check':mask.tobytes()==constrain(mask,side,roi).tobytes(),
             'roi':roi,'candidate_stats':candidate_statistics(mask),'distribution':distribution,'ground_area_available':False}
 
-def candidate_statistics(mask, min_area_pixels=1):
-    """Eight-connected candidate regions on the final, spatially constrained mask."""
-    w,h=mask.size
-    pixels=mask.tobytes()
-    seen=bytearray(len(pixels))
-    candidates=[]
-    raw_count=0
-    for seed,value in enumerate(pixels):
-        if not value or seen[seed]: continue
-        raw_count+=1
-        seen[seed]=1
-        queue=deque([seed])
-        area=0; sx=sy=0; left=w; top=h; right=bottom=0
-        while queue:
-            index=queue.popleft(); y,x=divmod(index,w)
-            area+=1; sx+=x; sy+=y
-            left=min(left,x); top=min(top,y); right=max(right,x+1); bottom=max(bottom,y+1)
-            for ny in range(max(0,y-1),min(h,y+2)):
-                row=ny*w
-                for nx in range(max(0,x-1),min(w,x+2)):
-                    neighbor=row+nx
-                    if pixels[neighbor] and not seen[neighbor]:
-                        seen[neighbor]=1; queue.append(neighbor)
-        if area>=min_area_pixels:
-            candidates.append({'candidate_id':len(candidates)+1,'area_pixels':area,
-                               'bbox':{'x':left,'y':top,'width':right-left,'height':bottom-top},
-                               'center':{'x':round(sx/area,3),'y':round(sy/area,3)}})
-    areas=[item['area_pixels'] for item in candidates]
-    return {'label':'candidate_regions','connectivity':8,'min_area_pixels':min_area_pixels,
-            'raw_candidate_count':raw_count,'candidate_count':len(candidates),
-            'filtered_out_count':raw_count-len(candidates),'total_area_pixels':sum(areas),
-            'min_area':min(areas,default=0),'max_area':max(areas,default=0),
-            'mean_area':round(sum(areas)/len(areas),3) if areas else 0.0,
-            'candidates':candidates,
-            'notice':'语义蒙版的连通区域只是候选目标，数量和边界需人工复核。'}
-
 def experiment_report(session, result):
     """Build a readable report strictly from persisted, deterministic run fields."""
     metrics=result['metrics']; task=result['task']; candidates=metrics['candidate_stats']
@@ -180,6 +144,13 @@ def experiment_report(session, result):
            '- 离线复核：python export_bundle.py 实验包.zip；复算范围、反选、像素面积和整图覆盖率。',
            '- 当前统计基于像素，不代表平方米、公顷或地理坐标。',
            '- 模型语义准确性和候选边界需要人工核查。', '']
+    if result.get('imported_evidence'):
+        origin=result['imported_evidence']
+        lines.extend(['## 实验包交接', '',
+                      '- 本次导入未运行模型；原始影像和蒙版文件字节保留。',
+                      f'- 原始实验包 SHA-256：{origin["bundle_sha256"]}',
+                      f'- 来源运行编号：{origin["source_run_id"]}；来源版本：{origin["source_version"]}',
+                      '- 单次结果交接不恢复完整祖先分支；校验不能证明提交者身份或模型精度。', ''])
     return '\n'.join(lines)
 
 def batch_csv(batch):
@@ -307,6 +278,44 @@ def run_task(s,p,allow_batch=False):
     if not s['lock'].acquire(blocking=False): raise ValueError('当前实验仍在执行，请稍后再试')
     try: return _run_task(s,p,allow_batch=allow_batch)
     finally: s['lock'].release()
+
+def import_evidence(p):
+    """Open verified evidence in a new local session and retain the original ZIP."""
+    from evidence_handoff import prepare_import
+    encoded=p.get('bundle')
+    if not isinstance(encoded,str) or len(encoded)>16*1024*1024:
+        raise ValueError('请上传不超过12MB的实验包')
+    try:
+        payload=base64.b64decode(encoded.split(',')[-1],validate=True)
+        result,files,facts=prepare_import(payload)
+    except (ValueError,zipfile.BadZipFile,OSError) as error:
+        raise ValueError('无法导入实验包：'+str(error)) from error
+    if not isinstance(result['metrics'].get('candidate_stats'),dict):
+        raise ValueError('此实验包缺少候选区域统计，暂不支持恢复')
+    name=p.get('name','导入实验包')
+    if not isinstance(name,str): raise ValueError('文件名不合法')
+    sid=uid();rid=result['id'];folder=DATA/sid;run_folder=folder/rid
+    s={'id':sid,'sample':None,'name':('导入 · '+name)[:120],
+       'width':facts['width'],'height':facts['height'],'created_at':now(),
+       'image_url':f'/experiments/{sid}/original.png','context':{},'runs':[result],
+       'source':result['provenance']['source'],'imported_evidence':result['imported_evidence'],
+       'lock':threading.Lock()}
+    base=f'/experiments/{sid}/{rid}'
+    result.update(session_id=sid,mask_url=base+'/mask.png',overlay_url=base+'/overlay.png',
+                  export_url=f'/api/export/{sid}/{rid}',report_url=f'/api/report/{sid}/{rid}')
+    try: report=experiment_report(s,result)
+    except (KeyError,TypeError,AttributeError) as error:
+        raise ValueError('实验报告字段不完整或不支持') from error
+    run_folder.mkdir(parents=True)
+    (folder/'original.png').write_bytes(files['original.png'])
+    (folder/'source-evidence.zip').write_bytes(payload)
+    for file in ('full_mask.png','mask.png','overlay.png','statistics.json','run_log.json'):
+        (run_folder/file).write_bytes(files[file])
+    save_json(run_folder/'result.json',{k:v for k,v in result.items() if k!='trace'})
+    (run_folder/'report.md').write_text(report,encoding='utf-8')
+    save_json(folder/'session.json',public_session(s))
+    with LOCK: SESSIONS[sid]=s
+    return public_session(s)
 
 def review_result(s, payload):
     rid=payload.get('run_id')
@@ -658,6 +667,7 @@ class Handler(SimpleHTTPRequestHandler):
             p=json.loads(self.rfile.read(length))
             if self.path=='/api/check-services': return self.json(inspect_services())
             if self.path=='/api/session': return self.json(new_session(p.get('sample','urban'),p.get('image'),p.get('name')))
+            if self.path=='/api/import': return self.json(import_evidence(p))
             if self.path=='/api/run':
                 s=get_session(p.get('session_id'))
                 if not s: raise ValueError('实验不存在，请重新选择影像')

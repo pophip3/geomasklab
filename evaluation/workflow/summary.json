@@ -1,0 +1,110 @@
+{
+  "schema": "geoscope-workflow-study/1.0",
+  "software_version": "0.9.0-dev.2",
+  "third_party": {
+    "component": "label_studio_sdk.converter.brush",
+    "package_version": "2.1.2",
+    "module_sha256": "8d12f77cb97f274e9f5445fb51ab77d6bbb4b9467bd42e33ad79d7daa39cac8a"
+  },
+  "environment": {
+    "python": "3.13.9",
+    "platform": "Windows-11-10.0.22631-SP0",
+    "numpy": "2.3.5",
+    "pillow": "12.0.0"
+  },
+  "protocol": "Same procedural inputs and saved masks; no model rerun or true EO accuracy comparison.",
+  "passed": true,
+  "cases": [
+    {
+      "case": "aircraft",
+      "pixel_area": 22532,
+      "sdk_converter_mask_roundtrip_exact": true,
+      "geoscope_adapter_mask_roundtrip_exact": true,
+      "restored_pixel_artifacts_exact": true,
+      "restored_review_state": "pending",
+      "model_calls_on_import": 0,
+      "sdk_converter_seconds_observed": 0.017187,
+      "geoscope_import_seconds_observed": 0.085458
+    },
+    {
+      "case": "left_branch",
+      "pixel_area": 38000,
+      "sdk_converter_mask_roundtrip_exact": true,
+      "geoscope_adapter_mask_roundtrip_exact": true,
+      "restored_pixel_artifacts_exact": true,
+      "restored_review_state": "pending",
+      "model_calls_on_import": 0,
+      "sdk_converter_seconds_observed": 0.014916,
+      "geoscope_import_seconds_observed": 0.088286
+    },
+    {
+      "case": "right",
+      "pixel_area": 37350,
+      "sdk_converter_mask_roundtrip_exact": true,
+      "geoscope_adapter_mask_roundtrip_exact": true,
+      "restored_pixel_artifacts_exact": true,
+      "restored_review_state": "accepted",
+      "model_calls_on_import": 0,
+      "sdk_converter_seconds_observed": 0.013299,
+      "geoscope_import_seconds_observed": 0.079979
+    },
+    {
+      "case": "roi",
+      "pixel_area": 12850,
+      "sdk_converter_mask_roundtrip_exact": true,
+      "geoscope_adapter_mask_roundtrip_exact": true,
+      "restored_pixel_artifacts_exact": true,
+      "restored_review_state": "pending",
+      "model_calls_on_import": 0,
+      "sdk_converter_seconds_observed": 0.010255,
+      "geoscope_import_seconds_observed": 0.045934
+    },
+    {
+      "case": "whole",
+      "pixel_area": 75350,
+      "sdk_converter_mask_roundtrip_exact": true,
+      "geoscope_adapter_mask_roundtrip_exact": true,
+      "restored_pixel_artifacts_exact": true,
+      "restored_review_state": "pending",
+      "model_calls_on_import": 0,
+      "sdk_converter_seconds_observed": 0.019391,
+      "geoscope_import_seconds_observed": 0.133891
+    }
+  ],
+  "controlled_faults": [
+    {
+      "fault": "coverage_denominator",
+      "all_manifest_checksums_updated": true,
+      "sdk_mask_converter_succeeds": true,
+      "geoscope_import_rejected": true,
+      "reason": "无法导入实验包：Coverage denominator or ratio is incorrect."
+    },
+    {
+      "fault": "roi_intent",
+      "all_manifest_checksums_updated": true,
+      "sdk_mask_converter_succeeds": true,
+      "geoscope_import_rejected": true,
+      "reason": "无法导入实验包：Task and statistics ROI disagree."
+    },
+    {
+      "fault": "review_binding",
+      "all_manifest_checksums_updated": true,
+      "sdk_mask_converter_succeeds": true,
+      "geoscope_import_rejected": true,
+      "reason": "无法导入实验包：Semantic review result identity mismatch."
+    },
+    {
+      "fault": "candidate_count",
+      "all_manifest_checksums_updated": true,
+      "sdk_mask_converter_succeeds": true,
+      "geoscope_import_rejected": true,
+      "reason": "无法导入实验包：Candidate measurements disagree with saved mask."
+    }
+  ],
+  "limits": [
+    "SDK converter only; Label Studio GUI, QGIS and SAMGeo not benchmarked.",
+    "Metadata validation is outside the brush converter scope; not a defect in Label Studio.",
+    "Observed operation times perform different work; do not report as a speed ranking.",
+    "No user-study labor savings, semantic improvement or first-of-kind claim."
+  ]
+}

@@ -1,7 +1,7 @@
 """Product boundaries, independent of planner/model performance claims."""
 from copy import deepcopy
 
-VERSION = '0.9.0-dev.1'
+VERSION = '0.9.0-dev.2'
 TARGET_CAPABILITIES = {
     'building': {'label': '建筑', 'level': 'primary', 'evidence': 'limited_prior_version_application_study'},
     'aircraft': {'label': '飞机', 'level': 'primary', 'evidence': 'limited_prior_version_application_study'},

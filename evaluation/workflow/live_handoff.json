@@ -1,0 +1,36 @@
+{
+  "purpose": "Handoff of previously run development image; no new inference or independent accuracy experiment",
+  "software_version": "0.9.0-dev.2",
+  "source_software_version": "0.9.0-dev.1",
+  "model_calls_on_import": 0,
+  "source_bundle_sha256": "17df2d9f7163d6fd967dd9407f642832ee0fcc0782e997040803cc931d753c84",
+  "pixel_artifacts_exact": {
+    "original.png": true,
+    "full_mask.png": true,
+    "mask.png": true,
+    "statistics.json": true
+  },
+  "restored_request": {
+    "task": "semantic_seg",
+    "classes": [
+      "building"
+    ],
+    "quality_mode": "fast"
+  },
+  "model_metadata_preserved": true,
+  "verification": {
+    "verified": true,
+    "schema": "geoscope-evidence/1.0",
+    "files_checked": 8,
+    "pixel_area": 134003,
+    "area_ratio": 0.27917291666666666,
+    "mode": "live",
+    "scope": "all",
+    "width": 800,
+    "height": 600,
+    "semantic_review_state": "pending",
+    "semantic_accuracy_verified": false,
+    "origin_authenticated": false
+  },
+  "raw_input_published": false
+}

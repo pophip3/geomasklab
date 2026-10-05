@@ -22,6 +22,7 @@ weights/
 .pytest_cache/
 outputs/
 reviewer-output/
+workflow-output/
 .cache/
 cupy-cache/
 .DS_Store

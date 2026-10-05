@@ -64,6 +64,15 @@ observations, real model predictions or real-image segmentation ground truth.
    decision changes no mask or numerical statistic.
 4. Download **导出实验包** and verify it with the command above. Decisions and
    their complete history are included; rejected results remain exportable for audit.
+5. Use **导入实验包** to reopen that ZIP in a new local experiment. The image,
+   scope, statistics and prior review records are restored without any inference.
+   You may add a review record and export again. Missing ancestor results are not
+   reconstructed; new segmentation on an imported image requires model mode.
+
+Optional Label Studio converter interoperability and controlled handoff tests are
+documented in [the workflow study](workflow_value_zh.md). They use an official
+third-party converter and require NumPy; this does not add dependencies to the
+Pillow-only reviewer demonstration.
 
 ## Measured execution and installation
 

@@ -7,6 +7,7 @@ const targetNames = {building:'建筑',aircraft:'飞机',road:'道路',water:'�
 const targetLabel = run => (run?.task?.invert?'非':'')+(targetNames[run?.task?.target]||'目标');
 const statusNames = {completed:'待语义复核',answered:'已回答',needs_clarification:'待确认',failed:'未完成',needs_review:'待复核',export_ready:'可导出'};
 const reviewNames = {pending:'待人工复核',accepted:'人工已接受',rejected:'人工已拒绝'};
+const runStateLabel = r => r.mask_url?(reviewNames[r.semantic_review?.state]||statusNames[r.status]):statusNames[r.status];
 const number = n => Number(n).toLocaleString('en-US');
 const escape = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icon = name => `<svg><use href="#i-${name}"/></svg>`;
@@ -34,7 +35,7 @@ async function showSession(session){
   state.loadToken++;Object.assign(state,{session,original,selected:null,last:null,mask:null,view:'original',zoom:1,roi:null,roiDraft:null,roiStart:null,roiDrawing:false,roiClear:false});
   // Restore the mode that actually produced this experiment when the user has
   // not explicitly saved a different preference.
-  if(session.runs.length&&!localStorage.getItem('geoscope-mode'))state.mode=session.runs.at(-1).mode;
+  if(!session.imported_evidence&&session.runs.length&&!localStorage.getItem('geoscope-mode'))state.mode=session.runs.at(-1).mode;
   clearTimeout(toastTimer);$('toast').hidden=true;
   $('chat').innerHTML=intro;
   if(session.sample==='airport'){
@@ -69,7 +70,23 @@ function updateMode(){
  $('connectionLabel').textContent=state.mode==='demo'?'演示模式':'模型模式';
  $('provenanceLabel').textContent=state.mode==='demo'?(state.session?.sample?'内置样例 · 预置标注演示':'上传影像 · 需连接模型'):'模型模式 · 实际服务调用';
  $('composerNote').textContent=state.mode==='demo'?'当前为流程演示，未调用模型':'上传影像将发送至你配置的模型服务';
+ if(state.session?.imported_evidence)$('provenanceLabel').textContent='导入记录 · 导入时未运行模型';
+ if(state.session?.imported_evidence&&state.mode==='demo')$('composerNote').textContent='导入记录可直接复核；新增分割任务需要切换到模型模式。';
 }
+
+$('importBtn').onclick=()=>{if(state.busy)return toast('请等待当前任务完成');$('bundleInput').click();};
+$('bundleInput').onchange=async e=>{
+ const file=e.target.files[0];e.target.value='';if(!file)return;
+ if(state.busy)return toast('请等待当前任务完成');
+ if(file.size>12*1024*1024)return toast('实验包不能超过12MB');
+ state.busy=true;$('importBtn').disabled=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
+ try{
+  const bundle=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('实验包读取失败'));reader.readAsDataURL(file);});
+  await showSession(await api('/api/import',{bundle,name:file.name}));
+  toast('实验包已校验并恢复；未运行模型，可继续记录复核');
+ }catch(error){modal('实验包未通过校验',`<p>${escape(error.message)}</p><p>当前实验和有效结果已保留。请检查来源实验包后重新导入。</p>`,'EVIDENCE HANDOFF');}
+ finally{state.busy=false;$('importBtn').disabled=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
+};
 function resetMetrics(){
  $('reviewPanel').hidden=true;
  $('answerCard').hidden=true;$('coverageCard').hidden=false;$('metricsPanel').hidden=false;$('checksPanel').hidden=false;
@@ -172,7 +189,8 @@ function addMessage(role,text,kind='',run=null){
  if(run?.mask_url){
   const target=targetLabel(run),next=run.task.side==='left'?'右':'左';
   const chips=document.createElement('div');chips.className='followup-chips';
-  for(const q of [`改成${next}侧的${target}`,'提取全图'+target,'导出刚才的结果']){const btn=document.createElement('button');btn.textContent=q;btn.dataset.prompt=q;chips.append(btn);}d.append(chips);
+  const prompts=run.imported_evidence?['导出刚才的结果']:[`改成${next}侧的${target}`,'提取全图'+target,'导出刚才的结果'];
+  for(const q of prompts){const btn=document.createElement('button');btn.textContent=q;btn.dataset.prompt=q;chips.append(btn);}d.append(chips);
   const meta=document.createElement('div');meta.className='message-meta';meta.textContent=`V${run.version} · ${run.mode==='demo'?'预置标注演示':'真实服务返回'} · ${run.duration_ms} ms`;d.append(meta);
  }
  if(run?.status==='needs_clarification'){
@@ -203,7 +221,9 @@ async function selectRun(run){
   $('candidateValue').textContent=m.candidate_stats?`${number(m.candidate_stats.candidate_count)} 个`:'旧结果未统计';
   $('qualityValue').textContent=run.mode==='demo'?'预置演示':qualityNames[run.task?.effective_quality_mode]||'服务未确认';
   $('resultTitle').textContent=(run.task.roi?'框选区域 · ':sideNames[run.task.side])+targetLabel(run);$('resultSubtitle').textContent=`V${run.version} · ${run.mode==='demo'?'预置演示标注，非模型输出':'模型输出，需人工复核'}`;
-  $('resultStatus').textContent=statusNames[run.status];
+  if(run.imported_evidence)$('resultSubtitle').textContent+=` · 导入记录（来源 V${run.imported_evidence.source_version}），未重新推理`;
+  if(run.imported_evidence)$('timeValue').textContent=run.duration_ms+' ms（来源运行）';
+  $('resultStatus').textContent=runStateLabel(run);
   const category=run.capability||state.status?.capabilities?.targets?.[run.task.target];
   if(category?.level==='experimental')$('resultSubtitle').textContent+=' · 实验类别，精度尚未验证';
   renderReview(run);
@@ -223,7 +243,7 @@ function renderReview(run){
 $('reviewBtn').onclick=()=>{
  if(state.busy||!state.selected)return toast('请等待任务完成后复核');
  const selected=state.selected,sessionId=state.session.id;
- modal('记录人工复核',`<p>请先检查原图与叠加蒙版，记录目标语义、漏检、误检及边界情况。决定只适用于 V${selected.version}；后续新结果重新待复核。</p><div class="modal-notice">复核不会修改蒙版或统计。此处保存自报记录，不等同独立精度评测或身份认证。</div><form id="reviewForm" class="review-form"><label for="reviewDecision">复核决定</label><select id="reviewDecision"><option value="accepted">接受这个结果</option><option value="rejected">拒绝这个结果</option><option value="pending">退回待复核</option></select><label for="reviewerName">复核人标识</label><input id="reviewerName" required maxlength="100" autocomplete="off"><label for="reviewNote">复核依据或退回原因</label><textarea id="reviewNote" required maxlength="2000" rows="4" placeholder="说明检查了哪些区域，发现哪些问题，以及结果是否适合当前用途。"></textarea><button type="submit" class="primary" id="saveReview">保存复核记录</button></form><h3>已有复核记录</h3><div class="review-history">${(selected.semantic_review?.events||[]).map(e=>`<p><strong>${escape(reviewNames[e.decision])}</strong> · ${escape(e.reviewer)} · ${escape(new Date(e.at).toLocaleString())}<br>${escape(e.note)}</p>`).join('')||'<p>尚无人工复核记录。</p>'}</div>`,'SEMANTIC REVIEW');
+ modal('记录人工复核',`<p>请先检查原图与叠加蒙版，记录目标语义、漏检、误检及边界情况。决定只适用于 V${selected.version}；后续新结果重新待复核。</p><div class="modal-notice">复核不会修改蒙版或统计。此处保存自报记录，不等同独立精度评测或身份认证。</div><form id="reviewForm" class="review-form"><label for="reviewDecision">复核决定</label><select id="reviewDecision" required><option value="">请选择复核决定</option><option value="accepted">接受这个结果</option><option value="rejected">拒绝这个结果</option><option value="pending">退回待复核</option></select><label for="reviewerName">复核人标识</label><input id="reviewerName" required maxlength="100" autocomplete="off"><label for="reviewNote">复核依据或退回原因</label><textarea id="reviewNote" required maxlength="2000" rows="4" placeholder="说明检查了哪些区域，发现哪些问题，以及结果是否适合当前用途。"></textarea><button type="submit" class="primary" id="saveReview">保存复核记录</button></form><h3>已有复核记录</h3><div class="review-history">${(selected.semantic_review?.events||[]).map(e=>`<p><strong>${escape(reviewNames[e.decision])}</strong> · ${escape(e.reviewer)} · ${escape(new Date(e.at).toLocaleString())}<br>${escape(e.note)}</p>`).join('')||'<p>尚无人工复核记录。</p>'}</div>`,'SEMANTIC REVIEW');
  $('reviewForm').onsubmit=async e=>{
   e.preventDefault();const button=$('saveReview');button.disabled=true;
   try{const updated=await api('/api/review',{session_id:sessionId,run_id:selected.id,decision:$('reviewDecision').value,reviewer:$('reviewerName').value,note:$('reviewNote').value});
@@ -328,7 +348,7 @@ async function batchDialog(){
 $('batchBtn').onclick=batchDialog;
 async function history(){
  const runs=state.session?.runs||[];
- modal('实验记录',runs.length?`<p>同一影像的结果分别保存。点击有效结果恢复查看，并以该版本为后续任务上下文。</p>${[...runs].reverse().map(r=>`<button class="history-row" ${r.mask_url?`data-run="${r.id}"`:''} ${!r.mask_url?'disabled':''}><span>V${r.version}</span><div><strong>${escape(r.query)}</strong><small>${statusNames[r.status]} · ${r.mode==='demo'?'演示':'模型'}</small></div><time>${r.duration_ms} ms</time></button>`).join('')}`:'<p>尚未运行实验。从提取右侧建筑开始，你的任务和结果会记录在这里。</p>','EXPERIMENT HISTORY');
+ modal('实验记录',runs.length?`<p>同一影像的结果分别保存。点击有效结果恢复查看，并以该版本为后续任务上下文。</p>${[...runs].reverse().map(r=>`<button class="history-row" ${r.mask_url?`data-run="${r.id}"`:''} ${!r.mask_url?'disabled':''}><span>V${r.version}</span><div><strong>${escape(r.query)}</strong><small>${escape(runStateLabel(r))} · ${r.mode==='demo'?'演示':'模型'}</small></div><time>${r.duration_ms} ms</time></button>`).join('')}`:'<p>尚未运行实验。从提取右侧建筑开始，你的任务和结果会记录在这里。</p>','EXPERIMENT HISTORY');
  try{
   const data=await api('/api/sessions');if(!$('modal').open||$('modalTitle').textContent!=='实验记录')return;
   $('modalBody').insertAdjacentHTML('beforeend','<h3>已保存的影像实验</h3>'+data.sessions.map(s=>`<button class="history-row" data-session="${escape(s.id)}"><span>↗</span><div><strong>${escape(s.name)}</strong><small>${s.width} × ${s.height} px · ${s.run_count} 次运行</small></div></button>`).join(''));
@@ -338,7 +358,7 @@ $('historyBtn').onclick=history;
 function details(log=false){
  const r=log?state.last||state.selected:state.selected||state.last;
  if(!r)return modal('运行详情','<p>尚未执行任务。完成实验后，这里会展示真实的工具事件、数据来源和运行参数。</p>');
- modal(log?'完整执行日志':'结果与运行详情',`<p><strong>RUN ${r.id}</strong> · ${r.mode==='demo'?'预置标注演示':'模型服务模式'} · ${statusNames[r.status]}</p><div class="modal-notice">${escape(r.provenance.perception)}</div>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>完整实验包 ↓</a></div>`:''}<h3>数据来源与方法</h3><p>${escape(r.provenance.source)}</p><p>规划器：${escape(r.provenance.planner)}。面积按实际二值蒙版计算，未推断平方米。</p><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre>`,'RUN PROVENANCE');
+ modal(log?'完整执行日志':'结果与运行详情',`<p><strong>RUN ${r.id}</strong> · ${r.mode==='demo'?'预置标注演示':'模型服务模式'} · ${escape(runStateLabel(r))}</p><div class="modal-notice">${escape(r.provenance.perception)}</div>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>完整实验包 ↓</a></div>`:''}<h3>数据来源与方法</h3><p>${escape(r.provenance.source)}</p><p>规划器：${escape(r.provenance.planner)}。面积按实际二值蒙版计算，未推断平方米。</p><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre>`,'RUN PROVENANCE');
 }
 $('detailBtn').onclick=()=>details(false);$('logBtn').onclick=()=>details(true);
 $('sourceBtn').onclick=()=>modal('影像与数据来源',`<p>${escape(state.session?.source||'未选择影像')}</p><p>内置建筑和飞机区域由程序几何规则生成，只用于检验交互、上下文和几何计算。不能据此报告模型准确率。</p><p>坐标以图像左上角为原点，X向右、Y向下。上下左右均为影像方向。面积占比使用整图像素为分母。</p>`,'DATA NOTES');

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-CN">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>观域 GeoScope · 遥感分割实验工作台</title><link rel="stylesheet" href="styles.css?v=0.5.0"><link rel="stylesheet" href="competition.css?v=0.5.0"><link rel="stylesheet" href="v07.css?v=0.9.0-dev.1-review1"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>观域 GeoScope · 遥感分割实验工作台</title><link rel="stylesheet" href="styles.css?v=0.5.0"><link rel="stylesheet" href="competition.css?v=0.9.0-dev.2"><link rel="stylesheet" href="v07.css?v=0.9.0-dev.2-handoff1"></head>
 <body>
 <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg"><defs>
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
@@ -25,7 +25,7 @@
     <div class="top-actions"><span class="version-tag">研究预览版</span><button class="text-button" id="connectionBtn"><span class="status-dot amber"></span><span id="connectionLabel">演示模式</span><svg><use href="#i-settings"/></svg></button></div>
   </header>
   <main>
-    <div class="page-heading"><div class="hero-copy"><div class="eyebrow">TRACEABLE SEGMENTATION WORKBENCH</div><h1>提取目标，复核结果，保留实验依据<span class="heading-dot">.</span></h1><p>导入影像 <b>→</b> 提取与检查 <b>→</b> 统计与可复核导出</p></div><div class="heading-actions"><button class="secondary" id="batchBtn">批量实验</button><button class="secondary" id="newBtn"><svg><use href="#i-plus"/></svg>开始新实验</button></div></div>
+    <div class="page-heading"><div class="hero-copy"><div class="eyebrow">TRACEABLE SEGMENTATION WORKBENCH</div><h1>提取目标，复核结果，保留实验依据<span class="heading-dot">.</span></h1><p>导入影像 <b>→</b> 提取与检查 <b>→</b> 统计与可复核导出</p></div><div class="heading-actions"><button class="secondary" id="importBtn">导入实验包</button><input id="bundleInput" type="file" accept=".zip,application/zip" hidden><button class="secondary" id="batchBtn">批量实验</button><button class="secondary" id="newBtn"><svg><use href="#i-plus"/></svg>开始新实验</button></div></div>
     <div class="context-bar"><div class="file-thumb"><img id="fileThumb" src="assets/urban.png" alt="当前样区缩略图"></div><div class="file-summary"><strong id="imageName">合成街区流程样例</strong><span id="imageMeta">RGB · 800 × 600 px · 像素坐标</span></div><span class="tag">单影像实验</span><div class="context-spacer"></div><div class="provenance-tag"><span class="status-dot amber"></span><span id="provenanceLabel">合成样例 · 无模型推理</span></div><button class="icon-button" id="sourceBtn" aria-label="查看数据来源" title="数据来源"><svg><use href="#i-info"/></svg></button><button class="swap-button" id="uploadBtn">更换影像 <svg><use href="#i-image"/></svg></button><input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden></div>
     <div class="workspace">
       <section class="panel conversation" aria-label="实验对话">
@@ -61,5 +61,5 @@
 </div>
 <dialog id="modal"><div class="modal-header"><div><span class="eyebrow" id="modalEyebrow">GEOSCOPE LAB</span><h2 id="modalTitle"></h2></div><button id="closeModal" class="icon-button" aria-label="关闭"><svg><use href="#i-x"/></svg></button></div><div id="modalBody"></div></dialog>
 <div id="toast" role="status" hidden></div>
-<script src="app.js?v=0.9.0-dev.1"></script>
+<script src="app.js?v=0.9.0-dev.2-handoff2"></script>
 </body></html>

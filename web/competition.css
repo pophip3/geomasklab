@@ -48,7 +48,7 @@ main{max-width:1640px;padding:22px 28px 0}
 .coverage-number strong{font-size:38px;color:#28664f}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:0 0 14px}
 .metrics>div{display:block;margin:0;padding:9px 10px;background:#f7f9f5;border:1px solid #edf0e9;border-radius:7px}
-.metrics>div:nth-child(3){display:none}
+.metrics>div:nth-child(3){display:flex}
 .metrics dt{font-size:8px;margin-bottom:3px}
 .metrics dd{font-size:11px}
 .checks{border:1px solid #e5ebe2;border-radius:7px;padding:0;margin-top:3px;background:#fff}
