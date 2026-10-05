@@ -131,7 +131,7 @@ authentication.
 
 ## Tests and existing-tool evidence
 
-The current suite contains 96 behavioral tests. Six OS/Python CI combinations
+The current suite contains 97 behavioral tests. Six OS/Python CI combinations
 cover Windows/Linux/macOS with Python 3.10/3.13; use the Actions badge to inspect
 the exact commit's result. Full tests add optional evaluation dependencies:
 
