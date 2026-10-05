@@ -43,7 +43,7 @@ def main():
         for name in ('.git', '.env', 'experiments', 'reviewer-output'):
             if (root/name).exists():
                 raise ValueError(f'Unexpected local artifact: {name}')
-        commands = [['reviewer_demo.py'], ['examples/recalculate_region.py', 'reviewer-output/right.zip']]
+        commands = [['reviewer_demo.py'], ['examples/recalculate_region.py', 'reviewer-output/right.zip'], ['examples/reference_workflow.py']]
         for command in commands:
             result = subprocess.run([args.python, *command], cwd=root, env=environment,
                                     text=True, encoding='utf-8', capture_output=True, check=True)
@@ -101,7 +101,7 @@ def main():
             process.communicate(timeout=10)
     report = {'passed': True, 'version': manifest['version'], 'source_commit': manifest['source_commit'],
               'source_hashes_checked': len(manifest['files']), 'reviewer_cases': 5,
-              'saved_mask_region_example': 'passed', 'new_generated_text': 'English',
+              'saved_mask_region_example': 'passed', 'external_mask_reference_example': 'passed', 'new_generated_text': 'English',
               'isolated_server_startup_and_interface': 'passed',
               'offline_user_guide': 'passed', 'platform_launcher': 'passed',
               'python': args.python, 'duration_seconds': round(time.perf_counter()-started, 3),

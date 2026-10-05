@@ -3,6 +3,7 @@ const state = { session:null, selected:null, last:null, original:null, mask:null
  roi:null,roiDraft:null,roiStart:null,roiDrawing:false,roiClear:false,batch:null };
 const sideNames = {all:'Whole image',left:'Left half',right:'Right half',top:'Top half',bottom:'Bottom half'};
 const qualityNames = {auto:'Automatic',fast:'Fast',accurate:'Tiled refinement'};
+const executionLabel = run => run.execution_kind==='saved_mask_region_analysis'?'Offline region analysis':run.mode==='external'?'Imported prediction':run.mode==='demo'?'Procedural demonstration':'Model-service response';
 const targetNames = {building:'Buildings',aircraft:'Aircraft',road:'Roads',water:'Water',tree:'Vegetation',ship:'Ships'};
 const targetLabel = run => (run?.task?.invert?'Non-':'')+(targetNames[run?.task?.target]||'Target').toLowerCase();
 const statusNames = {completed:'Pending semantic review',answered:'Answered',needs_clarification:'Clarification needed',failed:'Failed',needs_review:'Review required',export_ready:'Ready to export'};
@@ -27,7 +28,7 @@ async function newExperiment(sample='urban',image=null,name=null){
  try{
   const session=await api('/api/session',{sample,image,name});
   await showSession(session);
- }catch(e){toast(e.message);}finally{state.busy=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
+ }catch(e){toast(e.message);}finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('sendBtn').disabled=false;$('newBtn').disabled=false;}
 }
 
 async function showSession(session){
@@ -63,12 +64,12 @@ async function openExperiment(id){
  if(state.busy)return toast('Wait for the current task to finish.');
  state.busy=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
  try{await showSession(await api('/api/session/'+encodeURIComponent(id)));}
- catch(e){toast(e.message);}finally{state.busy=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
+ catch(e){toast(e.message);}finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('sendBtn').disabled=false;$('newBtn').disabled=false;}
 }
 
 function updateMode(){
  $('connectionLabel').textContent=state.mode==='demo'?'Demo mode':'Live mode';
- $('provenanceLabel').textContent=state.mode==='demo'?(state.session?.sample?'Synthetic example · Procedural mask':'Uploaded image · Model services required'):'Live mode · External model services';
+ $('provenanceLabel').textContent=state.mode==='demo'?(state.session?.sample?'Synthetic example · Procedural mask':'Uploaded image · Import a mask or use model services'):'Live mode · External model services';
  $('composerNote').textContent=state.mode==='demo'?'Offline demonstration · No model calls':'Live mode sends images to your configured model services.';
  if(state.session?.imported_evidence)$('provenanceLabel').textContent='Imported evidence · No inference during import';
  if(state.session?.imported_evidence&&state.mode==='demo')$('composerNote').textContent='Imported evidence supports offline review and region recalculation. New segmentation requests require model services.';
@@ -85,7 +86,7 @@ $('bundleInput').onchange=async e=>{
   await showSession(await api('/api/import',{bundle,name:file.name}));
   toast('Evidence verified and restored without inference. You can now review or recalculate a region.');
  }catch(error){modal('Evidence verification failed',`<p>${escape(error.message)}</p><p>The current experiment is preserved. Check the source bundle before importing it again.</p>`,'EVIDENCE HANDOFF');}
- finally{state.busy=false;$('importBtn').disabled=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
+ finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('importBtn').disabled=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
 };
 function resetMetrics(){
  $('recalculateBtn').disabled=true;$('regionCoverage').textContent='—';
@@ -195,7 +196,7 @@ function addMessage(role,text,kind='',run=null,recordedAt=run?.created_at){
   const chips=document.createElement('div');chips.className='followup-chips';
   const prompts=(run.imported_evidence||state.session?.imported_evidence)?['Export the selected result.']:[`Extract ${target} in the ${next} half.`,`Extract ${target} in the whole image.`,'Export the selected result.'];
   for(const q of prompts){const btn=document.createElement('button');btn.textContent=q;btn.dataset.prompt=q;chips.append(btn);}d.append(chips);
-  const meta=document.createElement('div');meta.className='message-meta';meta.textContent=`V${run.version} · ${run.execution_kind==='saved_mask_region_analysis'?'Offline region analysis':run.mode==='demo'?'Procedural demonstration':'Model-service response'} · ${run.duration_ms} ms`;d.append(meta);
+  const meta=document.createElement('div');meta.className='message-meta';meta.textContent=`V${run.version} · ${executionLabel(run)} · ${run.duration_ms} ms`;d.append(meta);
  }
  if(run?.status==='needs_clarification'){
   const chips=document.createElement('div');chips.className='followup-chips';const target=state.selected?.task?.target||state.status.samples[state.session.sample]?.target||'building';
@@ -226,7 +227,9 @@ async function selectRun(run){
   $('regionCoverage').textContent=m.scope_area_ratio==null?'Not recorded or empty scope':`${(m.scope_area_ratio*100).toFixed(2)}% (${number(m.scope_area_pixels)} px)`;
   $('recalculateBtn').disabled=false;
   $('qualityValue').textContent=run.mode==='demo'?'Procedural demo':qualityNames[run.task?.effective_quality_mode]||'Unconfirmed by service';
+  if(run.mode==='external')$('qualityValue').textContent='Imported mask';
   $('resultTitle').textContent=(run.task.roi?'Rectangle ROI':sideNames[run.task.side])+' · '+targetLabel(run);$('resultSubtitle').textContent=`V${run.version} · ${run.mode==='demo'?'Procedural mask · Not model output':'Model output · Review required'}`;
+  if(run.mode==='external')$('resultSubtitle').textContent=`V${run.version} · Imported prediction · No inference during import · Review required`;
   if(run.imported_evidence)$('resultSubtitle').textContent+=` · Imported from V${run.imported_evidence.source_version} · No new inference`;
   if(run.imported_evidence)$('timeValue').textContent=run.duration_ms+' ms (source run)';
   if(run.execution_kind==='saved_mask_region_analysis'){
@@ -282,7 +285,7 @@ async function run(query,simulateFailure=false){
   if(result.status==='export_ready')download(result.export_url);
   if(result.status==='failed'&&state.selected)toast('The task failed. The previous valid result remains on the canvas.');
  }catch(e){addMessage('assistant',e.message,'warning');toast('Request failed. No result was generated.');}
- finally{state.busy=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;$('busyOverlay').hidden=true;}
+ finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('sendBtn').disabled=false;$('newBtn').disabled=false;$('busyOverlay').hidden=true;}
 }
 $('taskForm').onsubmit=e=>{e.preventDefault();run($('query').value);};
 $('query').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();run($('query').value);}};
@@ -310,7 +313,7 @@ $('recalculateBtn').onclick=()=>{
    if(state.session.id===sessionId){state.session.runs.push(result);state.last=result;addMessage('user',result.query);addMessage('assistant',result.message,'',result);await selectRun(result);}
    closeModal();toast('Created a separate result version without model inference.');
   }catch(error){toast(error.message);if($('saveRegion'))$('saveRegion').disabled=false;}
-  finally{state.busy=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
+  finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('sendBtn').disabled=false;$('newBtn').disabled=false;}
  };
 };
 $('reportBtn').onclick=()=>{if(state.selected?.report_url)download(state.selected.report_url);};
@@ -382,7 +385,7 @@ async function batchDialog(){
 $('batchBtn').onclick=batchDialog;
 async function history(){
  const runs=state.session?.runs||[];
- modal('Experiment history',runs.length?`<p>Results are saved separately. Open a valid version to inspect it or use it as the parent of a new task.</p>${[...runs].reverse().map(r=>`<button class="history-row" ${r.mask_url?`data-run="${r.id}"`:''} ${!r.mask_url?'disabled':''}><span>V${r.version}</span><div><strong>${escape(r.query)}</strong><small>${escape(runStateLabel(r))} · ${r.mode==='demo'?'Demo':'Live'}</small></div><time>${r.duration_ms} ms</time></button>`).join('')}`:'<p>No tasks have run yet. Try extracting buildings in the right half.</p>','EXPERIMENT HISTORY');
+ modal('Experiment history',runs.length?`<p>Results are saved separately. Open a valid version to inspect it or use it as the parent of a new task.</p>${[...runs].reverse().map(r=>`<button class="history-row" ${r.mask_url?`data-run="${r.id}"`:''} ${!r.mask_url?'disabled':''}><span>V${r.version}</span><div><strong>${escape(r.query)}</strong><small>${escape(runStateLabel(r))} · ${executionLabel(r)}</small></div><time>${r.duration_ms} ms</time></button>`).join('')}`:'<p>No tasks have run yet. Try extracting buildings in the right half.</p>','EXPERIMENT HISTORY');
  try{
   const data=await api('/api/sessions');if(!$('modal').open||$('modalTitle').textContent!=='Experiment history')return;
   $('modalBody').insertAdjacentHTML('beforeend','<h3>Saved image experiments</h3>'+data.sessions.map(s=>`<button class="history-row" data-session="${escape(s.id)}"><span>↗</span><div><strong>${escape(s.name)}</strong><small>${s.width} × ${s.height} px · ${s.run_count} runs</small></div></button>`).join(''));
@@ -392,7 +395,7 @@ $('historyBtn').onclick=history;
 function details(log=false){
  const r=log?state.last||state.selected:state.selected||state.last;
  if(!r)return modal('Run details','<p>No task has run yet. Execution events, provenance and parameters will appear here.</p>');
- modal(log?'Full execution log':'Result and execution details',`<p><strong>RUN ${r.id}</strong> · ${r.mode==='demo'?'Procedural demonstration':'Live model services'} · ${escape(runStateLabel(r))}</p><div class="modal-notice">${escape(r.provenance.perception)}</div>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>Complete evidence bundle ↓</a></div>`:''}<h3>Data source and method</h3><p>${escape(r.provenance.source)}</p><p>Planner: ${escape(r.provenance.planner)}. Coverage is measured from the binary mask; no geographic area is inferred.</p><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre>`,'RUN PROVENANCE');
+ modal(log?'Full execution log':'Result and execution details',`<p><strong>RUN ${r.id}</strong> · ${executionLabel(r)} · ${escape(runStateLabel(r))}</p><div class="modal-notice">${escape(r.provenance.perception)}</div>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>Complete evidence bundle ↓</a></div>`:''}<h3>Data source and method</h3><p>${escape(r.provenance.source)}</p><p>Planner: ${escape(r.provenance.planner)}. Coverage is measured from the binary mask; no geographic area is inferred.</p><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre>`,'RUN PROVENANCE');
 }
 $('detailBtn').onclick=()=>details(false);$('logBtn').onclick=()=>details(true);
 $('sourceBtn').onclick=()=>modal('Image provenance',`<p>${escape(state.session?.source||'No image selected')}</p><p>Built-in masks are generated from geometric rules. They test interactions, context and pixel operations; they do not measure model accuracy.</p><p>Coordinates start at the top-left: X increases rightward and Y downward. Directions are image-relative. Whole-image coverage uses all image pixels as its denominator.</p>`,'DATA NOTES');

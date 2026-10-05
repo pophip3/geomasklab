@@ -24,6 +24,8 @@ def build_bundle(original, run_folder):
         contents[name] = (folder / name).read_bytes()
     if (folder / 'report.md').is_file():
         contents['report.md'] = (folder / 'report.md').read_bytes()
+    if (folder / 'source_mask.png').is_file():
+        contents['source_mask.png'] = (folder / 'source_mask.png').read_bytes()
     result = json.loads(contents['result.json'])
     manifest = {'schema': SCHEMA, 'software_version': result.get('software_version','unrecorded'),
                 'export_generator_version': VERSION,
@@ -82,6 +84,19 @@ def load_verified_bundle(payload):
         raise ValueError('Input identity mismatch.')
     if result['full_mask_sha256'] != checksums['full_mask.png']['sha256']:
         raise ValueError('Full-mask identity mismatch.')
+    external = result.get('external_mask')
+    if result.get('mode') == 'external' and external is None:
+        raise ValueError('External mask origin is missing.')
+    if external is not None:
+        from mask_inputs import binary_png, source_text
+        if (not isinstance(external, dict) or external.get('origin_authenticated') is not False or
+            external.get('alignment_user_assertion') is not True):
+            raise ValueError('Invalid external mask provenance assertions.')
+        source_text(external.get('source'))
+        if ('source_mask.png' not in contents or
+            external.get('upload_sha256') != checksums['source_mask.png']['sha256'] or
+            binary_png(contents['source_mask.png'], original.size).tobytes() != full.tobytes()):
+            raise ValueError('External mask provenance or lossless normalization disagrees.')
     review=result.get('semantic_review')
     if review is not None:
         verify_review(review,run_id=result['id'],image_sha256=checksums['original.png']['sha256'],

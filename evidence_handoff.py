@@ -18,7 +18,7 @@ def prepare_import(payload):
         result = json.loads(files['result.json'])
         if not re.fullmatch(r'[a-f0-9]{12}', result['id']):
             raise ValueError('Invalid run ID.')
-        if result['status'] not in ('completed', 'needs_review') or result['mode'] not in ('demo', 'live'):
+        if result['status'] not in ('completed', 'needs_review') or result['mode'] not in ('demo', 'live', 'external'):
             raise ValueError('Only bundles with a valid segmentation result are supported.')
         if result['task']['target'] not in ('building', 'aircraft', 'road', 'water', 'tree', 'ship'):
             raise ValueError('Unsupported target in the evidence bundle.')

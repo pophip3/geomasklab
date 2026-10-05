@@ -1,8 +1,8 @@
 # GeoMaskLab software scope and use context
 
 Decision date: 5 October 2026. This document describes the intended version 1.0
-functional scope. Feature acceptance was reopened in 1.0.0-dev.4 for comparison,
-experiment management and interface improvements. The implementation remains a development build; this decision
+functional scope. The version 1.0 feature boundary was consolidated in 1.0.0-dev.5 after
+comparison, experiment management and reference-assessment development. The implementation remains a development build; this decision
 does not certify publication readiness or establish novelty.
 
 ## Product definition
@@ -69,6 +69,10 @@ operational detection result.
 | Result versions | Preserve the selected parent, derived versions and earlier valid results after a failed request. |
 | Review | Record self-reported pending/accepted/rejected decisions bound to image and mask hashes; new derived results start pending. |
 | Evidence handoff | Export/import a single result with hashes, source mask, output mask, statistics and execution records; verify before reuse. |
+| External mask import | Accept aligned binary PNG predictions with declared target/source; preserve input bytes, record no inference and begin a new pending-review version. |
+| Reference assessment | Compare against supplied positive-target labels in the saved region, report TP/FP/FN/TN and six ratios, show errors and export all inputs for offline recomputation. |
+| Version comparison | Compare saved predictions in their common region; mask agreement is distinct from reference assessment. |
+| Experiment management | Search, name, annotate and pin investigations; export complete measurement ledgers including failures. |
 | Offline investigation | Recalculate a selected region from the verified full-image mask without agent or segmentation calls; retain historical prediction provenance. |
 | Small batches | Retain explicit batches of 2–5 image sessions and aggregate exports. |
 | Label Studio bridge | Retain optional official-SDK brush predictions; complete annotation GUI acceptance is pending. |
@@ -120,12 +124,15 @@ bundles. Integrity tests also cover legacy bundles, re-signed metadata faults,
 complement retention, busy sessions, reload and HTTP handoff. This is not a
 benchmark against a complete competing application.
 
-## Conditions still required for release
+## Acceptance and release status
 
-Version 1.0 feature scope is frozen in the English MIT-licensed release candidate.
-Local behavioral checks pass; the exact candidate commit must pass its own CI
-and source-archive reproduction. Final creator metadata, archive DOI and current
-journal-guide verification remain pending. A real-user study and independent
+The version 1.0 functional contract is now defined in
+[the acceptance contract](version_1_functional_contract.md). Development build
+1.0.0-dev.5 implements that scope; acceptance must refer to its exact commit.
+A stable release is still subject to GUI checks, clean-environment reproduction
+and external-service integration checks. Creator metadata, archive DOI and
+journal files belong to publication preparation and do not change software
+functionality. They remain pending separately. A real-user study and independent
 external-service installation have not been performed and are not claimed.
 The frozen prior-version semantic evaluation retains its original limitations;
 the new spatial operation does not improve those measured predictions.

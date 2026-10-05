@@ -67,6 +67,8 @@ def prepare_analysis(payload, side, roi, *, run_id, created_at, version,
     overlay = image.copy()
     overlay.paste(Image.blend(image, Image.new('RGB', image.size, (69, 213, 152)), .48), (0, 0), mask)
     files = {'full_mask.png': source_files['full_mask.png']}
+    if 'source_mask.png' in source_files:
+        files['source_mask.png'] = source_files['source_mask.png']
     for name, value in (('mask.png', mask), ('overlay.png', overlay)):
         encoded = io.BytesIO()
         value.save(encoded, format='PNG')
@@ -111,6 +113,8 @@ def prepare_analysis(payload, side, roi, *, run_id, created_at, version,
             {'step': 3, 'name': 'Create a separate result version', 'state': 'completed',
              'detail': 'Retained prediction provenance and reset semantic review to pending.'}]}
     result['duration_ms'] = round((time.perf_counter() - start) * 1000, 2)
+    if source.get('external_mask'):
+        result['external_mask'] = deepcopy(source['external_mask'])
     return result, files
 
 
@@ -133,6 +137,7 @@ def region_report(session, result):
              f'- Local verification and recalculation: {result["duration_ms"]} ms', '',
              '## Prediction provenance', '',
              f'- Upstream mode: {origin["mode"]}; procedural fixtures are not model predictions.',
+             f'- External mask provenance (user supplied): {json.dumps(result.get("external_mask"), ensure_ascii=False, sort_keys=True)}',
              f'- Upstream run: {origin["run_id"]}',
              f'- Upstream software version: {origin.get("software_version")}',
              f'- Original prediction task: {json.dumps(origin["task"], ensure_ascii=False, sort_keys=True)}',

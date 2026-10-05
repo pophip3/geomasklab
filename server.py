@@ -231,6 +231,8 @@ def import_evidence(p):
     (folder/'source-evidence.zip').write_bytes(payload)
     for file in ('full_mask.png','mask.png','overlay.png','statistics.json','run_log.json'):
         (run_folder/file).write_bytes(files[file])
+    if 'source_mask.png' in files:
+        (run_folder/'source_mask.png').write_bytes(files['source_mask.png'])
     save_json(run_folder/'result.json',{k:v for k,v in result.items() if k!='trace'})
     (run_folder/'report.md').write_text(report,encoding='utf-8')
     save_json(folder/'session.json',public_session(s))
@@ -299,6 +301,92 @@ def recalculate_region(s, payload):
         return result
     finally:
         s['lock'].release()
+
+def import_mask(s, payload):
+    """Attach a user's aligned binary prediction as a new, unreviewed version."""
+    from mask_inputs import decode_mask, binary_png, source_text
+    if set(payload)-{'session_id','mask','target','source','parent_run_id','aligned'}:
+        raise ValueError('Mask import accepts an aligned mask, target, source and optional parent only.')
+    if payload.get('aligned') is not True:
+        raise ValueError('Confirm pixel alignment with the displayed image before importing.')
+    target = payload.get('target')
+    if not isinstance(target, str) or target not in TARGETS:
+        raise ValueError('Choose a supported semantic target for the imported mask.')
+    source = source_text(payload.get('source'))
+    raw = decode_mask(payload.get('mask'))
+    full = binary_png(raw, (s['width'], s['height']))
+    if not s['lock'].acquire(blocking=False):
+        raise ValueError('This experiment is busy.')
+    try:
+        parent = payload.get('parent_run_id')
+        if parent is not None and not any(r['id']==parent and r.get('mask_url') for r in s['runs']):
+            raise ValueError('The parent must be a mask result in this experiment.')
+        started = time.perf_counter(); rid = uid()
+        image_path = DATA/s['id']/'original.png'
+        with Image.open(image_path) as im: image = im.convert('RGB')
+        encoded = io.BytesIO(); full.save(encoded, 'PNG'); full_bytes = encoded.getvalue()
+        overlay = Image.composite(Image.blend(image, Image.new('RGB', image.size, (69,213,152)), .48), image, full)
+        metrics = statistics(full, 'all', None, full)
+        task = {'action':'segment','target':target,'side':'all','invert':False,'roi':None,
+                'scope_rule':'deterministic_pixel_scope','quality_mode':None,'effective_quality_mode':None}
+        base = f'/experiments/{s["id"]}/{rid}'
+        result = {'id':rid,'session_id':s['id'],'parent_run_id':parent,'version':len(s['runs'])+1,
+                  'software_version':VERSION,'created_at':now(),'mode':'external',
+                  'execution_kind':'external_mask_import','inference_performed':False,
+                  'query':f'Import an external {target} mask.','task':task,'task_options':{'roi':None},
+                  'provenance':{'planner':'explicit_mask_import','perception':'User-supplied binary PNG; no model call',
+                                'source':s['source'],'image_sha256':hashlib.sha256(image_path.read_bytes()).hexdigest()},
+                  'external_mask':{'source':source,'origin_authenticated':False,
+                                   'alignment_user_assertion':True,'upload_sha256':hashlib.sha256(raw).hexdigest()},
+                  'full_mask_sha256':hashlib.sha256(full_bytes).hexdigest(),'metrics':metrics,
+                  'status':'completed' if metrics['pixel_area'] else 'needs_review',
+                  'semantic_review':initial_review(),'mask_url':base+'/mask.png','overlay_url':base+'/overlay.png',
+                  'export_url':f'/api/export/{s["id"]}/{rid}','report_url':f'/api/report/{s["id"]}/{rid}',
+                  'message':f'Imported {metrics["pixel_area"]:,} foreground pixels. No model inference. Review target, alignment and boundaries.',
+                  'trace':[{'step':1,'name':'Validate external mask','state':'completed',
+                            'detail':'Exact dimensions and binary PNG pixels; no resizing, thresholding or model calls.'},
+                           {'step':2,'name':'Create an independent result version','state':'completed',
+                            'detail':'Preserved uploaded source bytes, measured whole-image pixels and set review to pending.'}]}
+        result['duration_ms'] = round((time.perf_counter()-started)*1000, 2)
+        report = experiment_report(s, result)
+        folder = DATA/s['id']/rid; folder.mkdir()
+        (folder/'source_mask.png').write_bytes(raw)
+        (folder/'full_mask.png').write_bytes(full_bytes)
+        (folder/'mask.png').write_bytes(full_bytes); overlay.save(folder/'overlay.png')
+        save_json(folder/'statistics.json',metrics)
+        save_json(folder/'result.json',{k:v for k,v in result.items() if k!='trace'})
+        save_json(folder/'run_log.json',result['trace']); (folder/'report.md').write_text(report,encoding='utf-8')
+        s['runs'].append(result); s['context']={k:task.get(k) for k in ('target','side','invert','roi','quality_mode')}
+        save_json(DATA/s['id']/'session.json', public_session(s))
+        return result
+    finally: s['lock'].release()
+
+
+def assess_reference(s, payload):
+    """Return a reproducible reference-assessment packet without changing runs."""
+    from export_bundle import build_bundle
+    from mask_inputs import decode_mask
+    from reference_evaluation import evaluate_reference, evaluation_packet
+    if set(payload)-{'session_id','run_id','reference','source','target','independent','aligned'}:
+        raise ValueError('Unsupported reference-evaluation field.')
+    if payload.get('aligned') is not True:
+        raise ValueError('Confirm that the reference uses the displayed image coordinates.')
+    raw = decode_mask(payload.get('reference'))
+    if not s['lock'].acquire(blocking=False): raise ValueError('This experiment is busy.')
+    try:
+        result = next((r for r in s['runs'] if r['id']==payload.get('run_id') and r.get('mask_url')), None)
+        if not result: raise ValueError('Select a valid saved mask from this experiment.')
+        bundle = build_bundle(DATA/s['id']/'original.png', DATA/s['id']/result['id'])
+        record, difference = evaluate_reference(bundle, raw, source=payload.get('source'),
+            target=payload.get('target'),independent=payload.get('independent'),created_at=now())
+        packet = evaluation_packet(record, difference, bundle, raw)
+        assessment_id = uid()
+        folder = DATA/s['id']/'assessments'; folder.mkdir(exist_ok=True)
+        (folder/(assessment_id+'.zip')).write_bytes(packet)
+        return {**record,'difference_png_base64':base64.b64encode(difference).decode('ascii'),
+                'packet_url':f'/api/reference-export/{s["id"]}/{assessment_id}'}
+    finally: s['lock'].release()
+
 
 def run_batch(p, progress=None, batch_id=None):
     ids=p.get('session_ids')
@@ -574,6 +662,15 @@ class Handler(SimpleHTTPRequestHandler):
         path=self.path.split('?')[0]
         if path=='/api/status': return self.json({**settings_status(),'samples':SAMPLES,'version':VERSION,'capabilities':capabilities()})
         if path=='/api/sessions': return self.json({'sessions':session_index()})
+        if path.startswith('/api/reference-export/'):
+            parts=path.strip('/').split('/')
+            if len(parts)!=4 or not all(SID_RE.fullmatch(p) for p in parts[2:]):return self.send_error(404)
+            file=DATA/parts[2]/'assessments'/(parts[3]+'.zip')
+            if not file.is_file():return self.send_error(404)
+            raw=file.read_bytes();self.send_response(200)
+            self.send_header('Content-Type','application/zip')
+            self.send_header('Content-Disposition',f'attachment; filename="geomasklab-reference-{parts[3]}.zip"')
+            self.send_header('Content-Length',str(len(raw)));self.end_headers();return self.wfile.write(raw)
         if path.startswith('/api/ledger/'):
             s=get_session(path.rsplit('/',1)[-1])
             if not s: return self.json({'error':'Experiment not found.'},404)
@@ -641,6 +738,10 @@ class Handler(SimpleHTTPRequestHandler):
             if self.path=='/api/check-services': return self.json(inspect_services())
             if self.path=='/api/session': return self.json(new_session(p.get('sample','urban'),p.get('image'),p.get('name')))
             if self.path=='/api/import': return self.json(import_evidence(p))
+            if self.path in ('/api/import-mask','/api/evaluate-reference'):
+                s=get_session(p.get('session_id'))
+                if not s: raise ValueError('Experiment not found. Select an image first.')
+                return self.json(import_mask(s,p) if self.path=='/api/import-mask' else assess_reference(s,p))
             if self.path=='/api/session/update':
                 s=get_session(p.get('session_id'))
                 if not s: raise ValueError('Experiment not found.')

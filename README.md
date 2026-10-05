@@ -18,8 +18,8 @@ measurement and review decision. External models supply masks; a deterministic
 executor validates requests, measures pixels, preserves result versions and
 exports evidence that another researcher can check without model services.
 
-**Version 1.0.0-dev.4** continues software development with verified mask-version
-comparison, experiment management and an expanded English interface. The earlier
+**Version 1.0.0-dev.5** defines the version 1.0 feature scope and adds external
+binary-mask import and reproducible reference-label evaluation to the English workbench. The earlier
 release candidate is superseded for feature acceptance. This development build
 does not imply a submitted or accepted SoftwareX publication.
 Final creator metadata, archive DOI and current journal-guide verification remain
@@ -96,6 +96,34 @@ python examples/recalculate_region.py reviewer-output/right.zip
 accuracy or author identity. The region example verifies whole/left/right/ROI
 analyses using direct Pillow crops without model calls, retaining source image
 and full-mask bytes.
+
+## External masks and reference assessment
+
+Upload an RGB image, then select **Import prediction PNG** to use an existing
+mask from another tool. Declare its target, source and pixel alignment. PNG
+values must be 0/1 or 0/255, with exactly the displayed image dimensions; no
+threshold, class conversion or resizing is inferred. The new version is labeled
+as imported, starts pending review and retains the uploaded source bytes.
+
+Select a result and use **Evaluate reference** with positive-target reference
+labels. Evaluation is restricted to the saved region, records TP/FP/FN/TN and
+IoU, Dice, precision, recall, specificity and pixel accuracy, and shows error
+pixels. Reference provenance and independence are user assertions; the software
+does not authenticate them. Complement results invert reference semantics
+explicitly. Zero denominators remain undefined. One chip does not establish
+general model accuracy, and procedural fixtures do not measure EO accuracy.
+
+The downloadable assessment packet contains both inputs, metrics, error image
+and a hash manifest for offline recomputation. Evaluation never changes the
+prediction or its review decision. Run the complete procedural example:
+
+```sh
+python examples/reference_workflow.py
+python reference_evaluation.py workflow-output/reference-example/prediction.zip workflow-output/reference-example/reference.png --source "Procedural example, not real-image validation" --target building --output workflow-output/recomputed.zip
+```
+
+See [reference evaluation](docs/reference_evaluation.md) and the
+[version 1.0 functional contract](docs/version_1_functional_contract.md).
 
 ## Main workflow
 

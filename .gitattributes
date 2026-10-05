@@ -6,6 +6,7 @@
 *.html text eol=lf
 *.md text eol=lf
 *.json text eol=lf
+*.yml text eol=lf
 *.sh text eol=lf
 *.cmd text eol=crlf
 evaluation/historical/*.csv text eol=lf

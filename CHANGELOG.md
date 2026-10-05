@@ -3,6 +3,16 @@
 Entries describe implemented source changes. A release candidate is a software
 artifact; it does not imply journal submission, acceptance or a permanent DOI.
 
+## 1.0.0-dev.5 — 5 October 2026
+
+- Defined a finite version 1.0 feature boundary before further manuscript work.
+- Added strict external binary-PNG import with retained source bytes, declared
+  provenance, pending review, evidence round trips and offline region analysis.
+- Added scoped reference-label evaluation, error maps and reproducible packets
+  containing the exact prediction evidence and supplied labels.
+- Kept undefined metrics null and user-provided provenance separate from
+  authenticated or independent validation. Added hand-counted procedural checks.
+
 ## 1.0.0-dev.4 — 5 October 2026
 
 - Reopened feature acceptance before manuscript work; no final release is claimed.

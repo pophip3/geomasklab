@@ -17,7 +17,9 @@ REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'requirements.txt', 'requirements-reviewer.txt', '.env.example',
             'quickstart.py', 'reviewer_demo.py', 'fixtures.py', 'web/index.html',
             'docs/reviewer_quickstart.md', 'docs/model_services.md', 'web/help.html',
-            'bin/geomasklab.cmd', 'bin/geomasklab.sh')
+            'bin/geomasklab.cmd', 'bin/geomasklab.sh', 'mask_inputs.py',
+            'reference_evaluation.py', 'examples/reference_workflow.py',
+            'web/mask-tools.js', 'web/mask-tools.css')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
                    'node_modules', 'weights', 'checkpoints', 'pretrained_weights'}
 FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip'}

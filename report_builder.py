@@ -23,6 +23,7 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
     request = {key: request[key] for key in ('task', 'text', 'classes', 'quality_mode') if key in request}
     actual_request = json.dumps(request, ensure_ascii=False, sort_keys=True) if request else (
         'No model call in the procedural demonstration.' if result['mode'] == 'demo'
+        else 'No model call during external mask import.' if result['mode'] == 'external'
         else 'Not recorded in this older result; cannot be inferred.')
     call = (result.get('agent_decision') or {}).get('tool_call') or {}
     roi = options.get('roi')
@@ -30,7 +31,8 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
     recorded = lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True)
     region_ratio = metrics.get('scope_area_ratio')
     region_coverage = f'{region_ratio * 100:.4f}%' if region_ratio is not None else 'Not recorded or empty scope'
-    origin = 'Procedural synthetic image and mask; not neural inference' if result['mode'] == 'demo' else 'Live model-service response'
+    origin = {'demo': 'Procedural synthetic image and mask; not neural inference',
+              'external': 'User-supplied binary mask; imported without model inference'}.get(result['mode'], 'Live model-service response')
     category = 'Primary application category; human review required' if capabilities[task['target']]['level'] == 'primary' else 'Experimental category; no frozen semantic evaluation'
     scope = scope_labels[task['side']] + (f'; rectangle ROI {roi["xyxy"]}' if roi else '')
     lines = [f'# GeoMaskLab experiment report: {session["name"]}', '',
@@ -40,6 +42,7 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
         f'- Image dimensions: {session["width"]} × {session["height"]} pixels',
         f'- Recorded data source: {session["source"]}', f'- Recorded user task: {result["query"]}',
         f'- Execution origin: {origin}', f'- Planner: {result["provenance"]["planner"]}',
+        f'- External mask provenance (user supplied): {recorded(result.get("external_mask"))}',
         f'- Segmentation source: {result["provenance"]["perception"]}',
         f'- Semantic target: {target_labels.get(task["target"], task["target"])}',
         f'- Mask complement: {bool(task.get("invert"))}', f'- Spatial scope: {scope}',

@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GeoMaskLab · Segmentation Workbench</title><link rel="stylesheet" href="styles.css?v=1.0.0-dev.4"><link rel="stylesheet" href="competition.css?v=1.0.0-dev.4"><link rel="stylesheet" href="v07.css?v=1.0.0-dev.4"><link rel="stylesheet" href="workbench.css?v=1.0.0-dev.4"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GeoMaskLab · Segmentation Workbench</title><link rel="stylesheet" href="styles.css?v=1.0.0-dev.5"><link rel="stylesheet" href="competition.css?v=1.0.0-dev.5"><link rel="stylesheet" href="v07.css?v=1.0.0-dev.5"><link rel="stylesheet" href="workbench.css?v=1.0.0-dev.5"><link rel="stylesheet" href="mask-tools.css?v=1.0.0-dev.5"></head>
 <body>
 <svg class="svg-defs" xmlns="http://www.w3.org/2000/svg"><defs>
 <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
@@ -28,6 +28,7 @@
     <div class="page-heading"><div class="hero-copy"><div class="eyebrow">TRACEABLE SEGMENTATION WORKBENCH</div><h1>Segment. Inspect. Preserve the evidence<span class="heading-dot">.</span></h1><p>Import image <b>→</b> Segment and inspect <b>→</b> Measure and export</p></div><div class="heading-actions"><button class="secondary" id="guideBtn">Workflow guide <span>▷</span></button><button class="secondary" id="libraryBtn">Experiments</button><button class="secondary" id="importBtn">Import evidence</button><input id="bundleInput" type="file" accept=".zip,application/zip" hidden><button class="secondary" id="batchBtn">Batch analysis</button><button class="secondary" id="newBtn"><svg><use href="#i-plus"/></svg>New experiment</button></div></div>
     <div class="context-bar"><div class="file-thumb"><img id="fileThumb" src="assets/urban.png" alt="Current image thumbnail"></div><div class="file-summary"><strong id="imageName">Synthetic urban example</strong><span id="imageMeta">RGB · 800 × 600 px · Pixel coordinates</span></div><span class="tag">Single-image experiment</span><div class="context-spacer"></div><div class="provenance-tag"><span class="status-dot amber"></span><span id="provenanceLabel">Synthetic example · No model inference</span></div><button class="icon-button" id="sourceBtn" aria-label="View data source" title="Data source"><svg><use href="#i-info"/></svg></button><button class="swap-button" id="uploadBtn">Change image <svg><use href="#i-image"/></svg></button><input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp" hidden></div>
     <div class="experiment-overview" aria-label="Current experiment summary"><div><span class="overview-label">ACTIVE EXPERIMENT</span><strong id="experimentHeading">Synthetic urban example</strong><span id="experimentNote">An image. A reproducible record.</span></div><div class="overview-counts"><span><b id="overviewVersions">0</b> mask versions</span><span><b id="overviewPending">0</b> pending review</span><button id="editExperimentBtn" class="text-button">Edit details ↗</button></div></div>
+    <section class="investigation-bar" aria-label="Offline mask tools"><div><strong>Bring your own masks.</strong><span>Inspect external predictions and assess them against reference labels.</span></div><div><button class="secondary" id="importMaskBtn">Import prediction PNG</button><button class="primary" id="evaluateReferenceBtn" disabled>Evaluate reference ↗</button></div></section>
     <div class="workspace">
       <section class="panel conversation" aria-label="Experiment conversation">
         <div class="panel-heading"><div><span class="step-number">1</span><h2>Describe a task</h2></div><span class="small-muted">Follow-up tasks</span></div>
@@ -64,5 +65,5 @@
 </div>
 <dialog id="modal"><div class="modal-header"><div><span class="eyebrow" id="modalEyebrow">GEOMASKLAB</span><h2 id="modalTitle"></h2></div><button id="closeModal" class="icon-button" aria-label="Close"><svg><use href="#i-x"/></svg></button></div><div id="modalBody"></div></dialog>
 <div id="toast" role="status" hidden></div>
-<script src="app.js?v=1.0.0-dev.4"></script><script src="workbench.js?v=1.0.0-dev.4"></script>
+<script src="app.js?v=1.0.0-dev.5"></script><script src="workbench.js?v=1.0.0-dev.5"></script><script src="mask-tools.js?v=1.0.0-dev.5"></script>
 </body></html>
