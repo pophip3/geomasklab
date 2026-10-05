@@ -56,6 +56,7 @@ def main():
         cli('evaluate','evidence.zip','mask.png','--source','Procedural reference, not a real accuracy study',
             '--target','tree','--aligned','--output','assessment.zip')
         json.loads(cli('verify-assessment','assessment.zip'))
+        run('-I','-c','import zipfile; z=zipfile.ZipFile("assessment.zip"); text=z.read("report.md").decode(); assert "geomasklab evaluate" in text and "--aligned" in text and "python reference_evaluation.py" not in text')
         checks.append('Reference packet creation and independent replay')
         cli('segment','image.png','--output','baseline.png')
         assert (work/'baseline.png.provider.json').is_file()

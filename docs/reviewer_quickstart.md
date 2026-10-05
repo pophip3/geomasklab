@@ -1,6 +1,6 @@
 # Reviewer quick start
 
-Version 1.0.0rc1 provides an installable Pillow-only replay core and optional source workbench.
+Version 1.0.0rc2 provides an installable Pillow-only replay core and optional source workbench.
 
 ## Independent core and real-image example
 

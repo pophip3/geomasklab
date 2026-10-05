@@ -73,7 +73,7 @@ You can first verify its hashes, recorded scores, numeric CSV and error-map
 pixels directly, without extracting:
 
 ```sh
-python reference_evaluation.py --verify-packet path/to/evaluation.zip
+geomasklab verify-assessment path/to/evaluation.zip
 ```
 
 This also rejects a forged metric record even if its file hashes were updated.
@@ -81,7 +81,7 @@ The result remains a consistency check, not an authentication of reference origi
 For a separate recomputed packet:
 
 ```sh
-python reference_evaluation.py prediction.zip reference.png --source "Dataset/version and label procedure" --target building --independent --output recomputed.zip
+geomasklab evaluate prediction.zip reference.png --aligned --source "Dataset/version and label procedure" --target building --independent --output recomputed.zip
 ```
 
 Use `--independent` only when the stated label preparation supports that claim.

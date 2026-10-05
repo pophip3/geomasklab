@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0rc2 - 5 October 2026
+
+- Correct reference-packet replay instructions to use the installed CLI and explicit alignment assertion.
+- Check shipped report instructions during outside-checkout wheel acceptance.
+
 ## 1.0.0rc1 - 5 October 2026
 
 - Add independent Polygon/MultiPolygon assessment, holes, overlap union and both denominators.

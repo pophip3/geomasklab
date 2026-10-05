@@ -92,7 +92,7 @@ def evaluation_packet(record, difference, bundle, reference):
                          f"- Evaluated domain: {record['evaluated_pixels']} pixels; scope: {record['scope']}",
                          '- Metrics use ratios from 0 to 1. Empty denominators are undefined.',
                          '- Color legend: mint = true positive; amber = false positive; magenta = false negative.',
-                         '- Recompute: python reference_evaluation.py prediction.zip reference.png --source "Reference description" --target '+record['target']+
+                         '- Recompute: geomasklab evaluate prediction.zip reference.png --aligned --source "Reference description" --target '+record['target']+
                          (' --independent' if record['reference']['independent_user_assertion'] else '')+' --output recomputed.zip', ''])
     files = {'evaluation.json': json.dumps(record, indent=2).encode(),
              'metrics.csv': metrics_csv(record), 'difference.png': difference,
