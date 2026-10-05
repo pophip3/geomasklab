@@ -56,6 +56,4 @@ does not remove the need for external model endpoints or legally obtained
 weights. A Docker image is another possible convenience, not an implemented
 feature or a claimed journal mandate.
 
-Current status: private development source; functional scope defined; complete
-English acceptance, formal licensing, public fixed release and independent
-live-service reproduction remain pending.
+Current status: version 1.0 scope frozen as `1.0.0-rc.1`; standard MIT license installed; English generated-output acceptance implemented. Final fixed-release publication and creator/DOI metadata require their own recorded checks. Independent live-service installation acceptance remains pending and is not claimed.

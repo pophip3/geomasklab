@@ -30,5 +30,10 @@
     "raw historical model responses and personal coordination material"
   ],
   "publication_authorization_status": "user expressly authorizes publication of their code in a modified research version; original competition repository remains unchanged",
-  "release_license_status": "formal open-source license has not been specified"
+  "release_license_status": "standard MIT text in LICENSE and Licence.txt; external model/data rights remain separate",
+  "license_selected_on": "2026-10-05",
+  "license_selected": "MIT",
+  "license_selection_basis": "User authorized public release of their modified code, required a standard root open-source license, and requested completion of all release materials without further questions.",
+  "individual_creator_metadata": "not yet confirmed; no author identities or order inferred",
+  "third_party_approval_claimed": false
 }

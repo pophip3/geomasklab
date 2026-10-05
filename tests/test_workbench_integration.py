@@ -131,8 +131,8 @@ class IntegrationTests(unittest.TestCase):
                 metrics = json.loads(z.read('statistics.json'))
                 self.assertEqual(sum(mask.histogram()[1:]), metrics['pixel_area'])
                 report = z.read('report.md').decode('utf-8')
-                self.assertIn(f'{metrics["pixel_area"]:,} 像素', report)
-                self.assertIn('候选连通区域', report)
+                self.assertIn(f'Foreground pixels: {metrics["pixel_area"]:,}', report)
+                self.assertIn('Candidate components', report)
             with opener.open(endpoint+result['report_url']) as response:
                 self.assertEqual(response.status, 200)
                 self.assertIn(server.capabilities()['name'], response.read().decode('utf-8'))
@@ -177,16 +177,16 @@ class IntegrationTests(unittest.TestCase):
             result=self.run_task('提取道路',quality_mode='fast')
         self.assertEqual(result['status'],'completed')
         self.assertEqual(result['capability']['level'],'experimental')
-        self.assertIn('实验阶段',result['message'])
+        self.assertIn('experimental',result['message'])
         report=(server.DATA/self.session['id']/result['id']/'report.md').read_text(encoding='utf-8')
         self.assertIn('"text": "all roads"',report)
-        self.assertIn('实验类别',report)
+        self.assertIn('Experimental category',report)
 
     def test_demo_report_never_invents_a_model_prompt(self):
         s=server.SESSIONS[server.new_session('urban')['id']]
         result=server.run_task(s,{'query':'提取建筑','mode':'demo'})
         report=(server.DATA/s['id']/result['id']/'report.md').read_text(encoding='utf-8')
-        self.assertIn('合成演示未调用模型',report)
+        self.assertIn('No model call in the procedural demonstration',report)
         self.assertNotIn('all buildings',report)
 
     def test_new_quality_label_maps_to_existing_accurate_mode(self):

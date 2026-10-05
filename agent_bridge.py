@@ -33,7 +33,7 @@ def resolve_scope(query, context, selected=None):
     """Explicit, logged pixel-scope grammar; not an LLM reasoning capability."""
     q = query.lower()
     if re.search(r'靠近|附近|之间|东侧|西侧|南侧|北侧|平方米|公顷|米以内|最大|最小|除外|除了|不要.*[左右上下]|不含|左上|左下|右上|右下|\b(near|between|except|largest|smallest|north|south|east|west)\b', q):
-        raise Clarification('当前只支持全图或单个像素半幅。复杂关系、排除条件和地理面积需要另行明确，尚未执行。')
+        raise Clarification('Use a whole image or one pixel half. Complex relationships, exclusions and geographic area are unsupported; no segmentation was executed.')
     found = {side for side, pattern in {
         'left': r'左|\bleft\b', 'right': r'右|\bright\b',
         'top': r'上半|上方|顶部|\b(top|upper)\b',
@@ -41,12 +41,12 @@ def resolve_scope(query, context, selected=None):
         'all': r'全图|全部|整幅|\bwhole image\b|\bentire image\b',
     }.items() if re.search(pattern, q)}
     if len(found) > 1:
-        raise Clarification('一次实验请选择一个范围：全图、左半幅、右半幅、上半幅或下半幅。')
+        raise Clarification('Select one scope: whole image, left, right, top or bottom half.')
     if selected is not None:
         if selected not in SIDES:
-            raise ValueError('不支持的像素范围')
+            raise ValueError('Unsupported pixel scope.')
         if found and selected not in found:
-            raise Clarification('所选范围与文字指令不一致，请确认后重试。')
+            raise Clarification('The selected scope conflicts with the task text. Correct the scope and try again.')
         return selected, 'explicit_scope_selection'
     if found:
         return found.pop(), 'harness_pixel_scope_rule'
@@ -59,9 +59,9 @@ class WorkbenchAgent(PlannerProtocol):
         self.base = os.environ.get('GEO_AGENT_BASE_URL', '').rstrip('/')
         model = os.environ.get('GEO_AGENT_MODEL', '')
         if not self.base or not model:
-            raise ValueError('RemoteAgent 服务未配置，请填写实际服务地址和模型名称。')
+            raise ValueError('RemoteAgent is not configured. Set a valid service URL and model name.')
         if task_route not in ('dense', 'internal'):
-            raise ValueError('未知的 RemoteAgent 任务路由')
+            raise ValueError('Unknown RemoteAgent task route.')
         self.task_route = task_route
         allowed_tools = ALLOWED_TOOLS if task_route == 'dense' else set()
         token_limit = 1024 if task_route == 'internal' else 512
@@ -70,25 +70,25 @@ class WorkbenchAgent(PlannerProtocol):
     def _runtime_system_prompt(self):
         if self.task_route == 'internal':
             return (
-                'You are RemoteAgent in the GeoScope workbench. This turn is INTERNAL VISUAL UNDERSTANDING ONLY; '
+                'You are RemoteAgent in the GeoMaskLab workbench. This turn is INTERNAL VISUAL UNDERSTANDING ONLY; '
                 'only these deployed tools are available: none. Inspect the supplied image and answer the user '
                 'inside exactly one <answer>...</answer> block. Scene description, captioning, visual question '
                 'answering, classification, counting, and comparison are internal tasks. Do not output T_call. '
-                'Answer concisely in the user\'s language.'
+                'Answer concisely in English.'
             )
         return (
-            'You are RemoteAgent in the GeoScope workbench. This turn needs a pixel mask. '
+            'You are RemoteAgent in the GeoMaskLab workbench. This turn needs a pixel mask. '
             'Only these deployed tools are available: referring_expression_segmentation and semantic_segmentation. '
             'For a supported extraction request, output exactly ONE plain T_call(...) and nothing else: '
             'no <think>, <answer>, XML wrapper, markdown, explanation, or second call. '
             'Exact signatures: T_call(referring_expression_segmentation, "image_path", "whole-image English prompt") '
             'or T_call(semantic_segmentation, "image_path", ["one English class"]). '
             'Copy image_path from the user message. Valid targets are building, aircraft, road, water, tree, ship. '
-            'For any airplane, aircraft, plane, or 飞机 extraction, use '
+            'For any airplane, aircraft or plane extraction, use '
             'T_call(referring_expression_segmentation, "image_path", "all planes") '
             'or T_call(semantic_segmentation, "image_path", ["aircraft"]). '
             'For buildings, use "all buildings" or ["building"]. '
-            '"只提取左边的建筑" is a valid building request: call whole-image building segmentation. '
+            '"Extract only the buildings in the left half" is a valid building request: call whole-image building segmentation. '
             'The tool always segments the WHOLE image. ROI coordinates, quality mode, and batch membership '
             'are Harness-owned context; never add them to tool arguments or issue multiple calls. '
             'Do not put left, right, top, bottom, region, area, '
@@ -96,7 +96,7 @@ class WorkbenchAgent(PlannerProtocol):
             'For a follow-up, inherit the previous target from context unless the user changes it. '
             'If context.invert is true, request the positive target mask; the Harness inverts it. '
             'Do not guess a target from the image or substitute a supported target. '
-            '"所有物体的轮廓" / "contours of all objects" has no single supported target; ask for clarification. '
+            '"contours of all objects" has no single supported target; ask for clarification. '
             'For unsupported targets, multiple categories, or ambiguous targets, output a concise '
             '<answer>clarification needed</answer>. Never claim a mask or measurement before tool execution.'
         )
@@ -109,9 +109,9 @@ class WorkbenchAgent(PlannerProtocol):
         try:
             message = response['choices'][0]['message']['content']
         except (KeyError, IndexError, TypeError):
-            raise ValueError('认知服务未返回有效的文本响应') from None
+            raise ValueError('The planner service returned no valid text response.') from None
         if not isinstance(message, str) or not message.strip():
-            raise ValueError('认知服务返回空响应')
+            raise ValueError('The planner service returned an empty response.')
         return message.strip()
 
 
@@ -124,12 +124,12 @@ def decision_record(decision):
             return [sanitize(item) for item in value]
         if not isinstance(value, str):
             return value
-        value = re.sub(r'<think>[\s\S]*?</think>', '<think>[推理过程不写入实验记录]</think>',
+        value = re.sub(r'<think>[\s\S]*?</think>', '<think>[Reasoning omitted from the experiment record]</think>',
                        value, flags=re.IGNORECASE)
-        value = re.sub(r'(?i)\b(?:https?://)[^\s"\'<>]+', '[服务地址已隐去]', value)
+        value = re.sub(r'(?i)\b(?:https?://)[^\s"\'<>]+', '[Service URL redacted]', value)
         value = re.sub(r'\b(?:10\.(?:\d{1,3}\.){2}\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(?:1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})(?::\d+)?\b',
-                       '[内网地址已隐去]', value)
-        value = re.sub(r'(?i)\bBearer\s+[A-Za-z0-9._~+/-]+', 'Bearer [已隐去]', value)
+                       '[Private address redacted]', value)
+        value = re.sub(r'(?i)\bBearer\s+[A-Za-z0-9._~+/-]+', 'Bearer [REDACTED]', value)
         return value.strip()
     visible = sanitize(raw)
     history = sanitize(decision.history)
@@ -142,46 +142,46 @@ def decision_record(decision):
 
 def target_from_label(label, side):
     if not isinstance(label, str):
-        raise Clarification('模型没有提供有效的目标类别。')
+        raise Clarification('The model did not provide a valid semantic target.')
     label = label.strip().lower()
     # Only this exact simple suffix may be normalized; arbitrary relations are rejected.
     match = re.fullmatch(r'(.+?) (?:on|in) the (left|right|top|bottom)(?: (?:half|side))?', label)
     if match:
         if match.group(2) != side:
-            raise Clarification('模型返回的空间范围与本次任务范围不一致，请确认后重试。')
+            raise Clarification('The model scope conflicts with the requested scope. Correct the task and try again.')
         label = match.group(1)
     label = re.sub(r'^(?:all (?:the )?|the )', '', label)
     for target, aliases in LABELS.items():
         if label in aliases:
             return target
-    raise Clarification('本版仅支持六类目标的全图分割及像素半幅筛选；模型给出了其他类别或额外条件，请简化指令。')
+    raise Clarification('This version supports six targets with whole-image segmentation and deterministic spatial clipping. The model supplied an unsupported target or condition.')
 
 
 def segmentation_plan(decision, image_path, side, scope_source, invert=False, expected_target=None):
     call = decision.tool_call
     if decision.status != 'tool_call' or call is None or call.name not in ALLOWED_TOOLS:
-        raise ValueError('认知核心没有返回允许执行的分割工具')
+        raise ValueError('The planner returned no allowed segmentation tool.')
     args = call.arguments
     if Path(args.get('image_path', '')).resolve() != Path(image_path).resolve():
-        raise ValueError('工具影像与当前实验不一致')
+        raise ValueError('The tool image does not match the current experiment.')
     if call.name == 'referring_expression_segmentation':
         if set(args) != {'image_path', 'prompt'}:
-            raise ValueError('指代分割参数不符合约定')
+            raise ValueError('Referring-segmentation arguments violate the contract.')
         target = target_from_label(args['prompt'], side)
         request = {'task': 'referring_seg', 'text': PROMPTS[target]}
         mask_field = None
     else:
         classes = args.get('classes')
         if set(args) != {'image_path', 'classes'} or not isinstance(classes, list) or len(classes) != 1:
-            raise Clarification('每次实验只支持一个目标类别，请分别提取并保存版本。')
+            raise Clarification('Each task supports one semantic target. Segment categories separately and save separate versions.')
         target = target_from_label(classes[0], side)
         request = {'task': 'semantic_seg', 'classes': [CLASSES[target]]}
         mask_field = CLASSES[target]
     if expected_target is not None and target != expected_target:
-        raise Clarification('RemoteAgent 工具目标与本次任务目标不一致，未执行分割。')
+        raise Clarification('The RemoteAgent tool target conflicts with the task target. No segmentation was executed.')
     return {'action': 'segment', 'target': target, 'side': side, 'invert': bool(invert), 'scope_source': scope_source,
             'tool_name': call.name, 'service_request': request, 'mask_field': mask_field,
-            'planner_protocol': 'remoteagent', 'scope_rule': '整图目标分割后按像素半幅裁切；由 Harness 执行'}
+            'planner_protocol': 'remoteagent', 'scope_rule': 'Whole-image segmentation followed by deterministic pixel-scope clipping in the executor'}
 
 
 class AgentTurn:

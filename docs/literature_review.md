@@ -47,7 +47,7 @@ were unavailable; that limits author-based disambiguation.
 Draft as an **Original Software Publication** provisionally. If the authors have
 already published the same software in SoftwareX, use the official update template.
 The name alone does not determine article type. Avoid “first-ever GeoScope” and use
-the qualified name **GeoScope Workbench**.
+the adopted release name **GeoMaskLab**.
 
 ## Synthesis
 

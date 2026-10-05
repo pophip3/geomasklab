@@ -33,6 +33,6 @@ def main():
     with (out/'human_review_sheet.csv').open('w',encoding='utf-8',newline='') as f:
         w=csv.DictWriter(f,fieldnames=list(review[0]));w.writeheader();w.writerows(review)
     body=''.join(f'<h2>{t}</h2>'+''.join(f'<img src="{t}-ground-truth-{i}.png" style="width:100%;max-width:1560px">' for i in range(1,6)) for t in ['building','aircraft'])
-    (out/'index.html').write_text('<!doctype html><meta charset="utf-8"><title>人工标注复核包</title><body style="font-family:Arial;max-width:1600px;margin:auto"><h1>GeoScope 独立评测人工标注复核包</h1><p>60 组公开数据原作者的人工像素标注。绿色为目标，紫色为忽略像素。这里只展示真值，不展示模型输出。尺寸、二值范围、像素数量已自动校验；新增人工复核尚未进行，复核表未填写人员姓名或签字。</p>'+body+'</body>',encoding='utf-8')
+    (out/'index.html').write_text('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GeoMaskLab — Source annotation review</title><body style="font-family:Arial,Helvetica,sans-serif;max-width:1600px;margin:auto;padding:24px"><h1>Source annotation review packet</h1><p>60 image/label pairs with human pixel annotations from the original dataset authors. Green indicates the target; purple indicates ignored pixels. Only ground truth is shown, without model predictions. Dimensions, binary values and pixel counts were checked automatically. Additional independent human review has not been performed; no reviewer name or signature is supplied.</p>'+body+'</body></html>',encoding='utf-8')
     print('ANNOTATION_PACKET',len(review),'pairs; 10 sheets; no new human review claimed')
 if __name__=='__main__':main()

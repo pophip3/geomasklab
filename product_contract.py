@@ -1,15 +1,15 @@
 """Product boundaries, independent of planner/model performance claims."""
 from copy import deepcopy
 
-VERSION = '0.9.0-dev.3'
+VERSION = '1.0.0-rc.1'
 PRODUCT_NAME = 'GeoMaskLab'
 TARGET_CAPABILITIES = {
-    'building': {'label': '建筑', 'level': 'primary', 'evidence': 'limited_prior_version_application_study'},
-    'aircraft': {'label': '飞机', 'level': 'primary', 'evidence': 'limited_prior_version_application_study'},
-    'road': {'label': '道路', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
-    'water': {'label': '水体', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
-    'tree': {'label': '植被', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
-    'ship': {'label': '船舶', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
+    'building': {'label': 'Buildings', 'level': 'primary', 'evidence': 'limited_prior_version_application_study'},
+    'aircraft': {'label': 'Aircraft', 'level': 'primary', 'evidence': 'limited_prior_version_application_study'},
+    'road': {'label': 'Roads', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
+    'water': {'label': 'Water', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
+    'tree': {'label': 'Vegetation', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
+    'ship': {'label': 'Ships', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
 }
 
 def capabilities():
@@ -25,4 +25,4 @@ def capabilities():
             'semantic_review_required': True, 'geographic_area_available': False,
             'quality_mode_accuracy_guaranteed': False,
             'prior_evaluation_commit': '46ffbbb1898a4b5e8f2ac5974f0bdabace3a94bd',
-            'release_status': 'development; functional scope defined; English release and public licensing pending'}
+            'release_status': 'release candidate; version 1.0 feature scope frozen; final archive and author metadata pending'}

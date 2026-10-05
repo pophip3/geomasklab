@@ -18,8 +18,8 @@ def main():
     with tempfile.TemporaryDirectory() as temporary,patch.object(server,'DATA',Path(temporary)):
         sid=server.new_session('urban')['id']
         session=server.SESSIONS[sid]
-        jobs=[('whole','提取全图建筑',{}),('right','提取右侧建筑',{}),
-              ('left','提取左侧建筑',{}),('roi','提取全图框选区域内的建筑',
+        jobs=[('whole','Extract buildings in the whole image.',{}),('right','Extract buildings in the right half.',{}),
+              ('left','Extract buildings in the left half.',{}),('roi','Extract buildings in the selected region.',
                {'roi':{'xyxy':[80,50,280,250],'source':'drawn','image_size':[800,600]}})]
         expected={'whole':75350,'right':37350,'left':38000,'roi':12850}
         parent=None

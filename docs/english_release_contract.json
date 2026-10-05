@@ -16,9 +16,13 @@
     "README, installation and reviewer instructions"
   ],
   "figure_font_project_choice": "Arial",
-  "interface_font_stack_project_choice": ["Arial", "Helvetica", "sans-serif"],
+  "interface_font_stack_project_choice": [
+    "Arial",
+    "Helvetica",
+    "sans-serif"
+  ],
   "manuscript_typography": "Preserve and verify the dedicated journal template settings",
-  "english_migration_status": "not_complete",
+  "english_migration_status": "generated application text and new examples migrated; final acceptance recorded separately",
   "native_speaker_review_claimed": false,
   "dedicated_current_journal_template_font_settings_verified": false,
   "publisher_artwork_guidance_verified": true,

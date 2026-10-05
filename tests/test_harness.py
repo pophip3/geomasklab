@@ -42,14 +42,14 @@ class HarnessTests(unittest.TestCase):
         inverse=self.run_task('把非建筑的部分标注出来')
         self.assertTrue(inverse['task']['invert'])
         self.assertEqual(positive['metrics']['pixel_area']+inverse['metrics']['pixel_area'],480000)
-        self.assertIn('非建筑区域',inverse['message'])
+        self.assertIn('non-buildings',inverse['message'])
     def test_branch_from_old_result(self):
         r=self.run_task('提取右侧建筑')
         self.run_task('改成左侧的',parent_run_id=r['id'])
         branch=self.run_task('计算面积占比',parent_run_id=r['id'])
         self.assertEqual(branch['task']['side'],'right')
         self.assertEqual(branch['metrics'],r['metrics'])
-        self.assertTrue(any('复用' in t['name'] for t in branch['trace']))
+        self.assertTrue(any('Reuse' in t['name'] for t in branch['trace']))
     def test_no_pretend_live_result(self):
         with patch.dict(server.os.environ,{},clear=True): r=self.run_task('提取右侧建筑',mode='live')
         self.assertEqual(r['status'],'failed');self.assertNotIn('mask_url',r)
@@ -64,7 +64,7 @@ class HarnessTests(unittest.TestCase):
         self.assertFalse((server.DATA/self.s['id']/r['id']/'mask.png').exists())
     def test_unsupported_class_not_empty_truth(self):
         r=self.run_task('提取船舶')
-        self.assertEqual(r['status'],'failed');self.assertIn('不能据此判断',r['message'])
+        self.assertEqual(r['status'],'failed');self.assertIn('cannot establish',r['message'])
     def test_complex_spatial_constraint_clarifies(self):
         r=self.run_task('提取靠近道路的建筑')
         self.assertEqual(r['status'],'needs_clarification')
@@ -81,7 +81,7 @@ class HarnessTests(unittest.TestCase):
         wrong=Image.new('L',(2,2),255)
         with patch('agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all buildings")'), patch.object(server,'post_json',return_value={'status':'success','mask':server.image_b64(wrong)}), patch.dict(server.os.environ,{'GEO_AGENT_BASE_URL':'http://example.invalid/v1','GEO_AGENT_MODEL':'FAKE','GEO_REMOTESAM_URL':'http://example.invalid/predict'}):
             r=self.run_task('提取右侧建筑',mode='live')
-        self.assertEqual(r['status'],'failed');self.assertIn('尺寸',r['message'])
+        self.assertEqual(r['status'],'failed');self.assertIn('dimensions',r['message'])
     def test_real_adapter_accepts_aligned_mask(self):
         mask=Image.new('L',(800,600),255)
         with patch('agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all buildings")'), patch.object(server,'post_json',return_value={'status':'success','mask':server.image_b64(mask)}), patch.dict(server.os.environ,{'GEO_AGENT_BASE_URL':'http://example.invalid/v1','GEO_AGENT_MODEL':'FAKE','GEO_REMOTESAM_URL':'http://example.invalid/predict'}):

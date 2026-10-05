@@ -39,4 +39,4 @@ Whole-workbench positive-image mean IoU/Dice: buildings 22.75%/29.12%, aircraft
 35.23%/47.61%. Corresponding empty-target false-positive image counts are 1/10
 and 4/10. All 180 workbench requests, exports, matched masks and independent
 scope reconstructions passed. Preserving outputs is not proof of high accuracy.
-Full [interpretation and limitations](../../docs/application_results_zh.md).
+Full [interpretation and limitations](../../docs/application_results.md).

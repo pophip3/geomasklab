@@ -3,7 +3,7 @@
   "seed": 20261004,
   "cases": 60,
   "passed": 60,
-  "software_version": "0.9.0-dev.3",
+  "software_version": "1.0.0-rc.1",
   "real_model_inference": false,
   "model_semantic_accuracy_measured": false,
   "measurement_scope": "binary mask postprocessing, persisted pixel metrics and offline export verification",

@@ -114,8 +114,8 @@ class ProtocolIntegrationTests(unittest.TestCase):
         self.assertIn('exactly ONE plain T_call', prompt)
         self.assertIn('"all planes"', prompt)
         self.assertIn('["aircraft"]', prompt)
-        self.assertIn('"只提取左边的建筑"', prompt)
-        self.assertIn('"所有物体的轮廓"', prompt)
+        self.assertIn('"Extract only the buildings in the left half"', prompt)
+        self.assertIn('"contours of all objects"', prompt)
         self.assertNotIn('object_detection(', prompt)
         self.assertNotIn('crossearth_semantic_segmentation', prompt)
         self.assertEqual(sam[1]['text'], 'all planes')
@@ -148,7 +148,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
         FakeAgentAndSAM.decision = '<answer>已经提取完成。</answer>'
         result = self.run_task()
         self.assertEqual(result['status'],'failed')
-        self.assertIn('只返回了文字回答',result['message'])
+        self.assertIn('returned only text',result['message'])
         self.assertNotIn('metrics',result)
         # No tool was pending, so RemoteSAM and tool-result feedback are both skipped.
         self.assertEqual([r[0] for r in FakeAgentAndSAM.requests],['/v1/chat/completions'])
@@ -158,7 +158,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
         result = self.run_task('描述影像')
         record = result['agent_decision']
         self.assertNotIn('private model reasoning',json.dumps(record))
-        self.assertIn('推理过程不写入实验记录',record['raw_response'])
+        self.assertIn('Reasoning omitted from the experiment record',record['raw_response'])
         self.assertEqual(len(record['raw_response_sha256']),64)
 
     def test_rejected_or_unparsed_decisions_cannot_call_sam(self):
@@ -215,7 +215,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
         self.assertEqual(result['status'],'completed')
         self.assertEqual(result['metrics']['pixel_area'],42)
         self.assertEqual(result['agent_feedback']['status'],'transport_failed')
-        self.assertIn('反馈失败',result['message'])
+        self.assertIn('feedback failed',result['message'])
 
     def test_feedback_cannot_overwrite_statistics_or_start_another_tool(self):
         FakeAgentAndSAM.final = '<answer>面积是999999像素，占99%。</answer>'

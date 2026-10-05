@@ -1,0 +1,18 @@
+{
+  "status": "draft; not an archival deposit",
+  "title": "GeoMaskLab: A traceable workbench for remote-sensing segmentation and region-specific pixel measurements",
+  "version": "1.0.0-rc.1",
+  "resource_type": "software",
+  "license": "MIT",
+  "repository": "https://github.com/pophip3/geoscope-softwarex",
+  "documentation": "https://pophip3.github.io/remote-sensing-workbench-docs/",
+  "languages": ["Python", "JavaScript", "HTML", "CSS"],
+  "keywords": ["remote sensing", "segmentation", "pixel measurements", "provenance", "reproducibility", "research software"],
+  "creators": [],
+  "support_contact": null,
+  "archive_doi": null,
+  "article_doi": null,
+  "publication_date": null,
+  "description": "A local browser workbench that binds segmentation predictions to input images, explicit spatial scopes, pixel measurements, result versions and self-reported review. Portable evidence supports offline verification and region analysis. Model services and weights are external dependencies. Procedural examples test software behavior, not neural accuracy.",
+  "missing_confirmed_facts": ["software creator names and attribution", "support contact", "final version archive and DOI", "final public release date"]
+}

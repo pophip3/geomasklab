@@ -14,10 +14,10 @@ def load_settings(path=None):
         if not line or line.startswith('#'):
             continue
         if '=' not in line:
-            raise ValueError(f'.env 第 {number} 行缺少等号')
+            raise ValueError(f'.env line {number}: missing equals sign.')
         key, value = (part.strip() for part in line.split('=', 1))
         if not key.startswith('GEO_') or not key.replace('_', '').isalnum():
-            raise ValueError(f'.env 第 {number} 行不是有效的 GEO_ 配置项')
+            raise ValueError(f'.env line {number}: expected a valid GEO_ setting.')
         if len(value) >= 2 and value[0] == value[-1] and value[0] in ('"', "'"):
             value = value[1:-1]
         # A real shell setting wins over the file, including an intentionally empty value.
@@ -31,5 +31,5 @@ def settings_status():
         'agent_model': os.environ.get('GEO_AGENT_MODEL', ''),
         'agent_protocol': 'remoteagent',
         'service_proxy_mode': os.environ.get('GEO_SERVICE_PROXY_MODE', 'direct'),
-        'note': '工作台已接入 RemoteAgent 规划和工具反馈接口；配置不等于真实模型已验收。',
+        'note': 'RemoteAgent planning and tool feedback are integrated. Configuration does not establish successful model inference.',
     }

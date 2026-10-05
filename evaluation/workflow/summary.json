@@ -1,6 +1,6 @@
 {
   "schema": "geoscope-workflow-study/1.0",
-  "software_version": "0.9.0-dev.3",
+  "software_version": "1.0.0-rc.1",
   "third_party": {
     "component": "label_studio_sdk.converter.brush",
     "package_version": "2.1.2",
@@ -23,8 +23,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "pending",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.018641,
-      "geoscope_import_seconds_observed": 0.071239
+      "sdk_converter_seconds_observed": 0.019614,
+      "geoscope_import_seconds_observed": 0.07703
     },
     {
       "case": "left_branch",
@@ -34,8 +34,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "pending",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.014649,
-      "geoscope_import_seconds_observed": 0.080887
+      "sdk_converter_seconds_observed": 0.014097,
+      "geoscope_import_seconds_observed": 0.079119
     },
     {
       "case": "right",
@@ -45,8 +45,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "accepted",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.013053,
-      "geoscope_import_seconds_observed": 0.078924
+      "sdk_converter_seconds_observed": 0.013929,
+      "geoscope_import_seconds_observed": 0.084297
     },
     {
       "case": "roi",
@@ -56,8 +56,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "pending",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.010317,
-      "geoscope_import_seconds_observed": 0.059601
+      "sdk_converter_seconds_observed": 0.01258,
+      "geoscope_import_seconds_observed": 0.044483
     },
     {
       "case": "whole",
@@ -67,8 +67,8 @@
       "restored_pixel_artifacts_exact": true,
       "restored_review_state": "pending",
       "model_calls_on_import": 0,
-      "sdk_converter_seconds_observed": 0.019323,
-      "geoscope_import_seconds_observed": 0.133666
+      "sdk_converter_seconds_observed": 0.019295,
+      "geoscope_import_seconds_observed": 0.133701
     }
   ],
   "controlled_faults": [
@@ -77,28 +77,28 @@
       "all_manifest_checksums_updated": true,
       "sdk_mask_converter_succeeds": true,
       "geoscope_import_rejected": true,
-      "reason": "无法导入实验包：Coverage denominator or ratio is incorrect."
+      "reason": "Cannot import evidence: Coverage denominator or ratio is incorrect."
     },
     {
       "fault": "roi_intent",
       "all_manifest_checksums_updated": true,
       "sdk_mask_converter_succeeds": true,
       "geoscope_import_rejected": true,
-      "reason": "无法导入实验包：Task and statistics ROI disagree."
+      "reason": "Cannot import evidence: Task and statistics ROI disagree."
     },
     {
       "fault": "review_binding",
       "all_manifest_checksums_updated": true,
       "sdk_mask_converter_succeeds": true,
       "geoscope_import_rejected": true,
-      "reason": "无法导入实验包：Semantic review result identity mismatch."
+      "reason": "Cannot import evidence: Semantic review result identity mismatch."
     },
     {
       "fault": "candidate_count",
       "all_manifest_checksums_updated": true,
       "sdk_mask_converter_succeeds": true,
       "geoscope_import_rejected": true,
-      "reason": "无法导入实验包：Candidate measurements disagree with saved mask."
+      "reason": "Cannot import evidence: Candidate measurements disagree with saved mask."
     }
   ],
   "limits": [

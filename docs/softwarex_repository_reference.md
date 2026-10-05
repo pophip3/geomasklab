@@ -41,17 +41,38 @@ was available. The inspected current branch may have changed since publication.
 This example supports browser-based distribution as an established form of
 research software; it does not define journal requirements for every submission.
 
+## Additional maintenance example: Numba-MPI
+
+[Numba-MPI v1.0](https://doi.org/10.1016/j.softx.2024.101897), SoftwareX 28
+(2024), article 101897, links a publisher archive at
+[SOFTX-D-24-00357](https://github.com/ElsevierSoftwareX/SOFTX-D-24-00357).
+The complete nine-page author-hosted paper was inspected, together with the
+[upstream repository](https://github.com/numba-mpi/numba-mpi) at
+`1542d7410ae16daf5083e9ad10afc1d710d857db`.
+
+Its source includes focused API modules, API and paper-listing tests, GPL-3.0
+licensing, a README, `CITATION.cff`, `.zenodo.json`, a code of conduct and
+`pyproject.toml`. The inspected workflow checks lint/formatting and generated
+documentation, builds and installs distribution artifacts, and executes README
+examples as well as a Python/platform/MPI test matrix. Those are observed
+workflow instructions, not test results reproduced here. The current upstream
+commit is not automatically the immutable version 1.0 paper artifact.
+
+Useful practices are exact version identity, runnable documentation, tests of
+distributed source and accurate citation metadata. MPI dependencies, its license
+and its author list are specific to that project and are not copied.
+
 ## Mapping to GeoMaskLab
 
 | Repository component | GeoMaskLab status / action |
 | --- | --- |
 | Purpose and scientific use | Defined in `software_scope.md`; clarify these tasks at the beginning of the final README. |
 | Source modules | Present for planning, transport, geometry, evidence, review and offline analysis; improve the remaining large server/UI modules during release preparation. |
-| License | `Licence.txt` currently records pending licensing. Its filename alone does not satisfy an open-source license requirement. |
-| Installation and dependencies | `requirements.txt`, `quickstart.py`, `.env.example` and reviewer instructions exist; final English instructions and independent live-service setup acceptance remain necessary. |
+| License | Standard MIT text is installed in both `LICENSE` and `Licence.txt`; third-party model/data conditions are separate. |
+| Installation and dependencies | English installation instructions, `requirements.txt`, pinned reviewer dependencies, `quickstart.py` and an empty credential example are provided. Independent live-service installation remains unclaimed. |
 | Small examples | `fixtures.py`, `reviewer_demo.py` and example scripts exist. Generated images are explicitly synthetic. |
 | Automated checks | Unit/integration tests, a geometry matrix and six OS/Python CI jobs exist; a new code version needs its own CI result. |
-| Build/release artifact | Keep source distribution primary. Add a versioned, reproducible release after language and licensing acceptance. |
+| Build/release artifact | Source distribution is primary; the functional scope is frozen as `1.0.0-rc.1`. Distributed-source checks and fixed-version publication are recorded separately. |
 | Executable / container | Optional convenience; neither replaces source, dependency documentation or model configuration. No `.exe` or Docker release is claimed at present. |
 | Stable citation | A public, fixed version and accurate contributor citation remain pending; do not invent author metadata. |
 

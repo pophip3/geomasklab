@@ -1,6 +1,6 @@
 # Reviewer quick start
 
-This is a development preview, not the final licensed publication release.
+Version 1.0.0-rc.1 is an MIT-licensed release candidate. Final creator metadata and an archive DOI remain pending.
 
 ## Requirements and commands
 
@@ -13,7 +13,7 @@ python quickstart.py
 ```
 
 Only Pillow is required. The terminal prints a local URL. Open it in a browser;
-use `--port 4182` if port 4180 is occupied. For this walkthrough keep **演示模式**
+use `--port 4182` if port 4180 is occupied. For this walkthrough keep **Demo mode**
 (demo mode). A new browser starts in demo mode; an existing browser can remember a
 previous live-mode choice. The mode button explains and selects the mode.
 
@@ -55,22 +55,22 @@ observations, real model predictions or real-image segmentation ground truth.
 
 ## Interactive walkthrough
 
-1. Click **提取右侧建筑**, then **改成左侧的建筑**. The displayed values are
+1. Click **Extract right-half buildings**, then **Extract buildings in the left half.**. The displayed values are
    37,350 and 38,000 pixels respectively; coverage uses the full image denominator.
 2. Click the earlier result version to restore it. The next query uses that
    selected version as its parent rather than silently mixing result contexts.
-3. Inspect the image and overlay. **记录人工复核** records acceptance, rejection,
+3. Inspect the image and overlay. **Record review** records acceptance, rejection,
    or return to pending; enter an identifier and a reason. This self-reported
    decision changes no mask or numerical statistic.
-4. Download **导出实验包** and verify it with the command above. Decisions and
+4. Download **Export evidence** and verify it with the command above. Decisions and
    their complete history are included; rejected results remain exportable for audit.
-5. Use **导入实验包** to reopen that ZIP in a new local experiment. The image,
+5. Use **Import evidence** to reopen that ZIP in a new local experiment. The image,
    scope, statistics and prior review records are restored without any inference.
    You may add a review record and export again. Missing ancestor results are not
    reconstructed; new segmentation on an imported image requires model mode.
 
 Optional Label Studio converter interoperability and controlled handoff tests are
-documented in [the workflow study](workflow_value_zh.md). They use an official
+documented in [the workflow study](workflow_study.md). They use an official
 third-party converter and require NumPy; this does not add dependencies to the
 Pillow-only reviewer demonstration.
 
@@ -95,7 +95,7 @@ documented separately; it exposes substantial misses and false positives. The
 quick walkthrough does not claim to reproduce that model experiment or its
 semantic performance. Changes to model behavior require development images and
 a new frozen evaluation before making new performance claims.
-# Offline investigation of a saved mask
+## Offline investigation of a saved mask
 
 After selecting a mask result, click **Recalculate region (offline)**. Choose
 the whole image, one image half, or the current rectangle ROI. To use another
@@ -111,4 +111,3 @@ For a model-free CLI check, run `python reviewer_demo.py`, followed by
 `python examples/recalculate_region.py reviewer-output/right.zip`. The script
 checks four saved-mask analyses against direct Pillow crops. It does not
 measure neural prediction accuracy. See [software scope](software_scope.md).
-

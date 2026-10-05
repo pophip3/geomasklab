@@ -1,12 +1,12 @@
 const $ = id => document.getElementById(id);
 const state = { session:null, selected:null, last:null, original:null, mask:null, mode:'demo', view:'original', zoom:1, busy:false, status:null, loadToken:0,
  roi:null,roiDraft:null,roiStart:null,roiDrawing:false,roiClear:false,batch:null };
-const sideNames = {all:'全图',left:'左半幅',right:'右半幅',top:'上半幅',bottom:'下半幅'};
-const qualityNames = {auto:'自动',fast:'快速',accurate:'分块细化'};
-const targetNames = {building:'建筑',aircraft:'飞机',road:'道路',water:'水体',tree:'植被',ship:'船舶'};
-const targetLabel = run => (run?.task?.invert?'非':'')+(targetNames[run?.task?.target]||'目标');
-const statusNames = {completed:'待语义复核',answered:'已回答',needs_clarification:'待确认',failed:'未完成',needs_review:'待复核',export_ready:'可导出'};
-const reviewNames = {pending:'待人工复核',accepted:'人工已接受',rejected:'人工已拒绝'};
+const sideNames = {all:'Whole image',left:'Left half',right:'Right half',top:'Top half',bottom:'Bottom half'};
+const qualityNames = {auto:'Automatic',fast:'Fast',accurate:'Tiled refinement'};
+const targetNames = {building:'Buildings',aircraft:'Aircraft',road:'Roads',water:'Water',tree:'Vegetation',ship:'Ships'};
+const targetLabel = run => (run?.task?.invert?'Non-':'')+(targetNames[run?.task?.target]||'Target').toLowerCase();
+const statusNames = {completed:'Pending semantic review',answered:'Answered',needs_clarification:'Clarification needed',failed:'Failed',needs_review:'Review required',export_ready:'Ready to export'};
+const reviewNames = {pending:'Pending review',accepted:'Accepted by reviewer',rejected:'Rejected by reviewer'};
 const runStateLabel = r => r.mask_url?(reviewNames[r.semantic_review?.state]||statusNames[r.status]):statusNames[r.status];
 const number = n => Number(n).toLocaleString('en-US');
 const escape = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -14,15 +14,15 @@ const icon = name => `<svg><use href="#i-${name}"/></svg>`;
 const intro = $('chat').innerHTML;
 let toastTimer;
 function toast(text){$('toast').textContent=text;$('toast').hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').hidden=true,3800);}
-async function api(path,payload){const response=await fetch(path,payload?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}:{});const data=await response.json();if(!response.ok)throw new Error(data.error||'请求失败');return data;}
-function loadImage(url){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('影像加载失败'));image.src=url;});}
+async function api(path,payload){const response=await fetch(path,payload?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}:{});const data=await response.json();if(!response.ok)throw new Error(data.error||'Request failed.');return data;}
+function loadImage(url){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('Could not load the image.'));image.src=url;});}
 function modal(title,html,eyebrow='GEOMASKLAB'){$('modalTitle').textContent=title;$('modalEyebrow').textContent=eyebrow;$('modalBody').innerHTML=html;if(!$('modal').open)$('modal').showModal();}
 function closeModal(){$('modal').close();}
 $('closeModal').onclick=closeModal;
 $('modal').addEventListener('click',e=>{if(e.target===$('modal')){const r=$('modal').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)closeModal();}});
 
 async function newExperiment(sample='urban',image=null,name=null){
- if(state.busy)return toast('请等待当前任务完成');
+ if(state.busy)return toast('Wait for the current task to finish.');
  state.busy=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
  try{
   const session=await api('/api/session',{sample,image,name});
@@ -39,16 +39,16 @@ async function showSession(session){
   clearTimeout(toastTimer);$('toast').hidden=true;
   $('chat').innerHTML=intro;
   if(session.sample==='airport'){
-   const btn=$('starterList').querySelectorAll('button')[1];btn.dataset.prompt='提取右侧飞机并计算面积占比';btn.querySelector('span').innerHTML='提取右侧飞机<small>目标提取 + 面积占比</small>';
+   const btn=$('starterList').querySelectorAll('button')[1];btn.dataset.prompt='Extract aircraft in the right half and calculate coverage.';btn.querySelector('span').innerHTML='Extract right-half aircraft<small>Segmentation and pixel coverage</small>';
   }
-  $('imageName').textContent=session.name;$('imageMeta').textContent=`RGB · ${session.width} × ${session.height} px · 像素坐标`;
+  $('imageName').textContent=session.name;$('imageMeta').textContent=`RGB · ${session.width} × ${session.height} px · Pixel coordinates`;
   $('fileThumb').src=session.image_url;$('coordinateLabel').textContent=`${session.width} × ${session.height} px`;
-  $('stageLabel').textContent=session.sample?'研究样区 / '+(session.sample==='urban'?'01':'02'):'用户上传影像';
+  $('stageLabel').textContent=session.sample?'Example image / '+(session.sample==='urban'?'01':'02'):'Uploaded image';
   $('imageWatermark').textContent=session.sample?'SAMPLE IMAGE':'USER IMAGE';
-  $('contextChip').hidden=true;$('versions').innerHTML='<span class="small-muted">完成提取后，在这里保留每个结果版本</span>';
+  $('contextChip').hidden=true;$('versions').innerHTML='<span class="small-muted">Result versions appear here after segmentation.</span>';
   $('qualityMode').value='auto';updateRoiUI();
-  $('trace').innerHTML='<div class="trace-placeholder">'+icon('target')+'<span>每一步操作，都有可追溯的依据。</span><small>任务理解 → 专业感知 → 几何统计 → 结果检查</small></div>';
-  $('runLabel').textContent='等待实验开始';$('query').value='';updateMode();resetMetrics();draw();syncView();closeModal();
+  $('trace').innerHTML='<div class="trace-placeholder">'+icon('target')+'<span>Each operation has a saved execution record.</span><small>Planning → Segmentation → Measurements → Verification</small></div>';
+  $('runLabel').textContent='Awaiting a task';$('query').value='';updateMode();resetMetrics();draw();syncView();closeModal();
   localStorage.setItem('geoscope-session',session.id);
   if(session.runs.length){
    $('chat').innerHTML='';
@@ -60,58 +60,58 @@ async function showSession(session){
   }
 }
 async function openExperiment(id){
- if(state.busy)return toast('请等待当前任务完成');
+ if(state.busy)return toast('Wait for the current task to finish.');
  state.busy=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
  try{await showSession(await api('/api/session/'+encodeURIComponent(id)));}
  catch(e){toast(e.message);}finally{state.busy=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
 }
 
 function updateMode(){
- $('connectionLabel').textContent=state.mode==='demo'?'演示模式':'模型模式';
- $('provenanceLabel').textContent=state.mode==='demo'?(state.session?.sample?'内置样例 · 预置标注演示':'上传影像 · 需连接模型'):'模型模式 · 实际服务调用';
- $('composerNote').textContent=state.mode==='demo'?'当前为流程演示，未调用模型':'上传影像将发送至你配置的模型服务';
- if(state.session?.imported_evidence)$('provenanceLabel').textContent='导入记录 · 导入时未运行模型';
+ $('connectionLabel').textContent=state.mode==='demo'?'Demo mode':'Live mode';
+ $('provenanceLabel').textContent=state.mode==='demo'?(state.session?.sample?'Synthetic example · Procedural mask':'Uploaded image · Model services required'):'Live mode · External model services';
+ $('composerNote').textContent=state.mode==='demo'?'Offline demonstration · No model calls':'Live mode sends images to your configured model services.';
+ if(state.session?.imported_evidence)$('provenanceLabel').textContent='Imported evidence · No inference during import';
  if(state.session?.imported_evidence&&state.mode==='demo')$('composerNote').textContent='Imported evidence supports offline review and region recalculation. New segmentation requests require model services.';
 }
 
-$('importBtn').onclick=()=>{if(state.busy)return toast('请等待当前任务完成');$('bundleInput').click();};
+$('importBtn').onclick=()=>{if(state.busy)return toast('Wait for the current task to finish.');$('bundleInput').click();};
 $('bundleInput').onchange=async e=>{
  const file=e.target.files[0];e.target.value='';if(!file)return;
- if(state.busy)return toast('请等待当前任务完成');
- if(file.size>12*1024*1024)return toast('实验包不能超过12MB');
+ if(state.busy)return toast('Wait for the current task to finish.');
+ if(file.size>12*1024*1024)return toast('Evidence bundles must be 12 MB or smaller.');
  state.busy=true;$('importBtn').disabled=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
  try{
-  const bundle=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('实验包读取失败'));reader.readAsDataURL(file);});
+  const bundle=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read the evidence bundle.'));reader.readAsDataURL(file);});
   await showSession(await api('/api/import',{bundle,name:file.name}));
-  toast('实验包已校验并恢复；未运行模型，可继续记录复核');
- }catch(error){modal('实验包未通过校验',`<p>${escape(error.message)}</p><p>当前实验和有效结果已保留。请检查来源实验包后重新导入。</p>`,'EVIDENCE HANDOFF');}
+  toast('Evidence verified and restored without inference. You can now review or recalculate a region.');
+ }catch(error){modal('Evidence verification failed',`<p>${escape(error.message)}</p><p>The current experiment is preserved. Check the source bundle before importing it again.</p>`,'EVIDENCE HANDOFF');}
  finally{state.busy=false;$('importBtn').disabled=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
 };
 function resetMetrics(){
  $('recalculateBtn').disabled=true;$('regionCoverage').textContent='—';
  $('reviewPanel').hidden=true;
  $('answerCard').hidden=true;$('coverageCard').hidden=false;$('metricsPanel').hidden=false;$('checksPanel').hidden=false;
- $('resultEyebrow').textContent='COVERAGE ANALYSIS';$('artifactText').textContent='原图 · 蒙版 · 叠加图 · 统计 · 日志';
+ $('resultEyebrow').textContent='COVERAGE ANALYSIS';$('artifactText').textContent='Image · Mask · Overlay · Measurements · Logs';
  $('ratioValue').textContent='—';$('areaValue').innerHTML='— <small>px</small>';$('scopeValue').textContent='—';$('timeValue').textContent='—';$('candidateValue').textContent='—';$('qualityValue').textContent='—';
- $('totalValue').textContent=number(state.session?.width*state.session?.height||0);$('resultTitle').textContent='等待目标提取';$('resultSubtitle').textContent='运行一条任务，结果将在这里呈现';
- $('resultStatus').textContent='准备就绪';$('resultStatus').className='result-badge';$('coverageBar').style.width='0%';$('ringValue').setAttribute('stroke-dasharray','0 164');
- $('checksList').innerHTML=['结果与原始影像对齐','空间条件完成检查','统计与产物已生成'].map(s=>`<p class="pending"><span>○</span>${s}</p>`).join('');$('checkCount').textContent='0 / 3';$('exportBtn').disabled=true;$('reportBtn').disabled=true;
+ $('totalValue').textContent=number(state.session?.width*state.session?.height||0);$('resultTitle').textContent='Awaiting segmentation';$('resultSubtitle').textContent='Run a task to see its results here.';
+ $('resultStatus').textContent='Ready';$('resultStatus').className='result-badge';$('coverageBar').style.width='0%';$('ringValue').setAttribute('stroke-dasharray','0 164');
+ $('checksList').innerHTML=['Mask matches the image dimensions','Spatial constraints checked','Measurements and artifacts saved'].map(s=>`<p class="pending"><span>○</span>${s}</p>`).join('');$('checkCount').textContent='0 / 3';$('exportBtn').disabled=true;$('reportBtn').disabled=true;
 }
 function renderAnswer(run){
  $('recalculateBtn').disabled=true;$('regionCoverage').textContent='—';
  $('reviewPanel').hidden=true;
  $('answerCard').hidden=false;$('coverageCard').hidden=true;$('metricsPanel').hidden=true;$('checksPanel').hidden=true;
- $('resultEyebrow').textContent='IMAGE UNDERSTANDING';$('resultTitle').textContent='影像理解已完成';
- $('resultSubtitle').textContent='RemoteAgent 直接看图回答';$('answerText').textContent=run.message;
- $('resultStatus').textContent='已回答';$('resultStatus').className='result-badge success';
- $('artifactText').textContent='原图 · 模型回答 · 决策记录 · 运行日志';$('exportBtn').disabled=true;$('reportBtn').disabled=true;
+ $('resultEyebrow').textContent='IMAGE UNDERSTANDING';$('resultTitle').textContent='Scene response received';
+ $('resultSubtitle').textContent='Image response from RemoteAgent';$('answerText').textContent=run.message;
+ $('resultStatus').textContent='Answered';$('resultStatus').className='result-badge success';
+ $('artifactText').textContent='Image · Model response · Decision record · Logs';$('exportBtn').disabled=true;$('reportBtn').disabled=true;
 }
 
 function updateRoiUI(){
  const roi=state.roi?.xyxy;
- $('roiLabel').textContent=roi?`研究区：(${roi[0]}, ${roi[1]}) – (${roi[2]}, ${roi[3]}) px`:'未设置矩形研究区';
+ $('roiLabel').textContent=roi?`ROI: (${roi[0]}, ${roi[1]}) – (${roi[2]}, ${roi[3]}) px`:'No rectangle selected';
  $('drawRoiBtn').classList.toggle('selected',state.roiDrawing);
- $('drawRoiBtn').textContent=state.roiDrawing?'在影像上拖动框选':'框选研究区';
+ $('drawRoiBtn').textContent=state.roiDrawing?'Drag on the image to draw an ROI':'Draw ROI';
  $('clearRoiBtn').disabled=!roi;
  $('imageCanvas').classList.toggle('roi-drawing',state.roiDrawing);
 }
@@ -127,7 +127,7 @@ function finishRoi(event){
  state.roiStart=null;state.roiDraft=null;state.roiDrawing=false;
  if(box[2]-box[0]>=3&&box[3]-box[1]>=3){
   state.roi={xyxy:box,source:'drawn',image_size:[state.session.width,state.session.height]};state.roiClear=false;
- }else toast('研究区太小，请重新框选');
+ }else toast('The ROI is too small. Draw a larger rectangle.');
  updateRoiUI();draw();
 }
 $('drawRoiBtn').onclick=()=>{if(state.busy||!state.session)return;state.roiDrawing=!state.roiDrawing;state.roiDraft=null;state.roiStart=null;updateRoiUI();draw();};
@@ -173,11 +173,11 @@ function draw(){
   ctx.setLineDash([Math.max(6,w/100),Math.max(4,w/160)]);ctx.fillRect(x,y,rw,rh);ctx.strokeRect(x,y,rw,rh);ctx.restore();
  }
  canvas.style.transform=`scale(${state.zoom})`; $('zoomLabel').textContent=Math.round(state.zoom*100)+'%';
- $('legendScope').textContent=state.selected?.metrics?(state.selected.task.roi?'矩形研究区':sideNames[state.selected.task.side]):'暂无提取结果';
+ $('legendScope').textContent=state.selected?.metrics?(state.selected.task.roi?'Rectangle ROI':sideNames[state.selected.task.side]):'No mask result';
  $('imageWatermark').textContent=state.selected?.mode==='demo'&&state.view!=='original'?'DEMO ANNOTATION · NOT MODEL OUTPUT':state.session?.sample?'SAMPLE IMAGE':'USER IMAGE';
 }
 function syncView(){document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('selected',b.dataset.view===state.view));$('compareControl').hidden=state.view!=='compare';}
-function view(mode){if(mode!=='original'&&!state.mask)return toast('请先运行提取任务，再查看蒙版或对比');state.view=mode;draw();syncView();}
+function view(mode){if(mode!=='original'&&!state.mask)return toast('Run segmentation before viewing a mask or comparison.');state.view=mode;draw();syncView();}
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>view(b.dataset.view));
 $('opacity').oninput=()=>{$('opacityValue').textContent=$('opacity').value+'%';draw();};$('compareSlider').oninput=draw;
 $('zoomIn').onclick=()=>{state.zoom=Math.min(3,state.zoom+.25);draw();};$('zoomOut').onclick=()=>{state.zoom=Math.max(.5,state.zoom-.25);draw();};$('fitBtn').onclick=()=>{state.zoom=1;draw();};
@@ -186,18 +186,18 @@ $('imageCanvas').addEventListener('mouseleave',()=>{$('coordinateLabel').textCon
 
 function addMessage(role,text,kind='',run=null){
  const d=document.createElement('div');d.className=`message ${role} ${kind}`;
- d.innerHTML=`<div class="message-label"><span>${role==='user'?'YOU':'GEOMASKLAB'}</span><span>${new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="bubble"></div>`;
+ d.innerHTML=`<div class="message-label"><span>${role==='user'?'YOU':'GEOMASKLAB'}</span><span>${new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="bubble"></div>`;
  d.querySelector('.bubble').textContent=text;
  if(run?.mask_url){
-  const target=targetLabel(run),next=run.task.side==='left'?'右':'左';
+  const target=targetLabel(run),next=run.task.side==='left'?'right':'left';
   const chips=document.createElement('div');chips.className='followup-chips';
-  const prompts=run.imported_evidence?['导出刚才的结果']:[`改成${next}侧的${target}`,'提取全图'+target,'导出刚才的结果'];
+  const prompts=(run.imported_evidence||state.session?.imported_evidence)?['Export the selected result.']:[`Extract ${target} in the ${next} half.`,`Extract ${target} in the whole image.`,'Export the selected result.'];
   for(const q of prompts){const btn=document.createElement('button');btn.textContent=q;btn.dataset.prompt=q;chips.append(btn);}d.append(chips);
-  const meta=document.createElement('div');meta.className='message-meta';meta.textContent=`V${run.version} · ${run.mode==='demo'?'预置标注演示':'真实服务返回'} · ${run.duration_ms} ms`;d.append(meta);
+  const meta=document.createElement('div');meta.className='message-meta';meta.textContent=`V${run.version} · ${run.execution_kind==='saved_mask_region_analysis'?'Offline region analysis':run.mode==='demo'?'Procedural demonstration':'Model-service response'} · ${run.duration_ms} ms`;d.append(meta);
  }
  if(run?.status==='needs_clarification'){
   const chips=document.createElement('div');chips.className='followup-chips';const target=state.selected?.task?.target||state.status.samples[state.session.sample]?.target||'building';
-  for(const side of ['左侧','右侧']){const b=document.createElement('button');b.textContent=side+targetNames[target];b.dataset.prompt='提取'+side+targetNames[target];chips.append(b);}d.append(chips);
+  for(const side of ['left','right']){const b=document.createElement('button');b.textContent=`${sideNames[side]} ${targetNames[target].toLowerCase()}`;b.dataset.prompt=`Extract ${targetNames[target].toLowerCase()} in the ${side} half.`;chips.append(b);}d.append(chips);
  }
  $('chat').append(d);$('chat').scrollTop=$('chat').scrollHeight;
 }
@@ -208,55 +208,55 @@ function renderTrace(run){
 }
 function renderVersions(){
  const versions=state.session.runs.filter(r=>r.mask_url);
- $('versions').innerHTML=versions.map(r=>`<button class="version-pill ${r.id===state.selected?.id?'selected':''}" data-run="${r.id}"><span>V${r.version}</span>${escape(r.task.roi?'框选区域':sideNames[r.task.side])}${escape(targetLabel(r))}</button>`).join('')||'<span class="small-muted">完成提取后，在这里保留每个结果版本</span>';
+ $('versions').innerHTML=versions.map(r=>`<button class="version-pill ${r.id===state.selected?.id?'selected':''}" data-run="${r.id}"><span>V${r.version}</span>${escape(r.task.roi?'Rectangle ROI':sideNames[r.task.side])} · ${escape(targetLabel(r))}</button>`).join('')||'<span class="small-muted">Result versions appear here after segmentation.</span>';
 }
 async function selectRun(run){
  const token=++state.loadToken;
  try{const mask=await loadImage(run.mask_url);if(token!==state.loadToken)return;
   $('answerCard').hidden=true;$('coverageCard').hidden=false;$('metricsPanel').hidden=false;$('checksPanel').hidden=false;
-  $('resultEyebrow').textContent='COVERAGE ANALYSIS';$('artifactText').textContent='原图 · 蒙版 · 叠加图 · 统计 · 日志';
+  $('resultEyebrow').textContent='COVERAGE ANALYSIS';$('artifactText').textContent='Image · Mask · Overlay · Measurements · Logs';
   state.selected=run;state.mask=mask;state.view='overlay';const m=run.metrics,ratio=m.area_ratio*100;
   state.roi=run.task?.roi||null;state.roiClear=false;state.roiDrawing=false;state.roiDraft=null;
   $('qualityMode').value=run.task?.quality_mode||'auto';updateRoiUI();
   localStorage.setItem('geoscope-selected-'+state.session.id,run.id);
-  $('ratioValue').textContent=ratio.toFixed(2);$('areaValue').innerHTML=number(m.pixel_area)+' <small>px</small>';$('scopeValue').textContent=run.task.roi?'矩形研究区':sideNames[run.task.side];$('timeValue').textContent=run.duration_ms+' ms';
-  $('candidateValue').textContent=m.candidate_stats?`${number(m.candidate_stats.candidate_count)} 个`:'旧结果未统计';
+  $('ratioValue').textContent=ratio.toFixed(2);$('areaValue').innerHTML=number(m.pixel_area)+' <small>px</small>';$('scopeValue').textContent=run.task.roi?'Rectangle ROI':sideNames[run.task.side];$('timeValue').textContent=run.duration_ms+' ms';
+  $('candidateValue').textContent=m.candidate_stats?number(m.candidate_stats.candidate_count):'Not recorded in this older result';
   $('regionCoverage').textContent=m.scope_area_ratio==null?'Not recorded or empty scope':`${(m.scope_area_ratio*100).toFixed(2)}% (${number(m.scope_area_pixels)} px)`;
   $('recalculateBtn').disabled=false;
-  $('qualityValue').textContent=run.mode==='demo'?'预置演示':qualityNames[run.task?.effective_quality_mode]||'服务未确认';
-  $('resultTitle').textContent=(run.task.roi?'框选区域 · ':sideNames[run.task.side])+targetLabel(run);$('resultSubtitle').textContent=`V${run.version} · ${run.mode==='demo'?'预置演示标注，非模型输出':'模型输出，需人工复核'}`;
-  if(run.imported_evidence)$('resultSubtitle').textContent+=` · 导入记录（来源 V${run.imported_evidence.source_version}），未重新推理`;
-  if(run.imported_evidence)$('timeValue').textContent=run.duration_ms+' ms（来源运行）';
+  $('qualityValue').textContent=run.mode==='demo'?'Procedural demo':qualityNames[run.task?.effective_quality_mode]||'Unconfirmed by service';
+  $('resultTitle').textContent=(run.task.roi?'Rectangle ROI':sideNames[run.task.side])+' · '+targetLabel(run);$('resultSubtitle').textContent=`V${run.version} · ${run.mode==='demo'?'Procedural mask · Not model output':'Model output · Review required'}`;
+  if(run.imported_evidence)$('resultSubtitle').textContent+=` · Imported from V${run.imported_evidence.source_version} · No new inference`;
+  if(run.imported_evidence)$('timeValue').textContent=run.duration_ms+' ms (source run)';
   if(run.execution_kind==='saved_mask_region_analysis'){
    $('resultSubtitle').textContent=`V${run.version} · Offline region analysis · No model inference · Source ${run.source_prediction.mode}`;
    $('qualityValue').textContent='Saved mask';
   }
   $('resultStatus').textContent=runStateLabel(run);
   const category=run.capability||state.status?.capabilities?.targets?.[run.task.target];
-  if(category?.level==='experimental')$('resultSubtitle').textContent+=' · 实验类别，精度尚未验证';
+  if(category?.level==='experimental')$('resultSubtitle').textContent+=' · Experimental category · Accuracy not validated';
   renderReview(run);
   $('coverageBar').style.width=ratio+'%';$('ringValue').setAttribute('stroke-dasharray',`${ratio*1.634} 164`);
-  $('checksList').innerHTML=['蒙版尺寸与原始影像一致',`像素范围符合${run.task.roi?'矩形研究区':sideNames[run.task.side]}条件`,'统计及结果文件已生成'].map(s=>`<p><span>✓</span>${escape(s)}</p>`).join('');$('checkCount').textContent='3 / 3';
-  $('contextChip').hidden=false;$('contextChip').lastElementChild.textContent=`继承 V${run.version} · ${targetLabel(run)} · ${sideNames[run.task.side]}`;
+  $('checksList').innerHTML=['Mask and image dimensions match',`Scope matches ${run.task.roi?'the rectangle ROI':sideNames[run.task.side].toLowerCase()}`,'Measurements and result files saved'].map(s=>`<p><span>✓</span>${escape(s)}</p>`).join('');$('checkCount').textContent='3 / 3';
+  $('contextChip').hidden=false;$('contextChip').lastElementChild.textContent=`Parent V${run.version} · ${targetLabel(run)} · ${sideNames[run.task.side]}`;
   $('exportBtn').disabled=false;$('reportBtn').disabled=!run.report_url;renderVersions();renderTrace(run);draw();syncView();
  }catch(e){toast(e.message);}
 }
 function renderReview(run){
  const review=run.semantic_review||{state:'pending',events:[]},last=review.events.at(-1);
  $('reviewPanel').hidden=false;$('reviewState').textContent=reviewNames[review.state]||reviewNames.pending;
- $('reviewSummary').textContent=last?`${last.reviewer} · ${new Date(last.at).toLocaleString()} · ${last.note}`:'检查目标语义、漏检、误检和边界后记录决定。';
+ $('reviewSummary').textContent=last?`${last.reviewer} · ${new Date(last.at).toLocaleString('en-US')} · ${last.note}`:'Inspect target identity, omissions, false positives and boundaries before recording a decision.';
  $('resultStatus').textContent=reviewNames[review.state]||reviewNames.pending;
  $('resultStatus').className='result-badge '+(review.state==='accepted'?'success':review.state==='rejected'?'warning':'');
 }
 $('reviewBtn').onclick=()=>{
- if(state.busy||!state.selected)return toast('请等待任务完成后复核');
+ if(state.busy||!state.selected)return toast('Wait for the task to finish before reviewing.');
  const selected=state.selected,sessionId=state.session.id;
- modal('记录人工复核',`<p>请先检查原图与叠加蒙版，记录目标语义、漏检、误检及边界情况。决定只适用于 V${selected.version}；后续新结果重新待复核。</p><div class="modal-notice">复核不会修改蒙版或统计。此处保存自报记录，不等同独立精度评测或身份认证。</div><form id="reviewForm" class="review-form"><label for="reviewDecision">复核决定</label><select id="reviewDecision" required><option value="">请选择复核决定</option><option value="accepted">接受这个结果</option><option value="rejected">拒绝这个结果</option><option value="pending">退回待复核</option></select><label for="reviewerName">复核人标识</label><input id="reviewerName" required maxlength="100" autocomplete="off"><label for="reviewNote">复核依据或退回原因</label><textarea id="reviewNote" required maxlength="2000" rows="4" placeholder="说明检查了哪些区域，发现哪些问题，以及结果是否适合当前用途。"></textarea><button type="submit" class="primary" id="saveReview">保存复核记录</button></form><h3>已有复核记录</h3><div class="review-history">${(selected.semantic_review?.events||[]).map(e=>`<p><strong>${escape(reviewNames[e.decision])}</strong> · ${escape(e.reviewer)} · ${escape(new Date(e.at).toLocaleString())}<br>${escape(e.note)}</p>`).join('')||'<p>尚无人工复核记录。</p>'}</div>`,'SEMANTIC REVIEW');
+ modal('Record review',`<p>Inspect the original image and overlay for target identity, omissions, false positives and boundary errors. This decision applies only to V${selected.version}; each new result starts pending review.</p><div class="modal-notice">Review does not edit masks or measurements. Decisions are self-reported; they are not independent accuracy estimates or authenticated identities.</div><form id="reviewForm" class="review-form"><label for="reviewDecision">Review decision</label><select id="reviewDecision" required><option value="">Choose a decision</option><option value="accepted">Accept this result</option><option value="rejected">Reject this result</option><option value="pending">Return to pending review</option></select><label for="reviewerName">Reviewer label</label><input id="reviewerName" required maxlength="100" autocomplete="off"><label for="reviewNote">Review rationale</label><textarea id="reviewNote" required maxlength="2000" rows="4" placeholder="Describe the regions inspected, any problems found, and suitability for the intended use."></textarea><button type="submit" class="primary" id="saveReview">Save review</button></form><h3>Review history</h3><div class="review-history">${(selected.semantic_review?.events||[]).map(e=>`<p><strong>${escape(reviewNames[e.decision])}</strong> · ${escape(e.reviewer)} · ${escape(new Date(e.at).toLocaleString('en-US'))}<br>${escape(e.note)}</p>`).join('')||'<p>No review records yet.</p>'}</div>`,'SEMANTIC REVIEW');
  $('reviewForm').onsubmit=async e=>{
   e.preventDefault();const button=$('saveReview');button.disabled=true;
   try{const updated=await api('/api/review',{session_id:sessionId,run_id:selected.id,decision:$('reviewDecision').value,reviewer:$('reviewerName').value,note:$('reviewNote').value});
    if(state.session.id===sessionId){const existing=state.session.runs.find(r=>r.id===updated.id);if(existing)Object.assign(existing,updated);if(state.selected?.id===updated.id){Object.assign(state.selected,updated);renderReview(state.selected);}}
-   closeModal();toast('复核记录已保存，将随实验包和报告导出');
+   closeModal();toast('Review saved. It will be included in the report and evidence export.');
   }catch(error){toast(error.message);button.disabled=false;}
  };
 };
@@ -278,15 +278,15 @@ async function run(query,simulateFailure=false){
   addMessage('assistant',result.message,['failed','needs_clarification','needs_review'].includes(result.status)?'warning':'',result);
   if(result.mask_url)await selectRun(result);else{if(result.status==='answered')renderAnswer(result);renderTrace(result);}
   if(result.status==='export_ready')download(result.export_url);
-  if(result.status==='failed'&&state.selected)toast('本次未完成，画布保留上一次有效结果');
- }catch(e){addMessage('assistant',e.message,'warning');toast('请求未完成，未生成结果');}
+  if(result.status==='failed'&&state.selected)toast('The task failed. The previous valid result remains on the canvas.');
+ }catch(e){addMessage('assistant',e.message,'warning');toast('Request failed. No result was generated.');}
  finally{state.busy=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;$('busyOverlay').hidden=true;}
 }
 $('taskForm').onsubmit=e=>{e.preventDefault();run($('query').value);};
 $('query').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();run($('query').value);}};
 document.addEventListener('click',e=>{const experiment=e.target.closest('[data-session]');if(experiment)openExperiment(experiment.dataset.session);const prompt=e.target.closest('[data-prompt]');if(prompt)run(prompt.dataset.prompt);const v=e.target.closest('[data-run]');if(v&&!state.busy){const r=state.session.runs.find(x=>x.id===v.dataset.run);if(r?.mask_url){selectRun(r);closeModal();}}});
 function download(url){const a=document.createElement('a');a.href=url;a.download='';document.body.append(a);a.click();a.remove();}
-$('exportBtn').onclick=()=>{if(state.selected){download(state.selected.export_url);toast('实验包已开始下载，包含影像、蒙版、统计、日志和报告');}};
+$('exportBtn').onclick=()=>{if(state.selected){download(state.selected.export_url);toast('Evidence download started: image, masks, measurements, logs and report.');}};
 $('recalculateBtn').onclick=()=>{
  if(state.busy||!state.selected?.mask_url)return;
  const sessionId=state.session.id,sourceId=state.selected.id;
@@ -313,21 +313,21 @@ $('recalculateBtn').onclick=()=>{
 };
 $('reportBtn').onclick=()=>{if(state.selected?.report_url)download(state.selected.report_url);};
 function gallery(){
- if(state.busy)return toast('请等待当前任务完成');
- modal('选择一幅研究影像',`<p>从预置样例体验完整实验，或上传自己的影像连接模型分析。</p><div class="sample-grid">${Object.entries(state.status?.samples||{}).map(([key,s])=>`<button class="sample-card" data-sample="${key}"><img src="assets/${escape(s.file)}" alt="${escape(s.name)}"><strong>${escape(s.name)}</strong><small>${s.size.join(' × ')} px · 程序生成${targetNames[s.target]}掩膜</small></button>`).join('')}</div><p style="margin-top:16px">样例蒙版用于演示交互与几何计算，不是RemoteSAM预测，也不是精度评测真值。</p><button class="secondary" id="modalUpload">${icon('image')}上传自己的影像</button>`,'IMAGE LIBRARY');
+ if(state.busy)return toast('Wait for the current task to finish.');
+ modal('Choose an image',`<p>Try a procedural example, or upload an image for analysis with configured model services.</p><div class="sample-grid">${Object.entries(state.status?.samples||{}).map(([key,s])=>`<button class="sample-card" data-sample="${key}"><img src="assets/${escape(s.file)}" alt="${escape(s.name)}"><strong>${escape(s.name)}</strong><small>${s.size.join(' × ')} px · Procedural ${targetNames[s.target].toLowerCase()} mask</small></button>`).join('')}</div><p style="margin-top:16px">Example masks demonstrate interactions and pixel operations. They are not RemoteSAM predictions or ground truth for EO accuracy evaluation.</p><button class="secondary" id="modalUpload">${icon('image')}Upload an image</button>`,'IMAGE LIBRARY');
  $('modalBody').querySelectorAll('[data-sample]').forEach(b=>b.onclick=()=>newExperiment(b.dataset.sample));$('modalUpload').onclick=()=>{closeModal();$('fileInput').click();};
 }
 $('galleryBtn').onclick=gallery;$('newBtn').onclick=gallery;$('uploadBtn').onclick=gallery;$('workspaceBtn').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
-$('fileInput').onchange=async e=>{const file=e.target.files[0];if(!file)return;if(file.size>12*1024*1024){toast('请上传12MB以内的影像');e.target.value='';return;}const reader=new FileReader();reader.onload=()=>newExperiment(null,reader.result,file.name);reader.onerror=()=>toast('无法读取影像');reader.readAsDataURL(file);e.target.value='';};
+$('fileInput').onchange=async e=>{const file=e.target.files[0];if(!file)return;if(file.size>12*1024*1024){toast('Upload an image no larger than 12 MB.');e.target.value='';return;}const reader=new FileReader();reader.onload=()=>newExperiment(null,reader.result,file.name);reader.onerror=()=>toast('Could not read the image.');reader.readAsDataURL(file);e.target.value='';};
 
 function renderBatch(batch){
  state.batch=batch;
- if(!$('modal').open||$('modalTitle').textContent!=='批量实验')return;
+ if(!$('modal').open||$('modalTitle').textContent!=='Batch analysis')return;
  const items=batch.items||[],total=batch.total_count||items.length;
  const done=batch.status==='completed',failed=batch.status==='failed';
- $('modalBody').innerHTML=`<div class="batch-progress"><strong>${failed?'批次未启动':done?'批次已完成':'正在逐图运行'} · ${batch.completed_items||items.length} / ${total}</strong><p>${failed?escape(batch.error):'每幅影像独立保留结果；失败项不会覆盖已完成项。'}</p></div>
-  <div class="batch-items">${items.map((item,i)=>`<div class="batch-item"><span>${i+1}. ${escape(item.session_id)}</span><b>${escape(statusNames[item.status]||item.status)}</b><small>${item.metrics?`${number(item.metrics.pixel_area)} px · ${(item.metrics.area_ratio*100).toFixed(2)}% · 候选 ${item.metrics.candidate_stats?.candidate_count??'—'}`:escape(item.failure_reason||'等待结果')}</small><button data-session="${escape(item.session_id)}">查看影像</button></div>`).join('')}</div>
-  ${done?`<button class="primary" id="batchExportBtn">导出批量 CSV</button>`:''}`;
+ $('modalBody').innerHTML=`<div class="batch-progress"><strong>${failed?'Batch failed to start':done?'Batch complete':'Running images sequentially'} · ${batch.completed_items||items.length} / ${total}</strong><p>${failed?escape(batch.error):'Each image has its own results. A failed item does not overwrite completed results.'}</p></div>
+  <div class="batch-items">${items.map((item,i)=>`<div class="batch-item"><span>${i+1}. ${escape(item.session_id)}</span><b>${escape(statusNames[item.status]||item.status)}</b><small>${item.metrics?`${number(item.metrics.pixel_area)} px · ${(item.metrics.area_ratio*100).toFixed(2)}% · Components ${item.metrics.candidate_stats?.candidate_count??'—'}`:escape(item.failure_reason||'Awaiting result')}</small><button data-session="${escape(item.session_id)}">Open image</button></div>`).join('')}</div>
+  ${done?`<button class="primary" id="batchExportBtn">Export batch CSV</button>`:''}`;
  if(done)$('batchExportBtn').onclick=()=>download(`/api/batch-export/${batch.batch_id}`);
 }
 async function watchBatch(batchId){
@@ -340,33 +340,33 @@ async function watchBatch(batchId){
  }
 }
 async function batchDialog(){
- if(state.busy)return toast('请等待当前任务完成');
+ if(state.busy)return toast('Wait for the current task to finish.');
  if(state.batch?.status==='running'){
-  modal('批量实验','<p>正在恢复批次进度…</p>','BATCH EXPERIMENT');
+  modal('Batch analysis','<p>Restoring batch progress…</p>','BATCH EXPERIMENT');
   renderBatch(state.batch);return;
  }
  try{
   const data=await api('/api/sessions');
-  modal('批量实验',`<p>选择 2—5 幅已保存影像，系统依次运行同一任务。可先在“选择影像”中添加更多影像。</p>
-   <div class="batch-selector">${data.sessions.map(s=>`<label><input type="checkbox" class="batch-check" value="${escape(s.id)}" ${s.id===state.session?.id?'checked':''}><span>${escape(s.name)}<small>${s.width} × ${s.height} px · ${s.run_count} 次实验</small></span></label>`).join('')}</div>
-   <div class="batch-add"><button class="secondary" data-add-sample="airport">添加机场样例</button><button class="secondary" data-add-sample="urban">添加街区样例</button></div>
-   <label class="batch-label" for="batchQuery">统一任务</label><textarea id="batchQuery" rows="2" maxlength="1800" placeholder="例如：批量提取这些影像中的所有飞机并统计面积占比"></textarea>
-   <label class="batch-inline"><input id="batchUseRoi" type="checkbox" ${state.roi?'':'disabled'}> 同尺寸影像沿用当前矩形研究区</label>
-   <p>未勾选时各影像按全图处理。批次串行执行，单项失败会单独记录。</p>
-   <button class="primary" id="startBatchBtn">开始批量实验</button>`,'BATCH EXPERIMENT');
+  modal('Batch analysis',`<p>Select 2–5 saved images to run one task sequentially. Use Choose image to add images first.</p>
+   <div class="batch-selector">${data.sessions.map(s=>`<label><input type="checkbox" class="batch-check" value="${escape(s.id)}" ${s.id===state.session?.id?'checked':''}><span>${escape(s.name)}<small>${s.width} × ${s.height} px · ${s.run_count} runs</small></span></label>`).join('')}</div>
+   <div class="batch-add"><button class="secondary" data-add-sample="airport">Add aircraft example</button><button class="secondary" data-add-sample="urban">Add urban example</button></div>
+   <label class="batch-label" for="batchQuery">Shared task</label><textarea id="batchQuery" rows="2" maxlength="1800" placeholder="For example: Extract aircraft in these images and calculate coverage."></textarea>
+   <label class="batch-inline"><input id="batchUseRoi" type="checkbox" ${state.roi?'':'disabled'}> Use the current ROI for images with matching dimensions</label>
+   <p>Leave unchecked to use whole images. Batch items run sequentially; failures are recorded separately.</p>
+   <button class="primary" id="startBatchBtn">Start batch</button>`,'BATCH EXPERIMENT');
   $('modalBody').querySelectorAll('[data-add-sample]').forEach(b=>b.onclick=async()=>{
-   try{await api('/api/session',{sample:b.dataset.addSample});await batchDialog();toast('样例已加入影像列表');}
+   try{await api('/api/session',{sample:b.dataset.addSample});await batchDialog();toast('Example added to the image list.');}
    catch(e){toast(e.message);}
   });
   $('startBatchBtn').onclick=async()=>{
    const selected=[...$('modalBody').querySelectorAll('.batch-check:checked')].map(el=>el.value);
    const query=$('batchQuery').value.trim();
-   if(selected.length<2||selected.length>5)return toast('请选择 2—5 幅影像');
-   if(!query)return toast('请先输入包含单一目标的统一任务');
+   if(selected.length<2||selected.length>5)return toast('Select 2–5 images.');
+   if(!query)return toast('Enter one shared task with a single semantic target.');
    const useRoi=$('batchUseRoi').checked;
    if(useRoi){
     const chosen=data.sessions.filter(s=>selected.includes(s.id));
-    if(chosen.some(s=>s.width!==state.roi.image_size[0]||s.height!==state.roi.image_size[1]))return toast('所选影像尺寸不同，不能共用当前矩形');
+    if(chosen.some(s=>s.width!==state.roi.image_size[0]||s.height!==state.roi.image_size[1]))return toast('These images have different dimensions and cannot share this ROI.');
    }
    $('startBatchBtn').disabled=true;
    try{
@@ -380,35 +380,35 @@ async function batchDialog(){
 $('batchBtn').onclick=batchDialog;
 async function history(){
  const runs=state.session?.runs||[];
- modal('实验记录',runs.length?`<p>同一影像的结果分别保存。点击有效结果恢复查看，并以该版本为后续任务上下文。</p>${[...runs].reverse().map(r=>`<button class="history-row" ${r.mask_url?`data-run="${r.id}"`:''} ${!r.mask_url?'disabled':''}><span>V${r.version}</span><div><strong>${escape(r.query)}</strong><small>${escape(runStateLabel(r))} · ${r.mode==='demo'?'演示':'模型'}</small></div><time>${r.duration_ms} ms</time></button>`).join('')}`:'<p>尚未运行实验。从提取右侧建筑开始，你的任务和结果会记录在这里。</p>','EXPERIMENT HISTORY');
+ modal('Experiment history',runs.length?`<p>Results are saved separately. Open a valid version to inspect it or use it as the parent of a new task.</p>${[...runs].reverse().map(r=>`<button class="history-row" ${r.mask_url?`data-run="${r.id}"`:''} ${!r.mask_url?'disabled':''}><span>V${r.version}</span><div><strong>${escape(r.query)}</strong><small>${escape(runStateLabel(r))} · ${r.mode==='demo'?'Demo':'Live'}</small></div><time>${r.duration_ms} ms</time></button>`).join('')}`:'<p>No tasks have run yet. Try extracting buildings in the right half.</p>','EXPERIMENT HISTORY');
  try{
-  const data=await api('/api/sessions');if(!$('modal').open||$('modalTitle').textContent!=='实验记录')return;
-  $('modalBody').insertAdjacentHTML('beforeend','<h3>已保存的影像实验</h3>'+data.sessions.map(s=>`<button class="history-row" data-session="${escape(s.id)}"><span>↗</span><div><strong>${escape(s.name)}</strong><small>${s.width} × ${s.height} px · ${s.run_count} 次运行</small></div></button>`).join(''));
- }catch(e){toast('历史实验列表读取失败');}
+  const data=await api('/api/sessions');if(!$('modal').open||$('modalTitle').textContent!=='Experiment history')return;
+  $('modalBody').insertAdjacentHTML('beforeend','<h3>Saved image experiments</h3>'+data.sessions.map(s=>`<button class="history-row" data-session="${escape(s.id)}"><span>↗</span><div><strong>${escape(s.name)}</strong><small>${s.width} × ${s.height} px · ${s.run_count} runs</small></div></button>`).join(''));
+ }catch(e){toast('Could not load saved experiments.');}
 }
 $('historyBtn').onclick=history;
 function details(log=false){
  const r=log?state.last||state.selected:state.selected||state.last;
- if(!r)return modal('运行详情','<p>尚未执行任务。完成实验后，这里会展示真实的工具事件、数据来源和运行参数。</p>');
- modal(log?'完整执行日志':'结果与运行详情',`<p><strong>RUN ${r.id}</strong> · ${r.mode==='demo'?'预置标注演示':'模型服务模式'} · ${escape(runStateLabel(r))}</p><div class="modal-notice">${escape(r.provenance.perception)}</div>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>完整实验包 ↓</a></div>`:''}<h3>数据来源与方法</h3><p>${escape(r.provenance.source)}</p><p>规划器：${escape(r.provenance.planner)}。面积按实际二值蒙版计算，未推断平方米。</p><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre>`,'RUN PROVENANCE');
+ if(!r)return modal('Run details','<p>No task has run yet. Execution events, provenance and parameters will appear here.</p>');
+ modal(log?'Full execution log':'Result and execution details',`<p><strong>RUN ${r.id}</strong> · ${r.mode==='demo'?'Procedural demonstration':'Live model services'} · ${escape(runStateLabel(r))}</p><div class="modal-notice">${escape(r.provenance.perception)}</div>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>Complete evidence bundle ↓</a></div>`:''}<h3>Data source and method</h3><p>${escape(r.provenance.source)}</p><p>Planner: ${escape(r.provenance.planner)}. Coverage is measured from the binary mask; no geographic area is inferred.</p><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre>`,'RUN PROVENANCE');
 }
 $('detailBtn').onclick=()=>details(false);$('logBtn').onclick=()=>details(true);
-$('sourceBtn').onclick=()=>modal('影像与数据来源',`<p>${escape(state.session?.source||'未选择影像')}</p><p>内置建筑和飞机区域由程序几何规则生成，只用于检验交互、上下文和几何计算。不能据此报告模型准确率。</p><p>坐标以图像左上角为原点，X向右、Y向下。上下左右均为影像方向。面积占比使用整图像素为分母。</p>`,'DATA NOTES');
+$('sourceBtn').onclick=()=>modal('Image provenance',`<p>${escape(state.session?.source||'No image selected')}</p><p>Built-in masks are generated from geometric rules. They test interactions, context and pixel operations; they do not measure model accuracy.</p><p>Coordinates start at the top-left: X increases rightward and Y downward. Directions are image-relative. Whole-image coverage uses all image pixels as its denominator.</p>`,'DATA NOTES');
 async function connections(){
- try{state.status=await api('/api/status');}catch(e){return toast('本地服务不可用');}
+ try{state.status=await api('/api/status');}catch(e){return toast('The local server is unavailable.');}
  const canLive=state.status.agent_configured&&state.status.sam_configured;
- modal('实验运行方式',`<div class="mode-options"><button id="demoMode" class="${state.mode==='demo'?'selected':''}">样例演示<small>预置标注 · 真实几何计算</small></button><button id="liveMode" class="${state.mode==='live'?'selected':''}" ${!canLive?'disabled':''}>模型服务<small>${canLive?'已配置，执行时验证连通':'等待配置认知与感知服务'}</small></button></div><div class="connection-list"><div><span>认知核心</span><b>${state.status.agent_configured?'已配置（待调用验证）':'未连接'}</b></div><div><span>RemoteSAM</span><b>${state.status.sam_configured?'已配置（待调用验证）':'未连接'}</b></div><div><span>几何计算与实验存储</span><b style="color:#5d8850">本地服务可用</b></div></div><p>真实模型模式将影像发送至本地服务端配置的模型地址。API密钥不进入网页。</p><h3>连接方法</h3><p>按项目README配置GEO_AGENT_BASE_URL、GEO_AGENT_MODEL和GEO_REMOTESAM_URL，然后重启服务。配置状态不等于已通过模型测试。</p><button class="secondary" id="failureDemo">体验工具失败反馈</button>`,'RUNTIME SETTINGS');
- $('demoMode').onclick=()=>{state.mode='demo';localStorage.setItem('geoscope-mode','demo');updateMode();closeModal();toast('已切换到样例演示');};$('liveMode').onclick=()=>{state.mode='live';localStorage.setItem('geoscope-mode','live');updateMode();closeModal();toast('已切换到模型服务');};
- $('failureDemo').onclick=()=>{closeModal();run('检查工具失败时能否保留已有实验结果',true);};
- $('modalBody').insertAdjacentHTML('beforeend','<h3>服务连接检查</h3><p>工作台已接入 RemoteAgent 的规划与工具结果反馈接口，并由 Harness 校验后调用 RemoteSAM。这里只检查服务与就绪声明，不发送影像，也不证明真实推理质量。</p><button class="secondary" id="checkServices">检查服务连接</button><pre id="serviceReport" hidden></pre><p>可在项目根目录 .env 中填写配置后重启。本机访问实验室服务需具备对应网络通路。</p>');
+ modal('Runtime settings',`<div class="mode-options"><button id="demoMode" class="${state.mode==='demo'?'selected':''}">Offline demo<small>Procedural masks · Deterministic measurements</small></button><button id="liveMode" class="${state.mode==='live'?'selected':''}" ${!canLive?'disabled':''}>Model services<small>${canLive?'Configured; verified on execution':'Planner and segmentation services required'}</small></button></div><div class="connection-list"><div><span>Planner service</span><b>${state.status.agent_configured?'Configured; inference not checked':'Not configured'}</b></div><div><span>RemoteSAM</span><b>${state.status.sam_configured?'Configured; inference not checked':'Not configured'}</b></div><div><span>Measurements and local storage</span><b style="color:#5d8850">Local server available</b></div></div><p>Live mode sends images to the services configured on the Python server. API keys stay on the server.</p><h3>Connection setup</h3><p>Set GEO_AGENT_BASE_URL, GEO_AGENT_MODEL and GEO_REMOTESAM_URL as described in the README, then restart. Configuration does not establish successful inference.</p><button class="secondary" id="failureDemo">Try a controlled failure</button>`,'RUNTIME SETTINGS');
+ $('demoMode').onclick=()=>{state.mode='demo';localStorage.setItem('geoscope-mode','demo');updateMode();closeModal();toast('Switched to offline demo.');};$('liveMode').onclick=()=>{state.mode='live';localStorage.setItem('geoscope-mode','live');updateMode();closeModal();toast('Switched to live model services.');};
+ $('failureDemo').onclick=()=>{closeModal();run('Test preservation of earlier results after a controlled tool failure.',true);};
+ $('modalBody').insertAdjacentHTML('beforeend','<h3>Service connection checks</h3><p>The workbench validates RemoteAgent plans before calling RemoteSAM and returns tool feedback to the planner. These checks inspect service availability and readiness declarations without sending images; they do not evaluate inference quality.</p><button class="secondary" id="checkServices">Check connections</button><pre id="serviceReport" hidden></pre><p>Configure .env in the project root, then restart. Your machine must be able to reach the configured services.</p>');
  $('checkServices').onclick=async()=>{
-  const button=$('checkServices'),box=$('serviceReport');button.disabled=true;box.hidden=false;box.textContent='正在检查，最多约十秒…';
-  try{const report=await api('/api/check-services',{});box.textContent=`认知核心：${report.agent.message}\nRemoteSAM：${report.sam.message}\n\n${report.note}`;}
+  const button=$('checkServices'),box=$('serviceReport');button.disabled=true;box.hidden=false;box.textContent='Checking service availability…';
+  try{const report=await api('/api/check-services',{});box.textContent=`Planner service：${report.agent.message}\nRemoteSAM：${report.sam.message}\n\n${report.note}`;}
   catch(e){box.textContent=e.message;}finally{button.disabled=false;}
  };
 }
 $('connectionBtn').onclick=connections;
-$('aboutBtn').onclick=()=>modal('让一个问题，成为可复查的实验',`<p>观域 GeoMaskLab 是辅助研究者提取、检查和复核像素结果的工作台。</p><h3>建议体验顺序</h3><p>选择影像 → 框选研究区 → 选择快速或分块细化模式 → 提取目标 → 查看候选区域与统计 → 下载实验报告。也可用“批量实验”处理多张影像。</p><h3>类别与质量</h3><p>建筑、飞机为重点应用；道路、水体、植被、船舶为实验功能。分块细化可能改善小目标，也可能产生误检，名称不保证更高精度。所有模型结果都需要人工复核。</p><h3>目前已经能做什么</h3><p>真实影像上传、RemoteAgent任务规划、Harness校验、RemoteSAM分割、确定性几何统计、结果复核、上下文继承、版本恢复、批量运行和产物导出。</p><h3>当前边界</h3><p>演示模式使用预置标注，不代表真实模型精度；模型模式需要实际服务连通。候选区域按最终范围内的蒙版计算。像素面积不是地理面积，验证检查也不等于语义或边界正确。</p><p>实验文件保存在本机experiments目录。刷新页面或重启服务后可恢复实验，也可从历史记录重新打开。</p>`,'ABOUT THE PROTOTYPE');
+$('aboutBtn').onclick=()=>modal('Turn a question into a traceable experiment',`<p>GeoMaskLab helps researchers segment images, inspect masks and preserve evidence for review.</p><h3>Suggested workflow</h3><p>Choose an image → select a scope → segment one target → inspect components and coverage → record a review → export the evidence. Use offline region analysis to investigate saved masks without inference.</p><h3>Categories and quality</h3><p>Buildings and aircraft are the primary use cases. Roads, water, vegetation and ships remain experimental. Tiled refinement can change omissions and false positives; it does not guarantee greater accuracy. Review all model outputs.</p><h3>Supported operations</h3><p>RGB uploads, bounded task planning, validated segmentation, deterministic measurements, versioned results, review, evidence handoff, offline region analysis and small sequential batches.</p><h3>Scope and limitations</h3><p>Offline examples test software behavior rather than model accuracy. Live mode requires compatible services. Components are candidates, not verified object counts. Pixel measurements are not geographic area, and integrity checks do not establish semantic correctness.</p><p>Experiments are stored in the local experiments directory and can be restored after a page reload or server restart.</p>`,'ABOUT THE PROTOTYPE');
 
 async function init(){
  try{
@@ -416,6 +416,6 @@ async function init(){
   if(saved){try{await showSession(await api('/api/session/'+encodeURIComponent(saved)));return;}catch(e){localStorage.removeItem('geoscope-session');}}
   await newExperiment('urban');
  }
- catch(e){modal('本地服务尚未启动','<p>请按项目 README 的启动说明运行本地服务，再打开 http://127.0.0.1:4180。</p>');}
+ catch(e){modal('Local server not running','<p>Start the local server as described in the README, then open http://127.0.0.1:4180.</p>');}
 }
 init();

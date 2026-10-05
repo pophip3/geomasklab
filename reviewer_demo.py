@@ -29,12 +29,12 @@ def run_demo(output):
              patch.object(server, 'SESSIONS', {}), \
              patch.object(server, 'post_json', side_effect=RuntimeError('Offline demo attempted a model call')):
             for sample, jobs in [
-                ('urban', [('whole','提取全图建筑',None,75350),
-                           ('right','改成右侧建筑',None,37350),
-                           ('left_branch','改成左侧建筑',None,38000),
-                           ('roi','提取全图框选区域内的建筑',
+                ('urban', [('whole','Extract buildings in the whole image.',None,75350),
+                           ('right','Extract buildings in the right half.',None,37350),
+                           ('left_branch','Extract buildings in the left half.',None,38000),
+                           ('roi','Extract buildings in the selected region.',
                             {'xyxy':[80,50,280,250],'source':'drawn','image_size':[800,600]},12850)]),
-                ('airport', [('aircraft','提取全图飞机',None,fixture('airport')[1].histogram()[255])])
+                ('airport', [('aircraft','Extract aircraft in the whole image.',None,fixture('airport')[1].histogram()[255])])
             ]:
                 s = server.SESSIONS[server.new_session(sample)['id']]
                 parent = None
@@ -72,7 +72,7 @@ def run_demo(output):
 
 
 def main():
-    parser=argparse.ArgumentParser(description='Offline GeoScope reviewer workflow: five reproducible tiny examples.')
+    parser=argparse.ArgumentParser(description='Offline GeoMaskLab reviewer workflow: five reproducible tiny examples.')
     parser.add_argument('--output',type=Path,default=Path(__file__).parent/'reviewer-output')
     args=parser.parse_args()
     try: run_demo(args.output)

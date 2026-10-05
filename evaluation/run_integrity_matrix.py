@@ -50,7 +50,7 @@ def run_matrix():
                               'model':{'checkpoint_sha256':'SIMULATED-EXACT-FIXTURE'}}
                         started=time.perf_counter()
                         with patch.object(WorkbenchAgent,'_run_llm',model_response),patch.object(server,'post_json',return_value=fake):
-                            result=server.run_task(session,{'query':'把非建筑的部分标注出来' if invert else '提取建筑',
+                            result=server.run_task(session,{'query':'Extract non-buildings.' if invert else 'Extract buildings.',
                                                            'mode':'live','scope':side,'roi':roi})
                         accepted=[]
                         for y in range(height):

@@ -7,18 +7,18 @@ STATES = {'pending', 'accepted', 'rejected'}
 
 def initial_review():
     return {'schema': SCHEMA, 'state': 'pending', 'events': [],
-            'notice': '人工自报复核，未经身份认证；不等同真值、精度评测或边界修正。'}
+            'notice': 'Self-reported review without identity authentication; not ground truth, accuracy evaluation or boundary correction.'}
 
 
 def append_review(current, payload, *, at, run_id, image_bytes, mask_bytes):
     decision = payload.get('decision')
     if not isinstance(decision, str) or decision not in STATES:
-        raise ValueError('复核状态须为 pending、accepted 或 rejected')
+        raise ValueError('Review decision must be pending, accepted or rejected.')
     reviewer, note = payload.get('reviewer'), payload.get('note')
     if not isinstance(reviewer, str) or not reviewer.strip() or len(reviewer) > 100:
-        raise ValueError('请填写不超过100字的复核人标识')
+        raise ValueError('Enter a reviewer label of no more than 100 characters.')
     if not isinstance(note, str) or not note.strip() or len(note) > 2000:
-        raise ValueError('请填写不超过2000字的复核依据或退回原因')
+        raise ValueError('Enter a review rationale of no more than 2,000 characters.')
     review = {**initial_review(), **(current or {})}
     event = {'decision': decision, 'reviewer': reviewer.strip(), 'note': note.strip(),
              'at': at, 'run_id': run_id,

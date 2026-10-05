@@ -12,30 +12,30 @@ MAX_IMPORT_BYTES = 12 * 1024 * 1024
 def prepare_import(payload):
     """Validate operational metadata before creating any session directory."""
     if len(payload) > MAX_IMPORT_BYTES:
-        raise ValueError('实验包不能超过12MB')
+        raise ValueError('Evidence bundles must be 12 MB or smaller.')
     try:
         facts, files = load_verified_bundle(payload)
         result = json.loads(files['result.json'])
         if not re.fullmatch(r'[a-f0-9]{12}', result['id']):
-            raise ValueError('实验编号不合法')
+            raise ValueError('Invalid run ID.')
         if result['status'] not in ('completed', 'needs_review') or result['mode'] not in ('demo', 'live'):
-            raise ValueError('仅支持含有效分割结果的实验包')
+            raise ValueError('Only bundles with a valid segmentation result are supported.')
         if result['task']['target'] not in ('building', 'aircraft', 'road', 'water', 'tree', 'ship'):
-            raise ValueError('实验包目标类别不支持')
+            raise ValueError('Unsupported target in the evidence bundle.')
         for key in ('query', 'message', 'created_at'):
             if not isinstance(result[key], str) or len(result[key]) > 20000:
-                raise ValueError('实验包文本字段不合法')
+                raise ValueError('Invalid text field in the evidence bundle.')
         if type(result['duration_ms']) not in (int, float) or not math.isfinite(result['duration_ms']) or result['duration_ms'] < 0:
-            raise ValueError('实验耗时不合法')
+            raise ValueError('Invalid recorded duration.')
         for key in ('planner', 'source', 'perception'):
             if not isinstance(result['provenance'][key], str):
-                raise ValueError('实验来源字段不合法')
+                raise ValueError('Invalid provenance field.')
         for key in ('task_options', 'service_metadata', 'agent_decision'):
             if result.get(key) is not None and not isinstance(result[key], dict):
-                raise ValueError('实验元数据字段不合法')
+                raise ValueError('Invalid metadata field.')
         trace = json.loads(files['run_log.json'])
         if not isinstance(trace, list) or len(trace) > 1000 or any(not isinstance(e, dict) for e in trace):
-            raise ValueError('实验日志不合法')
+            raise ValueError('Invalid execution log.')
         imported = deepcopy(result)
         imported.pop('mask_cache_key', None)
         imported['parent_run_id'] = None
@@ -50,4 +50,4 @@ def prepare_import(payload):
         }
         return imported, files, facts
     except (KeyError, TypeError, AttributeError) as error:
-        raise ValueError('实验包结构不支持或不完整') from error
+        raise ValueError('Unsupported or incomplete evidence-bundle structure.') from error

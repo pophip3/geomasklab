@@ -69,7 +69,7 @@ class V07AgentContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'session_ids'):
             server.run_batch({'session_ids': [{}, self.session['id']], 'query': '批量提取飞机'})
         other = server.SESSIONS[server.new_session('airport')['id']]
-        with self.assertRaisesRegex(ValueError, '共同的目标'):
+        with self.assertRaisesRegex(ValueError, 'target shared'):
             server.run_batch({'session_ids': [self.session['id'], other['id']],
                               'query': '把同一任务应用到这些影像', 'mode': 'demo'})
 
@@ -92,7 +92,7 @@ class V07AgentContractTests(unittest.TestCase):
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
             result = server.run_task(self.session, {'query': '高精度提取飞机', 'mode': 'live'})
         self.assertEqual(result['status'], 'failed')
-        self.assertIn('未确认', result['message'])
+        self.assertIn('did not confirm', result['message'])
         self.assertNotIn('mask_url', result)
 
     def test_auto_mode_keeps_legacy_result_without_claiming_actual_mode(self):

@@ -96,8 +96,7 @@ class RegionAnalysisTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'busy'):self.analyze(scope='all')
         finally:self.s['lock'].release()
     def test_complement_is_retained_without_a_new_semantic_request(self):
-        with patch.object(server,'resolve_invert',return_value=True):
-            source=server.run_task(self.s,{'query':'Segment buildings in the right half','mode':'demo'})
+        source=server.run_task(self.s,{'query':'Segment non-buildings in the right half','mode':'demo'})
         with patch.object(server,'post_json',side_effect=AssertionError('No inference')):
             r=server.recalculate_region(self.s,{'run_id':source['id'],'scope':'left'})
         self.assertTrue(r['task']['invert'])

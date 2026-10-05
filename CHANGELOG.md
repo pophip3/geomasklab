@@ -1,7 +1,22 @@
 # Changelog
 
-This repository is a private research development branch. Entries describe
-implemented changes, not an approved public release or journal acceptance.
+Entries describe implemented source changes. A release candidate is a software
+artifact; it does not imply journal submission, acceptance or a permanent DOI.
+
+## 1.0.0-rc.1 — 5 October 2026
+
+- Adopted GeoMaskLab as the release name and froze the version 1.0 scope.
+- Converted application controls, generated messages/reports and reviewer examples
+  to English; retained multilingual input compatibility and original imported records.
+- Extracted task grammar and report generation into focused modules.
+- Added six English end-to-end acceptance cases, including actual complement intent,
+  positive override, scope follow-ups, strict export routing and exported text checks.
+- Added a standard MIT license, third-party notices, API/developer/service guides,
+  contribution/security guidance, an ordered submission checklist and archive drafts.
+- Added pinned minimal reviewer dependencies. Raw evaluation images, private service
+  credentials and model weights remain outside the source distribution.
+- Kept the original frozen model study unchanged. Creator/contact metadata, permanent
+  DOI, additional human review and independent model installation are not claimed.
 
 ## 0.9.0-dev.3 — 5 October 2026
 

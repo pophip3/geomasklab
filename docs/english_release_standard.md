@@ -74,6 +74,9 @@ Raw evaluation images remain at their original pixel dimensions.
 6. Assemble the English submission package, then check the specific current
    SoftwareX template and author guide again.
 
-The existing Chinese development interface and internal planning documents have
-not passed these gates. Prior functional tests and interoperability measurements
-do not establish completion of English-language or typography review.
+The release candidate now generates English interface labels, errors, reports
+and procedural examples. Local automated language/behavior checks have passed.
+Browser acceptance, final source-archive inspection and CI are recorded separately
+for the exact release candidate. Historical source evidence and bilingual input
+compatibility are preserved; they are not new generated English observations.
+No independent native-speaker editing service or human user study is claimed.

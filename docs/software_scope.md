@@ -121,12 +121,13 @@ benchmark against a complete competing application.
 
 ## Conditions still required for release
 
-Functional scope is now defined. Release acceptance still needs complete English
-interface/comments/output review, real-user workflow acceptance, an approved
-open-source license and public immutable version, service setup reproducibility,
-and an appropriately scoped comparison with existing workflows. The frozen
-60-image prior-version semantic evaluation is retained with its limitations;
-the new spatial operation does not improve those measured model predictions.
+Version 1.0 feature scope is frozen in the English MIT-licensed release candidate.
+Local behavioral checks pass; the exact candidate commit must pass its own CI
+and source-archive reproduction. Final creator metadata, archive DOI and current
+journal-guide verification remain pending. A real-user study and independent
+external-service installation have not been performed and are not claimed.
+The frozen prior-version semantic evaluation retains its original limitations;
+the new spatial operation does not improve those measured predictions.
 See [English release standard](english_release_standard.md),
 [repository reference](softwarex_repository_reference.md), and
-[distribution plan](distribution_plan.md).
+[submission sequence](submission_requirements.md).

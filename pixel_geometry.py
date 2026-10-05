@@ -54,5 +54,5 @@ def candidate_statistics(mask, min_area_pixels=1):
             'min_area':min(areas,default=0),'max_area':max(areas,default=0),
             'mean_area':round(sum(areas)/len(areas),3) if areas else 0.0,
             'candidates':candidates,
-            'notice':'语义蒙版的连通区域只是候选目标，数量和边界需人工复核。'}
+            'notice':'Connected components are candidates; review their counts and boundaries separately.'}
 

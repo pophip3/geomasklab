@@ -61,7 +61,7 @@ class EvidenceHandoffTests(unittest.TestCase):
                                'note':'Testing persistence only, not a semantic judgement.'})
         self.assertEqual(verify_bundle(build_bundle(server.DATA/s['id']/'original.png',folder))['semantic_review_state'],'rejected')
         self.assertEqual((self.folder/'result.json').read_bytes(),source_result)
-        self.assertIn('本次导入未运行模型',(folder/'report.md').read_text(encoding='utf-8'))
+        self.assertIn('Import did not run model inference',(folder/'report.md').read_text(encoding='utf-8'))
     def test_inconsistent_resigned_metadata_does_not_create_session(self):
         def bad_roi(files):
             r=json.loads(files['result.json']);r['task']['roi']={'xyxy':[0,0,10,10]}
