@@ -1,21 +1,5 @@
 # Changelog
 
-## 1.0.0rc6
-
-- Accumulate offline batch files across separate picker selections; show filenames, sizes and the total.
-- Support removal and clearing without changing the manifest; preserve existing files on duplicate names or over-limit additions.
-- Keep upload inputs fixed while submitting; retain the list for corrections and retries.
-- Update the illustrated handoff instructions and add a browser regression with independent batch replay. Scientific calculations and evidence formats are unchanged.
-
-## 1.0.0rc5
-
-- Import a source image and target mask together from the introduction or workbench.
-- Show both file dimensions before submission; keep form entries when correcting a mismatch.
-- Keep advanced validity inputs collapsed and retain existing saved-image mask import.
-- Provide a reviewer reproduction route with fixed NAIP counts and independent CLI replay.
-- Record the author-confirmed support email. Scientific calculations and evidence formats are unchanged.
-
-
 ## 1.0.0rc4 - 6 October 2026 (unified handoff candidate)
 
 - Ship the same introduction, compact workbench, canvas controls and publication-figure exports in the wheel and fixed source archive.

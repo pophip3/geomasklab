@@ -90,34 +90,11 @@ const batchManifestExample={schema:'geomasklab-batch-manifest/1.0',samples:[{id:
 $('offlineBatchBtn').onclick=()=>{
  if(state.busy)return toast('Wait for the current task to finish.');
  stopOfflinePoll();const saved=localStorage.getItem('geomasklab-offline-batch');
- modal('Explicit offline mask batch',`<p>Upload a JSON manifest and the files it names. Each sample has explicit image, mask, target and source pairing. The CLI supports relative subdirectories; this browser uses flat filenames.</p><form id="offlineBatchForm" class="review-form"><label for="offlineManifest">Manifest · JSON</label><input type="file" id="offlineManifest" accept="application/json,.json" required><label for="offlineInputs">Input files · add the images, masks and references named in the manifest</label><input type="file" id="offlineInputs" multiple required><p class="mask-input-hint">Add files one at a time or select several together. Previous files stay in the list.</p><div class="batch-file-head"><strong id="offlineFileCount" aria-live="polite">0 files added</strong><button type="button" id="clearOfflineInputs" class="text-button" disabled>Clear list</button></div><ul id="offlineFileList" class="batch-file-list" aria-label="Files added to this batch"></ul><p id="offlineFileNotice" class="batch-file-notice" role="status" hidden></p><p class="mask-input-hint">Up to 128 files, 32 MB total. Missing or invalid sample inputs are reported individually. A running sample finishes before cooperative cancellation takes effect.</p><button id="startOfflineBatch" class="primary" type="submit">Start offline batch</button></form><details class="manifest-example"><summary>See a manifest example</summary><pre>${escape(JSON.stringify(batchManifestExample,null,2))}</pre></details>${saved?'<button id="restoreOfflineBatch" class="secondary">Restore most recent batch</button>':''}<div id="offlineBatchOutput" aria-live="polite"></div>`,'RELIABLE BATCH PROCESSING');
+ modal('Explicit offline mask batch',`<p>Upload a JSON manifest and the files it names. Each sample has explicit image, mask, target and source pairing. The CLI supports relative subdirectories; this browser uses flat filenames.</p><form id="offlineBatchForm" class="review-form"><label for="offlineManifest">Manifest · JSON</label><input type="file" id="offlineManifest" accept="application/json,.json" required><label for="offlineInputs">Explicit input files · select all named images, masks and references</label><input type="file" id="offlineInputs" multiple required><p class="mask-input-hint">Up to 128 files, 32 MB total. Missing or invalid sample inputs are reported individually. A running sample finishes before cooperative cancellation takes effect.</p><button id="startOfflineBatch" class="primary" type="submit">Start offline batch</button></form><details class="manifest-example"><summary>See a manifest example</summary><pre>${escape(JSON.stringify(batchManifestExample,null,2))}</pre></details>${saved?'<button id="restoreOfflineBatch" class="secondary">Restore most recent batch</button>':''}<div id="offlineBatchOutput" aria-live="polite"></div>`,'RELIABLE BATCH PROCESSING');
  $('modal').classList.add('wide-dialog');
- enhanceEnglishFileInputs();
- const input=$('offlineInputs'),picker=input.nextElementSibling,chosen=new Map();let uploading=false;
- const addButton=picker.querySelector('button');addButton.textContent='Add files';
- const sizeText=size=>size<1024?size+' B':size<1024*1024?(size/1024).toFixed(1)+' KB':(size/1024/1024).toFixed(1)+' MB';
- const notice=text=>{const node=$('offlineFileNotice');node.textContent=text;node.hidden=!text;};
- const renderInputs=()=>{
-  const transfer=new DataTransfer();for(const file of chosen.values())transfer.items.add(file);input.files=transfer.files;
-  picker.querySelector('span').textContent=chosen.size?chosen.size+' files added':'No files added';
-  $('offlineFileCount').textContent=chosen.size+' files added · '+sizeText([...chosen.values()].reduce((n,file)=>n+file.size,0));
-  $('offlineFileList').innerHTML=[...chosen.values()].map(file=>`<li><span>${escape(file.name)}<small>${sizeText(file.size)}</small></span><button type="button" class="text-button" data-remove-input="${escape(file.name)}" aria-label="Remove ${escape(file.name)}" ${uploading?'disabled':''}>Remove</button></li>`).join('');
-  $('offlineFileList').querySelectorAll('[data-remove-input]').forEach(button=>button.onclick=()=>{chosen.delete(button.dataset.removeInput.toLowerCase());notice('');renderInputs();});
-  addButton.disabled=uploading;input.disabled=uploading;$('offlineManifest').disabled=uploading;
-  $('offlineManifest').nextElementSibling.querySelector('button').disabled=uploading;
-  $('clearOfflineInputs').disabled=uploading||!chosen.size;
- };
- input.addEventListener('change',()=>{
-  const next=new Map(chosen),duplicates=[];
-  for(const file of input.files){const key=file.name.toLowerCase();if(next.has(key))duplicates.push(file.name);else next.set(key,file);}
-  if(next.size>128||[...next.values()].reduce((n,file)=>n+file.size,0)>32*1024*1024){notice('These files exceed the 128-file or 32 MB limit. The previous list has been kept.');renderInputs();return;}
-  chosen.clear();for(const [key,file] of next)chosen.set(key,file);
-  notice(duplicates.length?'Already added: '+duplicates.join(', ')+'. The existing files were kept. To replace a file, remove it first.':'');renderInputs();
- });
- $('clearOfflineInputs').onclick=()=>{chosen.clear();notice('');renderInputs();};renderInputs();
  if(saved)$('restoreOfflineBatch').onclick=()=>showOfflineJob(saved);
  $('offlineBatchForm').onsubmit=async event=>{
-  event.preventDefault();stopOfflinePoll();const form=event.currentTarget;$('startOfflineBatch').disabled=true;uploading=true;renderInputs();
+  event.preventDefault();stopOfflinePoll();const form=event.currentTarget;$('startOfflineBatch').disabled=true;
   try{
    const manifestFile=$('offlineManifest').files[0];if(!manifestFile)throw new Error('Choose a JSON manifest first.');if(manifestFile.size>1024*1024)throw new Error('The manifest must be 1 MB or smaller.');
    const manifest=JSON.parse(await manifestFile.text()),inputs=[...$('offlineInputs').files];
@@ -127,7 +104,7 @@ $('offlineBatchBtn').onclick=()=>{
    const job=await api('/api/offline-batch/start',{manifest,files});localStorage.setItem('geomasklab-offline-batch',job.id);
    if($('offlineBatchForm')===form)await showOfflineJob(job.id);toast('Offline batch started; the current experiment is preserved.');
   }catch(error){if($('offlineBatchForm')===form)$('offlineBatchOutput').innerHTML='<p class="comparison-empty" role="alert">'+escape(error.message)+'</p>';}
-  finally{if($('offlineBatchForm')===form){uploading=false;renderInputs();$('startOfflineBatch').disabled=false;}}
+  finally{if($('offlineBatchForm')===form)$('startOfflineBatch').disabled=false;}
  };
 };
 $('modal').addEventListener('close',stopOfflinePoll);

@@ -32,17 +32,12 @@ python -m pip install .
 geomasklab --version
 ```
 
-For independent testing, download the fixed **1.0.0rc6** wheel and source ZIP
-from the [rc6 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc6).
+For independent testing, download the fixed **1.0.0rc4** wheel and source ZIP
+from the [rc4 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4).
 The wheel includes the complete browser interface, images, CLI and JSON Schemas;
 the source ZIP supplies the matching examples and handoff instructions. After
 installing the wheel, run `geomasklab-ui` and open the local URL it prints.
-The root URL shows the introduction. Choose **Import image + mask** to select
-the source image and binary mask in one form, then **Import and view results**.
-The form shows both filenames and dimensions before import; a mismatched file
-can be replaced without losing the other entries. **Enter workbench** opens the
-working view. Start with the [reviewer reproduction](docs/reviewer_reproduction.md)
-for a credited real-image example, expected counts and second-environment replay.
+The root URL shows the introduction; **Enter workbench** opens the working view.
 The interface matches this release's [presentation guide](docs/presentation_workbench.md).
 Core calculations and all five browser workflows use the same source in both
 artifacts. Optional geo, interoperability and signing dependencies are installed
@@ -173,7 +168,7 @@ replay; they do not replace independent semantic evaluation.
 The earlier fixed rc3 source rerun passed 271 of 272 tests. One native file-symlink
 test was skipped because the Windows account could not create file symlinks.
 The [release validation summary](docs/release_validation.md) distinguishes the
-current rc5 handoff candidate from the historical rc3 baseline. The rc6 release
+current rc4 handoff candidate from the historical rc3 baseline. The rc4 release
 provides its own artifact hashes and current-commit technical acceptance. An
 [independent handoff walkthrough](docs/independent_handoff.md) and empty
 record sheet are ready for a colleague; a [Chinese handoff guide](docs/independent_handoff_zh.md)
@@ -204,5 +199,3 @@ record source attribution and separate image, dataset and dependency terms.
 For reproducible citation, record the software version and exact commit. Confirmed
 Confirmed creator metadata is in CITATION.cff; an archival DOI remains pending.
 Use the [issue tracker](https://github.com/pophip3/geomasklab/issues) for support.
-
-Software support: Yun Xing, Hohai University — [2416010301@hhu.edu.cn](mailto:2416010301@hhu.edu.cn).
