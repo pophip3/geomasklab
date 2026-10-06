@@ -1,13 +1,13 @@
 # GeoMaskLab independent release handoff
 
 Ask a colleague who did not develop GeoMaskLab to follow this path using the
-public rc5 release and its documentation. Record failures and any author help.
+public rc6 release and its documentation. Record failures and any author help.
 Successful independent completion is a separate result from automated testing.
 
 ## Obtain and install the release
 
 Use Python 3.10 or newer. Download the source ZIP, wheel and `SHA256SUMS.txt`
-from [v1.0.0rc5](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc5).
+from [v1.0.0rc6](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc6).
 Compare their digests using `Get-FileHash -Algorithm SHA256` on PowerShell,
 `sha256sum` on Linux or `shasum -a 256` on macOS. Extract the source ZIP.
 
@@ -15,7 +15,7 @@ Create a new environment beside the downloaded files. On Windows PowerShell:
 
 ```powershell
 python -m venv ui-env
-.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
+.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc6-py3-none-any.whl
 .\ui-env\Scripts\geomasklab.exe --version
 .\ui-env\Scripts\geomasklab-ui.exe --port 4180
 ```
@@ -24,7 +24,7 @@ On Linux or macOS:
 
 ```sh
 python3 -m venv ui-env
-./ui-env/bin/python -m pip install ./geomasklab-1.0.0rc5-py3-none-any.whl
+./ui-env/bin/python -m pip install ./geomasklab-1.0.0rc6-py3-none-any.whl
 ./ui-env/bin/geomasklab --version
 ./ui-env/bin/geomasklab-ui --port 4180
 ```
@@ -76,7 +76,7 @@ On Windows PowerShell:
 
 ```powershell
 python -m venv cli-env
-.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
+.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc6-py3-none-any.whl
 .\cli-env\Scripts\python.exe -I -m geomasklab --version
 .\cli-env\Scripts\python.exe -I -m geomasklab verify .\replay\selected-region-evidence.zip
 .\cli-env\Scripts\python.exe -I -m geomasklab verify-comparison .\replay\comparison.zip
@@ -109,7 +109,11 @@ paths below to that directory. Retain the earlier outputs and failed record.
 
 For a browser cancellation attempt, expand **More**, use **Offline batch**, upload
 `five-step-output/batch-manifest.json` and all available files named by that
-   manifest. They are in `five-step-output/inputs`. Do not supply the deliberately
+manifest. They are in `five-step-output/inputs`. Use **Add files** once or in
+several selections; earlier additions remain in the visible list. Check all five
+PNG filenames before starting. Use **Remove** for one file or **Clear list** to
+start over. A repeated filename keeps the existing file; remove it before adding
+a replacement. Do not supply the deliberately
 missing file. While the batch is running, request cancellation. It is cooperative:
 a sample may finish computing before cancellation takes effect. If the batch
 finishes too quickly to cancel, record "cancellation not observed"; do not claim

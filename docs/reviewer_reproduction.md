@@ -17,7 +17,7 @@ Windows PowerShell:
 
 ```powershell
 python -m venv ui-env
-.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
+.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc6-py3-none-any.whl
 .\ui-env\Scripts\geomasklab.exe --version
 .\ui-env\Scripts\geomasklab-ui.exe --port 4180
 ```
@@ -26,7 +26,7 @@ macOS/Linux:
 
 ```sh
 python3 -m venv ui-env
-./ui-env/bin/python -m pip install ./geomasklab-1.0.0rc5-py3-none-any.whl
+./ui-env/bin/python -m pip install ./geomasklab-1.0.0rc6-py3-none-any.whl
 ./ui-env/bin/geomasklab --version
 ./ui-env/bin/geomasklab-ui --port 4180
 ```
@@ -77,7 +77,7 @@ outside the source tree. Store your two exported ZIP copies in `replay`.
 
 ```powershell
 python -m venv cli-env
-.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
+.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc6-py3-none-any.whl
 .\cli-env\Scripts\python.exe -I -m geomasklab verify .\replay\selected-region-evidence.zip
 .\cli-env\Scripts\python.exe -I -m geomasklab verify-comparison .\replay\comparison.zip
 ```

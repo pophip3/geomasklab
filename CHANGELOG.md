@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0rc6
+
+- Accumulate offline batch files across separate picker selections; show filenames, sizes and the total.
+- Support removal and clearing without changing the manifest; preserve existing files on duplicate names or over-limit additions.
+- Keep upload inputs fixed while submitting; retain the list for corrections and retries.
+- Update the illustrated handoff instructions and add a browser regression with independent batch replay. Scientific calculations and evidence formats are unchanged.
+
 ## 1.0.0rc5
 
 - Import a source image and target mask together from the introduction or workbench.

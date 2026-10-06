@@ -4,22 +4,22 @@
 
 ## 下载与启动
 
-从 [v1.0.0rc5 发布页面](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc5) 的 Assets 下载：
+从 [v1.0.0rc6 发布页面](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc6) 的 Assets 下载：
 
-- `geomasklab-1.0.0rc5-py3-none-any.whl`：完整安装包。
-- `GeoMaskLab-1.0.0rc5-source.zip`：相同版本的源码、真实影像示例和交接说明。
+- `geomasklab-1.0.0rc6-py3-none-any.whl`：完整安装包。
+- `GeoMaskLab-1.0.0rc6-source.zip`：相同版本的源码、真实影像示例和交接说明。
 - `SHA256SUMS.txt`：核对下载文件。
 
 安装 Python 3.10 或更新版本，把文件放在新的可写目录，解压源码 ZIP。在此目录打开 PowerShell：
 
 ```powershell
 python -m venv ui-env
-.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
+.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc6-py3-none-any.whl
 .\ui-env\Scripts\geomasklab.exe --version
 .\ui-env\Scripts\geomasklab-ui.exe --port 4180
 ```
 
-版本应为 `1.0.0rc5`。打开终端显示的 `http://127.0.0.1:4180`，先看到介绍首页。
+版本应为 `1.0.0rc6`。打开终端显示的 `http://127.0.0.1:4180`，先看到介绍首页。
 点击 **Enter workbench** 进入工作台，**Overview** 返回首页。
 保持终端运行；停止时按 Ctrl+C。端口被占用可改成 `--port 4182`。
 安装包包含网页和图片，不需要另装前端工具。实验保存在运行目录下的 `experiments`，后续启动请使用同一目录。
@@ -43,7 +43,7 @@ python -m venv ui-env
 
 ```powershell
 python -m venv cli-env
-.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
+.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc6-py3-none-any.whl
 .\cli-env\Scripts\python.exe -I -m geomasklab verify .\replay\selected-region-evidence.zip
 .\cli-env\Scripts\python.exe -I -m geomasklab verify-comparison .\replay\comparison.zip
 ```
@@ -52,7 +52,7 @@ python -m venv cli-env
 
 ## 批量与反馈
 
-按 [完整交接说明](independent_handoff.md) 的 **Exercise failure isolation and recovery** 生成批量样本，然后在 **More → Offline batch** 上传清单和输入。保留故意缺失的样本，观察失败隔离，尝试取消及 **Verify & resume**。如果任务过快无法取消，记录“未观察到取消”。
+按 [完整交接说明](independent_handoff.md) 的 **Exercise failure isolation and recovery** 生成批量样本，然后在 **More → Offline batch** 上传清单。点击 **Add files**，可逐个或分次添加输入文件；已添加文件会保留在清单中。确认五个 PNG 均在列表中，再开始批处理。**Remove** 移除单个文件，**Clear list** 清空输入列表。重选同名文件不会覆盖原文件；替换时先移除原文件。保留故意缺失的样本，观察失败隔离，尝试取消及 **Verify & resume**。如果任务过快无法取消，记录“未观察到取消”。
 
 复制并填写 [handoff_record.csv](handoff_record.csv)。测试者可用 P01 代号，记录操作系统、Python 版本、命令或动作、实际输出、卡点和作者帮助。重试另加一行，不覆盖失败记录。
 交回记录表、原始报错和导出 ZIP。未参与开发的同学实际完成后才能记录真人交接通过。

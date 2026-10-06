@@ -32,8 +32,8 @@ python -m pip install .
 geomasklab --version
 ```
 
-For independent testing, download the fixed **1.0.0rc5** wheel and source ZIP
-from the [rc5 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc5).
+For independent testing, download the fixed **1.0.0rc6** wheel and source ZIP
+from the [rc6 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc6).
 The wheel includes the complete browser interface, images, CLI and JSON Schemas;
 the source ZIP supplies the matching examples and handoff instructions. After
 installing the wheel, run `geomasklab-ui` and open the local URL it prints.
@@ -173,7 +173,7 @@ replay; they do not replace independent semantic evaluation.
 The earlier fixed rc3 source rerun passed 271 of 272 tests. One native file-symlink
 test was skipped because the Windows account could not create file symlinks.
 The [release validation summary](docs/release_validation.md) distinguishes the
-current rc5 handoff candidate from the historical rc3 baseline. The rc5 release
+current rc5 handoff candidate from the historical rc3 baseline. The rc6 release
 provides its own artifact hashes and current-commit technical acceptance. An
 [independent handoff walkthrough](docs/independent_handoff.md) and empty
 record sheet are ready for a colleague; a [Chinese handoff guide](docs/independent_handoff_zh.md)

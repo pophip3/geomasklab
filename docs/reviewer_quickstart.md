@@ -4,8 +4,8 @@ Start with [reviewer reproduction](reviewer_reproduction.md): a fresh wheel
 installation, paired real-image import, saved region comparison and independent
 CLI replay. Use the same release for the manuscript, screenshots and review.
 
-Version 1.0.0rc5 packages the complete browser workbench and Pillow-only replay core together.
-Use the [fixed rc5 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc5)
+Version 1.0.0rc6 packages the complete browser workbench and Pillow-only replay core together.
+Use the [fixed rc6 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc6)
 for independent testing; the [handoff walkthrough](independent_handoff.md) records
 the installation, saved versions and exported evidence. After wheel installation,
 run `geomasklab-ui` and choose **Import image + mask**, **Enter workbench** or **Run an offline example**
