@@ -1,0 +1,66 @@
+/* Run against an isolated local server. PLAYWRIGHT_PATH selects the installed package. */
+const {chromium}=require(process.env.PLAYWRIGHT_PATH||'playwright');
+const assert=require('node:assert/strict');
+const fs=require('node:fs/promises');
+const path=require('node:path');
+(async()=>{
+ const output=path.resolve(process.env.GEOMASKLAB_UI_AUDIT||'ui-audit');await fs.mkdir(output,{recursive:true});
+ const browser=await chromium.launch({headless:true,channel:'msedge'});
+ const context=await browser.newContext({viewport:{width:1600,height:1100},acceptDownloads:true});
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const base=process.env.GEOMASKLAB_UI_URL||'http://127.0.0.1:4195';
+ try{
+  await page.goto(base);await page.waitForFunction(()=>typeof state!=='undefined'&&state.original&&!state.busy);
+  await page.waitForFunction(()=>{const c=document.querySelector('#landingMask');return c&&c.getContext('2d').getImageData(0,0,c.width,c.height).data.some((v,i)=>i%4===3&&v>0);});
+  assert(await page.locator('#landing').isVisible());await page.click('#pauseLanding');assert.equal(await page.locator('#pauseLanding').getAttribute('aria-pressed'),'true');
+  await page.screenshot({path:path.join(output,'landing-desktop.png'),fullPage:true});
+  await page.click('#loadSample');await page.waitForFunction(()=>state.selected?.mask_url&&!state.busy);
+  assert.equal(await page.evaluate(()=>state.mode),'demo');assert.equal(await page.evaluate(()=>state.selected.mode),'demo');
+  assert.equal(await page.locator('#resultStatus').getAttribute('data-review'),'pending');assert.equal(await page.locator('#checksPanel').getAttribute('data-integrity'),'passed');
+  assert.equal(await page.locator('#measurementDetails').getAttribute('open'),null);assert(!await page.locator('#validitySummary').isVisible());
+  await page.click('#measurementDetails>summary');assert(await page.locator('#validitySummary').isVisible());assert(await page.locator('#qualityValue').isVisible());await page.click('#measurementDetails>summary');
+  assert(!await page.locator('#capabilityNote').isVisible());await page.click('.task-settings>summary');assert(await page.locator('#qualityMode').isVisible());await page.click('.task-settings>summary');
+  await page.click('.more-tools>summary');assert(await page.locator('#offlineBatchBtn').isVisible());assert(await page.locator('#verifyPacketBtn').isVisible());await page.click('.more-tools>summary');
+  assert(!await page.locator('#ledgerTable').isVisible());await page.click('.ledger-disclosure>summary');assert(await page.locator('#ledgerTable').isVisible());await page.click('.ledger-disclosure>summary');
+  await page.waitForTimeout(300);await page.evaluate(()=>window.scrollTo(0,0));
+  await page.screenshot({path:path.join(output,'workbench-desktop.png'),fullPage:true});
+  await page.setViewportSize({width:1100,height:900});assert(await page.evaluate(()=>Math.abs(document.querySelector('.image-panel').getBoundingClientRect().top-document.querySelector('.results-panel').getBoundingClientRect().top)<2));
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));assert(await page.evaluate(()=>document.querySelector('#figureExportBtn').getBoundingClientRect().bottom<=document.querySelector('.results-body').getBoundingClientRect().bottom),'Primary export actions must fit the default results view');await page.screenshot({path:path.join(output,'workbench-medium.png'),fullPage:true});await page.setViewportSize({width:1600,height:1100});
+  const originalWidth=await page.locator('.image-panel').evaluate(e=>e.getBoundingClientRect().width);
+  await page.click('#collapseAssistant');const collapsedWidth=await page.locator('.image-panel').evaluate(e=>e.getBoundingClientRect().width);assert(collapsedWidth>originalWidth+100);
+  await page.click('#collapseResults');assert(!await page.locator('.results-panel').isVisible());await page.click('#collapseResults');
+  await page.click('#canvasFocus');assert(!await page.locator('.results-panel').isVisible());assert(!await page.locator('.conversation').isVisible());
+  await page.screenshot({path:path.join(output,'canvas-focus.png'),fullPage:true});await page.keyboard.press('Escape');assert(await page.locator('.results-panel').isVisible());await page.click('#restoreAssistant');
+  await page.click('[data-view="compare"]');assert(await page.locator('#compareControl').isVisible());await page.locator('#compareSlider').fill('30');assert.equal(await page.locator('[data-view="compare"]').getAttribute('aria-pressed'),'true');
+  await page.locator('#zoomIn').click();await page.waitForTimeout(50);const scale=await page.evaluate(()=>{const text=document.querySelector('.pixel-scale span').textContent,pixels=Number(text.match(/^[\d.]+/)[0]);return {expected:pixels*document.querySelector('#imageCanvas').getBoundingClientRect().width/state.original.naturalWidth,actual:document.querySelector('.pixel-scale-line').getBoundingClientRect().width};});assert(Math.abs(scale.expected-scale.actual)<1);
+  await page.click('#figureExportBtn');await page.selectOption('#figureLayout','triple');await page.selectOption('#figureDpi','600');
+  const exportDims=await page.locator('.figure-preview').evaluate(c=>({width:c.width,height:c.height}));assert.equal(exportDims.width,4252);
+  await page.screenshot({path:path.join(output,'figure-export-dialog.png'),fullPage:true});
+  const downloads={};for(const format of ['Png','Pdf','Svg','Config']){const [download]=await Promise.all([page.waitForEvent('download'),page.click('#figure'+format)]);downloads[format]=download.suggestedFilename();await download.saveAs(path.join(output,downloads[format]));}
+  const config=JSON.parse(await fs.readFile(path.join(output,downloads.Config),'utf8'));
+  assert.equal(config.figure.dpi,600);assert.match(config.input.image_sha256,/^[a-f0-9]{64}$/);assert.match(config.mask.sha256,/^[a-f0-9]{64}$/);
+  const recorded=await page.evaluate(()=>state.selected.metrics);assert.deepEqual(config.measurements,recorded);assert.equal(config.model_version,null);
+  await page.click('#closeModal');
+  const dataRoot=path.resolve(__dirname,'../examples/data/naip-denver');
+  await page.locator('#fileInput').setInputFiles(path.join(dataRoot,'image.png'));await page.waitForFunction(()=>state.original?.naturalWidth===512&&!state.busy);
+  await page.click('#importMaskBtn');await page.locator('#maskFile').setInputFiles(path.join(dataRoot,'mask.png'));await page.selectOption('#maskTarget','tree');await page.fill('#maskSource','NAIP 2019 Denver; repository excess-green/Otsu color baseline, not independently validated.');await page.check('#maskAligned');await page.click('#submitMaskImport');
+  await page.waitForFunction(()=>state.selected?.mode==='external'&&!state.busy);assert(await page.locator('#figureExportBtn').isEnabled());
+  assert.equal(await page.evaluate(()=>state.selected.metrics.pixel_area),142629);await page.evaluate(()=>window.scrollTo(0,0));await page.locator('#toast').waitFor({state:'hidden'});await page.screenshot({path:path.join(output,'workbench-real-naip.png'),fullPage:true});
+  await page.click('#figureExportBtn');assert.equal(await page.locator('.figure-preview').evaluate(c=>c.width),2126);
+  const [realDownload]=await Promise.all([page.waitForEvent('download'),page.click('#figurePng')]);await realDownload.saveAs(path.join(output,'real-naip-300dpi.png'));await page.click('#closeModal');
+  await page.evaluate(()=>modal('Evidence verification failed','<p>Test fixture: a modified packet was rejected.</p><pre>Recorded error details</pre>','EVIDENCE HANDOFF'));
+  assert(await page.locator('.validation-symbol').isVisible());await page.screenshot({path:path.join(output,'validation-modal.png'),fullPage:true});await page.keyboard.press('Escape');
+  await page.setViewportSize({width:390,height:844});await page.click('#homeBtn');assert(await page.locator('#enterWorkbench').isVisible());await page.screenshot({path:path.join(output,'landing-mobile.png'),fullPage:true});
+  await page.click('#enterWorkbench');await page.screenshot({path:path.join(output,'workbench-mobile.png'),fullPage:true});
+  assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Mobile page overflows horizontally');
+  await page.reload();await page.waitForFunction(()=>state.selected?.mask_url&&!state.busy);assert(!await page.locator('#landing').isVisible());
+  const saved=await page.evaluate(()=>({id:state.session.id,run:state.selected.id,count:state.session.runs.length}));
+  await page.goto(base);await page.waitForFunction(()=>state.selected?.mask_url&&!state.busy);assert(await page.locator('#landing').isVisible(),'Root URL must show the introduction even when an experiment is saved');
+  await page.evaluate(()=>{location.hash='#workbench';});await page.waitForFunction(()=>!document.querySelector('#landing').getBoundingClientRect().height);assert(await page.locator('.workspace').isVisible());
+  await page.evaluate(()=>{location.hash='#home';});await page.waitForFunction(()=>document.querySelector('#landing').getBoundingClientRect().height>0);assert(await page.locator('#enterWorkbench').isVisible());
+  await page.click('#enterWorkbench');assert.deepEqual(await page.evaluate(()=>({id:state.session.id,run:state.selected.id,count:state.session.runs.length})),saved,'Returning through the introduction must preserve the experiment');
+  await context.close();const reduced=await browser.newContext({viewport:{width:1100,height:900},reducedMotion:'reduce'}),reducedPage=await reduced.newPage();await reducedPage.goto(base+'/#home');assert.equal(await reducedPage.locator('#landingMask').evaluate(c=>getComputedStyle(c).animationName),'none');await reduced.close();
+  assert.deepEqual(errors,[]);await fs.writeFile(path.join(output,'browser-verification.json'),JSON.stringify({status:'passed',export_dimensions:exportDims,downloads,browser_errors:errors,checks:['offline example','review and integrity distinction','assistant and result collapse','canvas focus and Escape','split view','pixel scale under zoom','600 DPI PNG/PDF/SVG/config downloads','saved metric equality','real NAIP upload and external mask import','300 DPI real-image export','validation presentation','390 px mobile layout','session restoration','reduced motion']},null,2));
+  console.log('Presentation browser checks passed. Artifacts: '+output);
+ }finally{await browser.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

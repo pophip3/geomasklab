@@ -3,10 +3,13 @@ import argparse
 import hashlib
 import json
 import os
+import socket
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
+import urllib.request
 import venv
 
 
@@ -104,10 +107,45 @@ def main():
             text=True,check=True,timeout=15).stdout.strip()
         assert version==identity['version']
         checks.append('Installed console entry point')
+        with socket.socket() as listener:
+            listener.bind(('127.0.0.1', 0))
+            port = listener.getsockname()[1]
+        process = subprocess.Popen([str(python), '-I', '-m', 'workbench.launcher', '--port', str(port)],
+                                   cwd=work, env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        try:
+            for attempt in range(100):
+                if process.poll() is not None:
+                    raise RuntimeError('Installed workbench exited before readiness')
+                try:
+                    with urllib.request.urlopen(f'http://127.0.0.1:{port}/api/status', timeout=1) as response:
+                        status = json.load(response)
+                    break
+                except OSError:
+                    time.sleep(.1)
+            else:
+                raise RuntimeError('Installed workbench did not start')
+            assert status['version'] == identity['version']
+            for resource in ('index.html', 'presentation.js', 'presentation.css', 'help.html',
+                             'assets/urban.png', 'assets/airport.jpg', 'assets/naip-preview.png',
+                             'assets/naip-preview-mask.png', 'assets/naip-preview-provenance.json'):
+                with urllib.request.urlopen(f'http://127.0.0.1:{port}/' + resource, timeout=2) as response:
+                    raw = response.read()
+                assert raw, resource
+                if resource == 'index.html':
+                    assert b'presentation.js' in raw and b'presentation.css' in raw
+            assert (work / 'experiments').is_dir(), 'Installed sessions must use a writable working directory'
+            ui_script = python.parent / ('geomasklab-ui.exe' if os.name == 'nt' else 'geomasklab-ui')
+            help_result = subprocess.run([str(ui_script), '--help'], cwd=work, env=env,
+                                         capture_output=True, text=True, check=True, timeout=15)
+            assert '--data-dir' in help_result.stdout
+            checks.append('Complete installed browser assets, matching API version, writable storage and UI console entry point')
+        finally:
+            process.terminate()
+            process.communicate(timeout=10)
     report={'passed':True,'version':identity['version'],'wheel':wheel.name,
         'wheel_sha256':hashlib.sha256(wheel.read_bytes()).hexdigest(),
         'installed_core_path':identity['path'],'checks':checks,
-        'runtime_dependencies':base,'execution':'Outside checkout, isolated Python import, no model or browser server',
+        'runtime_dependencies':base,'execution':'Outside checkout, isolated imports, installed local browser server and offline CLI; no model service',
         'platform':sys.platform,'python':sys.version.split()[0]}
     if args.output:
         args.output.parent.mkdir(parents=True,exist_ok=True)

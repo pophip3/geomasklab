@@ -19,6 +19,7 @@ classifiers = [
 
 [project.scripts]
 geomasklab = "geomasklab.cli:main"
+geomasklab-ui = "workbench.launcher:main"
 
 [project.urls]
 Documentation = "https://pophip3.github.io/geomasklab/"
@@ -31,11 +32,15 @@ geo = ["rasterio>=1.3,<2", "pyproj>=3.6,<4"]
 interop = ["prov>=2,<3"]
 signing = ["cryptography>=42,<47"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+include-package-data = false
+packages = ["geomasklab", "workbench"]
+py-modules = ["_source_package"]
+package-dir = {"" = ".", geomasklab = "src/geomasklab", workbench = "workbench"}
 
 [tool.setuptools.dynamic]
 version = {attr = "geomasklab._version.VERSION"}
 
 [tool.setuptools.package-data]
 geomasklab = ["schemas/*.json"]
+workbench = ["web/*.html", "web/*.css", "web/*.js", "web/assets/*.png", "web/assets/*.jpg", "web/assets/*.json"]

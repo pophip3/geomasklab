@@ -61,7 +61,9 @@ reports, errors and new examples use English.
 
 Optional workbench modules live under `workbench/`; its compatibility adapters delegate to the src package. The server's external-mask
 creation and all measurements use that same core, preventing a separate GUI
-arithmetic implementation. The wheel excludes source-only browser assets.
+arithmetic implementation. From rc4, the wheel includes the complete workbench
+modules and browser assets. The separate `geomasklab-ui` launcher starts the
+server; importing the scientific core or running the CLI does not.
 
 Source modules have explicit boundaries, but `workbench/server.py` and `workbench/web/app.js` still
 coordinate multiple operations. Changes should be small and verified through

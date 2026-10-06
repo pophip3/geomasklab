@@ -29,9 +29,11 @@ GeoMaskLab applies these delivery principles to its smaller Python application:
 | `LICENSE`, `Licence.txt`, `THIRD_PARTY_NOTICES.md` | MIT source license, origin and external dependency boundaries |
 | `release/build_source.py`, `release/check_distribution.py` | Fixed-commit archive, file hashes and extracted-package acceptance |
 
-The software is distributed as a headless Python wheel and a separate full source
-archive. Both require Python and Pillow; the source includes browser assets and
-examples. A Python runtime is installed separately. The lightweight offline workflow
+The software is distributed as a complete Python wheel and a matching fixed source
+archive. Both contain the same core, workbench modules and browser assets.
+Run `geomasklab-ui` after installing the wheel. The source supplies the executable
+examples and handoff materials; `python quickstart.py` opens the same interface.
+Both require Python and Pillow. A Python runtime is installed separately. The lightweight offline workflow
 and external live-model installation are documented separately. A versioned source
 archive is produced from committed files only, with a `SOURCE-MANIFEST.json`
 containing the exact Git commit and per-file checksums. Development archives are

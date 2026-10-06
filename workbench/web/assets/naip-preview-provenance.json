@@ -1,0 +1,108 @@
+{
+  "schema": "geomasklab-real-example-source/1.0",
+  "dataset": "USDA NAIP distributed by USGS The National Map",
+  "dataset_doi": "https://doi.org/10.5066/F7QN651G",
+  "rights": "Public-domain NAIP imagery; credit USDA and USGS.",
+  "rights_source": "https://www.usgs.gov/centers/eros/science/usgs-eros-archive-aerial-photography-national-agriculture-imagery-program-naip",
+  "credit": "USDA-FSA-APFO / USGS The National Map",
+  "acquisition": {
+    "service_url": "https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPPlus/ImageServer",
+    "catalog_item": {
+      "OBJECTID": 30589,
+      "Name": "m_3910417_nw_13_060_20190803",
+      "MinPS": 0,
+      "MaxPS": 19.1,
+      "Category": 1,
+      "CenterX": -11685066.848351358,
+      "CenterY": 4825157.11412978,
+      "State": "CO",
+      "Year": 2019,
+      "raster_name": "m_3910417_nw_13_060_20190803",
+      "download_url": "https://earthexplorer.usgs.gov/download/options/naip/3031380",
+      "acquisition_date": 1564790400000,
+      "agency": "USDA",
+      "vendor": "USDA-FSA-APFO",
+      "resolution_value": 0.6,
+      "resolution_units": "METER",
+      "band_count": 4,
+      "sensor_type": "CNIR",
+      "projection_name": "UTM",
+      "projection_zone": "13N",
+      "datum": "NAD83"
+    },
+    "parameters": {
+      "f": "json",
+      "bbox": "503616.05128560006,4399524.633349307,503923.2512856,4399831.833349306",
+      "bboxSR": "32613",
+      "imageSR": "32613",
+      "size": "512,512",
+      "format": "tiff",
+      "pixelType": "U8",
+      "bandIds": "0,1,2",
+      "interpolation": "RSP_NearestNeighbor",
+      "mosaicRule": "{\"mosaicMethod\": \"esriMosaicLockRaster\", \"lockRasterIds\": [30589], \"mosaicOperation\": \"MT_FIRST\"}"
+    },
+    "response": {
+      "href": "https://imagery.nationalmap.gov/arcgis/rest/directories/imagery_output/USGSNAIPPlus_ImageServer/_ags_9a66ea35_a69b_44ef_8aae_b0a1eab707d9.tif",
+      "width": 512,
+      "height": 512,
+      "extent": {
+        "xmin": 503616.05128560006,
+        "ymin": 4399524.633349306,
+        "xmax": 503923.2512856,
+        "ymax": 4399831.833349306,
+        "spatialReference": {
+          "wkid": 32613,
+          "latestWkid": 32613
+        }
+      },
+      "scale": 0
+    },
+    "downloaded_at": "2026-10-05T10:55:41.098227+00:00",
+    "sha256": "b31edcf462452b2db9c21098098b2d392b64141974da85a96c4880d7a1e6144f",
+    "interpretation": "USGS service-exported RGB NAIP chip, reprojected by the service with nearest-neighbor interpolation; not original source-tile bytes."
+  },
+  "processing": [
+    "USGS exportImage: locked named catalog item, RGB bands 0/1/2, nearest-neighbor, EPSG:32613.",
+    "Lossless PNG decoding of exactly the exported GeoTIFF RGB pixels.",
+    "Reproducible excess-green/Otsu color baseline; unvalidated vegetation candidates.",
+    "Four analyst-defined WGS84 study zones; not surveyed or administrative boundaries."
+  ],
+  "georeference": {
+    "epsg": 32613,
+    "transform": [
+      0.599999999999909,
+      0.0,
+      503616.05128560006,
+      0.0,
+      -0.6000000000003638,
+      4399831.833349306
+    ],
+    "width": 512,
+    "height": 512
+  },
+  "files": {
+    "image.png": {
+      "bytes": 258996,
+      "sha256": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff"
+    },
+    "mask.png": {
+      "bytes": 26160,
+      "sha256": "2015d44080c7a14eca37ecd92286f0b58dff8716717372b8f7800ee29f4dab9d"
+    },
+    "mask.png.provider.json": {
+      "bytes": 471,
+      "sha256": "a14fc0a3d27efe82c5e8ec7abf78f7195424abf53031191e5f1c79f0263e4543"
+    },
+    "source.tif": {
+      "bytes": 787985,
+      "sha256": "b31edcf462452b2db9c21098098b2d392b64141974da85a96c4880d7a1e6144f"
+    },
+    "zones.geojson": {
+      "bytes": 4246,
+      "sha256": "0ceb553bd3febeef2026dd196bac57b21a1066721670985aa8195e1083120694"
+    }
+  },
+  "semantic_reference_labels": false,
+  "human_participants": 0
+}

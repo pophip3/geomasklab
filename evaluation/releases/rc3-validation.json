@@ -1,0 +1,203 @@
+{
+  "schema": "geomasklab-public-release-validation/1.0",
+  "checked_on": "2026-10-06",
+  "software_version": "1.0.0rc3",
+  "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227",
+  "release_url": "https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc3",
+  "artifacts": [
+    {
+      "name": "geomasklab-1.0.0rc3-py3-none-any.whl",
+      "size": 98928,
+      "sha256": "655da08682a5beaa1d327abfe4a158093c7e86fcc686483eda21fc98f26d44c8"
+    },
+    {
+      "name": "GeoMaskLab-1.0.0rc3-source.zip",
+      "size": 1695583,
+      "sha256": "f31df0f35696c22375112458d3bc8a13046140730ed52846c1a0e641fdc00f32"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 200,
+      "sha256": "93753faea6b8c9a3b158a19ad7a07e8a6e32371c196e9a08ddf042ec98bb1690"
+    }
+  ],
+  "source_files_checked": 227,
+  "tests": {
+    "total": 272,
+    "passed": 271,
+    "skipped": 1,
+    "failed": 0,
+    "command": "python -m unittest discover -s tests -p \"test_*.py\" -q",
+    "skip_reason": "The Windows account could not create a native file symlink; test_symlink_escape_rejected_when_supported was skipped."
+  },
+  "ci": {
+    "url": "https://github.com/pophip3/geomasklab/actions/runs/37327185301",
+    "jobs": [
+      {
+        "name": "minimal-install (windows-latest)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      },
+      {
+        "name": "minimal-install (macos-latest)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      },
+      {
+        "name": "minimal-install (ubuntu-latest)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      },
+      {
+        "name": "contracts (windows-latest, 3.13)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      },
+      {
+        "name": "contracts (windows-latest, 3.10)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      },
+      {
+        "name": "contracts (macos-latest, 3.10)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      },
+      {
+        "name": "contracts (ubuntu-latest, 3.13)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      },
+      {
+        "name": "contracts (macos-latest, 3.13)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      },
+      {
+        "name": "contracts (ubuntu-latest, 3.10)",
+        "conclusion": "success",
+        "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227"
+      }
+    ]
+  },
+  "fresh_virtual_environment": {
+    "passed": true,
+    "python": "3.13.9",
+    "packages": {
+      "geomasklab": "1.0.0rc3",
+      "pillow": "12.3.0",
+      "pip": "25.2"
+    },
+    "isolated_import": true,
+    "inherited_site_packages": false,
+    "replayed_packets": [
+      {
+        "case": "conditions_only",
+        "verified": true
+      },
+      {
+        "case": "prediction_and_conditions",
+        "verified": true
+      },
+      {
+        "case": "boundary_inspection",
+        "verified": true
+      },
+      {
+        "case": "cancelled_resumed_batch",
+        "verified": true
+      },
+      {
+        "case": "reference_assessment",
+        "verified": true
+      }
+    ],
+    "scope": "New virtual environment on the existing Windows host, published wheel and declared Pillow dependency; not a clean operating-system install or human handoff."
+  },
+  "real_naip": {
+    "passed": true,
+    "dataset_credit": "USDA-FSA-APFO / USGS The National Map",
+    "source_tile": "m_3910417_nw_13_060_20190803",
+    "image_size": [
+      512,
+      512
+    ],
+    "measurement": {
+      "schema": "geomasklab-validity-measurements/1.0",
+      "foreground_pixels": 105232,
+      "geometric_image_pixels": 262144,
+      "geometric_region_pixels": 262144,
+      "valid_image_pixels": 196608,
+      "valid_region_pixels": 196608,
+      "excluded_image_pixels": 65536,
+      "excluded_region_pixels": 65536,
+      "excluded_foreground_pixels": 37397,
+      "coverage_of_valid_image": 0.5352376302083334,
+      "coverage_of_valid_region": 0.5352376302083334
+    },
+    "independent_comparison": {
+      "common_pixels": 25600,
+      "shared_foreground_pixels": 17947,
+      "removed_pixels": 944,
+      "added_pixels": 80,
+      "changed_pixels": 1024,
+      "saved_total_delta_pixels": -87205,
+      "common_domain_delta_pixels": -864,
+      "excluded_domain_delta_pixels": -86341
+    },
+    "component_inspection": {
+      "component_count": 97,
+      "selected_component_count": 6,
+      "selected_foreground_pixels": 17775,
+      "source_mask_modified": false
+    },
+    "batch": {
+      "status": "completed_with_errors",
+      "completed_count": 3,
+      "failed_count": 1,
+      "aggregate": {
+        "coverage_basis": "foreground / selected valid region",
+        "defined_coverage_samples": 2,
+        "undefined_coverage_samples": 1,
+        "macro_mean_coverage": 0.5087229410807292,
+        "micro_weighted_coverage": 0.51402587890625,
+        "summed_foreground_pixels": 168436,
+        "summed_valid_region_pixels": 327680,
+        "failed_samples_included": false
+      },
+      "verified_resume_preserved_completed_artifacts": true,
+      "offline_packet_replay": true
+    },
+    "inference_performed": false,
+    "semantic_accuracy_measured": false,
+    "human_participants": 0
+  },
+  "historical_compatibility": {
+    "passed": true,
+    "software_version": "1.0.0rc3",
+    "source_commit": "ab7494726637b8b9f34229f41db88c5a900fc227",
+    "historical_prediction_commit": "46ffbbb1898a4b5e8f2ac5974f0bdabace3a94bd",
+    "images": 60,
+    "historical_bundles_verified": 180,
+    "derived_count_and_source_checks": 120,
+    "new_model_calls": 0,
+    "human_participants": 0,
+    "scope": "Historical compatibility and current-core recalculation; no new model-accuracy experiment."
+  },
+  "historical_receipt_rerun_in_this_review": false,
+  "observed_human_handoff": {
+    "participants": 0,
+    "status": "pending"
+  },
+  "publication_status": {
+    "stable_release": false,
+    "archival_doi": null
+  },
+  "presentation_in_fixed_artifacts": false,
+  "limitations": [
+    "Software arithmetic and replay consistency are not semantic accuracy.",
+    "Fresh virtual environment on an existing host; not a clean OS installation.",
+    "Self-reported review and origin metadata require separately trusted evidence."
+  ],
+  "passed": true
+}

@@ -1,6 +1,11 @@
 # Reviewer quick start
 
-Version 1.0.0rc3 provides an installable Pillow-only replay core and optional source workbench.
+Version 1.0.0rc4 packages the complete browser workbench and Pillow-only replay core together.
+Use the [fixed rc4 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4)
+for independent testing; the [handoff walkthrough](independent_handoff.md) records
+the installation, saved versions and exported evidence. After wheel installation,
+run `geomasklab-ui` and choose **Enter workbench** or **Run an offline example**
+on the introduction page. The scientific CLI remains server-independent.
 
 ## Independent core and real-image example
 
@@ -76,7 +81,7 @@ observations, real model predictions or real-image segmentation ground truth.
 
 ## Interactive walkthrough
 
-1. Click **Extract right-half buildings**, then **Extract buildings in the left half.**. The displayed values are
+1. On the introduction choose **Run an offline example**. In the workbench use the quick target/scope controls to run buildings in the right half, then left half. The displayed values are
    37,350 and 38,000 pixels respectively; coverage uses the full image denominator.
 2. Click the earlier result version to restore it. The next query uses that
    selected version as its parent rather than silently mixing result contexts.
@@ -118,7 +123,7 @@ semantic performance. Changes to model behavior require development images and
 a new frozen evaluation before making new performance claims.
 ## Offline investigation of a saved mask
 
-After selecting a mask result, click **Recalculate region (offline)**. Choose
+After selecting a mask result, expand **Measurement details** and click **Region & validity**. Choose
 the whole image, one image half, or the current rectangle ROI. To use another
 rectangle, draw it on the image before opening the dialog. The target and
 complement remain fixed; this operation creates a separate result version with

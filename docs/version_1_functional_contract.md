@@ -1,13 +1,13 @@
 # Version 1.0 functional contract
 
-Decision date: 5 October 2026. Current software candidate: 1.0.0rc3.
+Core decision date: 5 October 2026. Unified handoff candidate: 1.0.0rc4.
 
 The software freeze target consists of five connected operations: declared pixel
 validity and realized configuration, fair result comparison, reliable manifest-based
 batch execution, candidate-component inspection and one shared-core browser workflow.
 All five operations are implemented in the core, CLI and source workbench.
 Automated acceptance must use the same fixed candidate artifacts. Actual human
-handoff testing, confirmed creators and stable-release metadata remain separate
+handoff testing and stable-release metadata remain separate
 release gates; implementation alone does not establish those outcomes.
 
 ## Five connected operations
@@ -29,7 +29,8 @@ fixture, not an independent segmentation-accuracy result.
 Segmentation mask -> explicit spatial domain and coverage denominators ->
 deterministic pixel measurements -> portable evidence -> offline replay.
 
-The reusable core installs independently of the source-only browser workbench.
+The wheel includes the reusable core and complete browser workbench; the core
+can run without starting the browser server.
 It requires Pillow and runs without model services. Target accuracy, authenticated
 origin and human workflow value require separate evidence.
 

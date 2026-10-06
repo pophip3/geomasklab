@@ -10,9 +10,12 @@ retains only launch/demo entry points and the local-package bootstrap.
 
 Install from this checkout with `python -m pip install .`, or install a built
 wheel with `python -m pip install /path/to/geomasklab-VERSION-py3-none-any.whl`.
-The project has not yet been published on PyPI. The wheel contains the headless
-core and its schemas. Start the optional browser application from the source
-distribution with `python quickstart.py`.
+The project has not yet been published on PyPI. From rc4, the wheel contains
+the headless core, schemas and complete browser interface. Start the installed
+interface with `geomasklab-ui` or `python -m workbench.launcher`. It stores
+experiments in the working directory; use `--data-dir` to choose another location.
+The same interface can be started from the source ZIP with `python quickstart.py`.
+The CLI imports no browser server unless the separate UI launcher is invoked.
 
 ```sh
 geomasklab create --image image.png --mask mask.png --target building --source "My exported mask" --aligned --output evidence.zip

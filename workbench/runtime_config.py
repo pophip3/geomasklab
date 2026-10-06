@@ -6,7 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_settings(path=None):
-    path = Path(path) if path else ROOT / '.env'
+    path = Path(path) if path else (ROOT if (ROOT / 'src/geomasklab').is_dir() else Path.cwd()) / '.env'
     if not path.is_file():
         return
     for number, raw in enumerate(path.read_text(encoding='utf-8-sig').splitlines(), 1):

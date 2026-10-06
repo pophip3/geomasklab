@@ -28,8 +28,9 @@ load_settings()
 
 ROOT = Path(__file__).resolve().parents[1]
 WEB = ROOT / 'workbench/web'
-DATA = ROOT / 'experiments'
-DATA.mkdir(exist_ok=True)
+DATA = Path(os.environ.get('GEO_DATA_DIR', str(
+    ROOT / 'experiments' if (ROOT / 'src/geomasklab').is_dir() else Path.cwd() / 'experiments'))).resolve()
+DATA.mkdir(parents=True, exist_ok=True)
 SESSIONS = {}
 BATCHES = {}
 LOCK = threading.RLock()

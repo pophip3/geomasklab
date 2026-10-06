@@ -1,6 +1,6 @@
 # Release and archival preparation
 
-The current software is a release candidate, `1.0.0rc3`. Automated software
+The current software is a release candidate, `1.0.0rc4`. Automated software
 checks and real-data arithmetic are distinct from confirmed creator attribution
 and observed human-study results.
 
@@ -28,14 +28,14 @@ and observed human-study results.
    is not an archive.
 
 `prepare_metadata.py` writes both complete files from real confirmed facts;
-neither creator names nor a DOI have been invented. Until that input exists,
-the root citation/archive files and stable tag remain pending. The confirmed
-creator template is deliberately not valid submission metadata by itself.
+the root CITATION.cff now records the author-confirmed Yun Xing, Hohai University
+and ORCID 0009-0009-1746-5019. A stable tag and archival DOI remain pending.
+The creator template remains an input example, not an observed human result.
 
 The compatible core format remains `geoscope-evidence/1.0`; this is a legacy
 format identifier, not a competing software name. All new assessment/signature
-formats use `geomasklab-*`. Source-only workbench code is under `workbench/`;
-the reviewed installable scientific package is `src/geomasklab/`.
+formats use `geomasklab-*`. The wheel packages `workbench/` and its complete local assets alongside
+`src/geomasklab/`. Both wheel and fixed source ZIP ship the same presentation.
 
 References: [CFF specification](https://github.com/citation-file-format/citation-file-format),
 [Zenodo metadata documentation](https://developers.zenodo.org/#deposit-metadata).

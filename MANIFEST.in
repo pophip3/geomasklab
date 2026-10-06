@@ -1,0 +1,11 @@
+include _source_package.py quickstart.py reviewer_demo.py requirements*.txt CITATION.cff
+include LICENSE Licence.txt THIRD_PARTY_NOTICES.md .env.example
+graft workbench/web
+graft examples
+graft docs
+graft bin
+graft release
+graft evaluation
+graft tests
+prune evaluation/images
+global-exclude __pycache__ *.py[cod] *.log *.zip *.whl

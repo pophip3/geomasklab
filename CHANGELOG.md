@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0rc4 - 6 October 2026 (unified handoff candidate)
+
+- Ship the same introduction, compact workbench, canvas controls and publication-figure exports in the wheel and fixed source archive.
+- Add `geomasklab-ui` with a writable experiment directory; the scientific CLI remains server-independent and Pillow-only.
+- Include confirmed Yun Xing / Hohai University / ORCID citation metadata and independent handoff instructions.
+- Retain the rc3 scientific calculations and evidence contracts. Independent human completion and an archival DOI remain pending.
+
 ## 1.0.0rc3 - 5 October 2026 (software candidate)
 
 - Complete the five connected mask-evidence operations with shared core/CLI/browser calculations.

@@ -1,0 +1,22 @@
+# Author and ORCID confirmed by 邢芸.
+cff-version: 1.2.0
+message: "If you use GeoMaskLab, cite the software version used in your work."
+type: software
+title: "GeoMaskLab: Replayable measurements and portable evidence for segmentation masks"
+authors:
+  - family-names: "Xing"
+    given-names: "Yun"
+    affiliation: "Hohai University"
+    orcid: "https://orcid.org/0009-0009-1746-5019"
+version: "1.0.0rc4"
+date-released: "2026-10-06"
+license: MIT
+url: "https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4"
+repository-code: "https://github.com/pophip3/geomasklab"
+abstract: "GeoMaskLab records images, binary masks, explicit analysis domains and measurements in replayable evidence packages, with a shared Python core, command-line interface and browser workbench."
+keywords:
+  - remote sensing
+  - binary masks
+  - explicit analysis domains
+  - reproducible measurements
+  - evidence replay

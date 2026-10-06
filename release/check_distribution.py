@@ -88,7 +88,8 @@ def main():
                 raise ValueError('English browser interface missing')
             if not all(identifier in page for identifier in ('inspectComponentsBtn','offlineBatchBtn','verifyPacketBtn')):
                 raise ValueError('Connected browser workflow controls are missing')
-            for asset in ('offline-tools.js','offline-tools.css'):
+            for asset in ('offline-tools.js','offline-tools.css','presentation.js','presentation.css',
+                          'assets/naip-preview.png','assets/naip-preview-mask.png','assets/naip-preview-provenance.json'):
                 with urllib.request.urlopen(f'http://127.0.0.1:{port}/'+asset,timeout=2) as response:
                     if not response.read():raise ValueError('New workflow asset is missing: '+asset)
             with urllib.request.urlopen(f'http://127.0.0.1:{port}/help.html', timeout=2) as response:

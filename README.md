@@ -9,7 +9,7 @@ GeoMaskLab binds a binary mask to its image, target, spatial scope, declared val
 pixels and coverage denominators. Compare results under explicit conditions,
 inspect clipping boundaries, process paired samples reliably and let a colleague
 replay the measurement offline. The headless core requires
-only **Python 3.10+ and Pillow**. The optional browser workbench uses the same core.
+only **Python 3.10+ and Pillow**. The complete browser workbench is included in the same package and uses the same core.
 
 ## Official website
 
@@ -32,11 +32,20 @@ python -m pip install .
 geomasklab --version
 ```
 
-You can also install the distributed wheel directly. It contains the headless
-core and JSON Schemas; source-only browser assets and examples are supplied in
-the source archive. The current software candidate is **1.0.0rc3**; fixed artifacts
-are listed on the [Releases page](https://github.com/pophip3/geomasklab/releases). PyPI publication,
-confirmed creator metadata, stable tagging and archival DOI remain pending.
+For independent testing, download the fixed **1.0.0rc4** wheel and source ZIP
+from the [rc4 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4).
+The wheel includes the complete browser interface, images, CLI and JSON Schemas;
+the source ZIP supplies the matching examples and handoff instructions. After
+installing the wheel, run `geomasklab-ui` and open the local URL it prints.
+The root URL shows the introduction; **Enter workbench** opens the working view.
+The interface matches this release's [presentation guide](docs/presentation_workbench.md).
+Core calculations and all five browser workflows use the same source in both
+artifacts. Optional geo, interoperability and signing dependencies are installed
+with the corresponding extras; model-service mode uses explicitly configured
+external endpoints. No private development configuration or model weights ship.
+PyPI publication,
+stable tagging and archival DOI remain pending. Confirmed citation metadata for
+Yun Xing, Hohai University ([ORCID](https://orcid.org/0009-0009-1746-5019)), is in [CITATION.cff](CITATION.cff).
 
 ## One connected offline workflow
 
@@ -156,6 +165,15 @@ also run the installed wheel outside the checkout and verify a committed source
 archive. Tests check arithmetic, provenance, state, malformed inputs and evidence
 replay; they do not replace independent semantic evaluation.
 
+The earlier fixed rc3 source rerun passed 271 of 272 tests. One native file-symlink
+test was skipped because the Windows account could not create file symlinks.
+The [release validation summary](docs/release_validation.md) distinguishes the
+current rc4 handoff candidate from the historical rc3 baseline. The rc4 release
+provides its own artifact hashes and current-commit technical acceptance. An
+[independent handoff walkthrough](docs/independent_handoff.md) and empty
+record sheet are ready for a colleague; a [Chinese handoff guide](docs/independent_handoff_zh.md)
+is also included. No human completion is claimed yet.
+
 - [Architecture](docs/architecture.md) and [software scope](docs/software_scope.md)
 - [Existing-tool workflow study](docs/workflow_study.md)
 - [Historical real-image results and limitations](docs/application_results.md)
@@ -179,5 +197,5 @@ for this build. The browser server is intended for trusted local use.
 Project code is [MIT licensed](LICENSE). [Third-party notices](THIRD_PARTY_NOTICES.md)
 record source attribution and separate image, dataset and dependency terms.
 For reproducible citation, record the software version and exact commit. Confirmed
-creator metadata and an archival DOI will accompany the stable release.
+Confirmed creator metadata is in CITATION.cff; an archival DOI remains pending.
 Use the [issue tracker](https://github.com/pophip3/geomasklab/issues) for support.

@@ -3,6 +3,9 @@ experiments/
 evaluation/images/
 .env
 test-results/
+/audit/
+/test-out/
+*.whl
 .venv/
 venv/
 node_modules/

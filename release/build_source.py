@@ -41,6 +41,12 @@ REQUIRED = ('README.md', 'LICENSE', 'Licence.txt', 'THIRD_PARTY_NOTICES.md',
             'src/geomasklab/schemas/batch-manifest-1.0.schema.json','workbench/offline_workflows.py',
             'workbench/web/offline-tools.js','workbench/web/offline-tools.css',
             'docs/fair_comparison.md','docs/component_inspection.md','docs/manifest_batch.md')
+REQUIRED += ('CITATION.cff', 'MANIFEST.in', 'workbench/launcher.py',
+             'workbench/web/presentation.js', 'workbench/web/presentation.css',
+             'workbench/web/assets/naip-preview.png', 'workbench/web/assets/naip-preview-mask.png',
+             'workbench/web/assets/naip-preview-provenance.json',
+             'docs/independent_handoff.md', 'docs/independent_handoff_zh.md',
+             'docs/handoff_record.csv', 'docs/presentation_workbench.md')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
                    'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist'}
 FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip', '.whl'}
