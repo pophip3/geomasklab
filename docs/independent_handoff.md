@@ -1,13 +1,13 @@
 # GeoMaskLab independent release handoff
 
 Ask a colleague who did not develop GeoMaskLab to follow this path using the
-public rc4 release and its documentation. Record failures and any author help.
+public rc5 release and its documentation. Record failures and any author help.
 Successful independent completion is a separate result from automated testing.
 
 ## Obtain and install the release
 
 Use Python 3.10 or newer. Download the source ZIP, wheel and `SHA256SUMS.txt`
-from [v1.0.0rc4](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4).
+from [v1.0.0rc5](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc5).
 Compare their digests using `Get-FileHash -Algorithm SHA256` on PowerShell,
 `sha256sum` on Linux or `shasum -a 256` on macOS. Extract the source ZIP.
 
@@ -15,7 +15,7 @@ Create a new environment beside the downloaded files. On Windows PowerShell:
 
 ```powershell
 python -m venv ui-env
-.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc4-py3-none-any.whl
+.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
 .\ui-env\Scripts\geomasklab.exe --version
 .\ui-env\Scripts\geomasklab-ui.exe --port 4180
 ```
@@ -24,7 +24,7 @@ On Linux or macOS:
 
 ```sh
 python3 -m venv ui-env
-./ui-env/bin/python -m pip install ./geomasklab-1.0.0rc4-py3-none-any.whl
+./ui-env/bin/python -m pip install ./geomasklab-1.0.0rc5-py3-none-any.whl
 ./ui-env/bin/geomasklab --version
 ./ui-env/bin/geomasklab-ui --port 4180
 ```
@@ -39,11 +39,15 @@ the selected experiment. This is the interface intended for submission figures.
 
 ## Complete the browser path
 
-1. Choose the real image `examples/data/naip-denver/image.png` from the extracted
-   source. It is a 512 × 512 USDA NAIP Denver image supplied through USGS.
-2. Use **Import mask** with the matching `mask.png`. Select **Vegetation** and record
-   the source as "repository excess-green/Otsu baseline; not independently
-   validated vegetation labels". Confirm pixel alignment. Keep this first version.
+1. On the introduction, choose **Import image + mask**. Choose the real image
+   `examples/data/naip-denver/image.png` in **Source image** and its matching
+   `mask.png` in **Target mask**. Both should show 512 × 512 and **Dimensions match**.
+2. Choose **Vegetation**, enter the source as "repository excess-green/Otsu
+   baseline; not independently validated", confirm alignment and choose
+   **Import and view results**. V1 should contain 142,629 foreground pixels out
+   of 262,144 image pixels (54.41%). The workbench entry is **Import image / mask**.
+   Select **Upload an image with its mask** for a new pair or **Use current image**
+   to add a mask to the selected image. File corrections preserve the form entries.
 3. Expand **Measurement details** and use **Region & validity**.
    Derive a **Right half** version without replacing the prediction. Record the
    selected version, foreground count, whole-image denominator and region denominator.
@@ -72,7 +76,7 @@ On Windows PowerShell:
 
 ```powershell
 python -m venv cli-env
-.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc4-py3-none-any.whl
+.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
 .\cli-env\Scripts\python.exe -I -m geomasklab --version
 .\cli-env\Scripts\python.exe -I -m geomasklab verify .\replay\selected-region-evidence.zip
 .\cli-env\Scripts\python.exe -I -m geomasklab verify-comparison .\replay\comparison.zip

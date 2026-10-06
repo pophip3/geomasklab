@@ -1,9 +1,9 @@
 # GeoMaskLab release validation
 
-The current handoff candidate is **1.0.0rc4**, which combines the complete browser
+The current handoff candidate is **1.0.0rc5**, which combines the complete browser
 presentation and CLI in the wheel and fixed source ZIP. Its exact artifact
 hashes, technical acceptance and current-commit CI link are supplied on the
-[rc4 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4).
+[rc5 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc5).
 Use [independent_handoff.md](independent_handoff.md) for the matching interface.
 Independent human completion is still pending; no semantic-accuracy or DOI claim
 is implied by automated acceptance.

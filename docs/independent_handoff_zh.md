@@ -4,30 +4,30 @@
 
 ## 下载与启动
 
-从 [v1.0.0rc4 发布页面](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4) 的 Assets 下载：
+从 [v1.0.0rc5 发布页面](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc5) 的 Assets 下载：
 
-- `geomasklab-1.0.0rc4-py3-none-any.whl`：完整安装包。
-- `GeoMaskLab-1.0.0rc4-source.zip`：相同版本的源码、真实影像示例和交接说明。
+- `geomasklab-1.0.0rc5-py3-none-any.whl`：完整安装包。
+- `GeoMaskLab-1.0.0rc5-source.zip`：相同版本的源码、真实影像示例和交接说明。
 - `SHA256SUMS.txt`：核对下载文件。
 
 安装 Python 3.10 或更新版本，把文件放在新的可写目录，解压源码 ZIP。在此目录打开 PowerShell：
 
 ```powershell
 python -m venv ui-env
-.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc4-py3-none-any.whl
+.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
 .\ui-env\Scripts\geomasklab.exe --version
 .\ui-env\Scripts\geomasklab-ui.exe --port 4180
 ```
 
-版本应为 `1.0.0rc4`。打开终端显示的 `http://127.0.0.1:4180`，先看到介绍首页。
+版本应为 `1.0.0rc5`。打开终端显示的 `http://127.0.0.1:4180`，先看到介绍首页。
 点击 **Enter workbench** 进入工作台，**Overview** 返回首页。
 保持终端运行；停止时按 Ctrl+C。端口被占用可改成 `--port 4182`。
 安装包包含网页和图片，不需要另装前端工具。实验保存在运行目录下的 `experiments`，后续启动请使用同一目录。
 
 ## 完成并记录
 
-1. 导入源码目录 `examples/data/naip-denver/image.png`。
-2. 点击 **Import mask**，导入同目录 `mask.png`，目标选择 **Vegetation**，填写来源 `repository excess-green/Otsu baseline; not independently validated`，确认像素对齐。保留第一版结果。
+1. 从首页点击 **Import image + mask**。在同一窗口的 **Source image** 选择 `examples/data/naip-denver/image.png`，在 **Target mask** 选择同目录的 `mask.png`。确认显示两个文件均为 **512 × 512 px**、状态为 **Dimensions match**。这一尺寸来自配套案例数据，软件保留用户影像的原始宽高。
+2. **Semantic target** 选择 **Vegetation**；来源填写 `repository excess-green/Otsu baseline; not independently validated`，确认像素对齐后点击 **Import and view results**。应直接进入工作台的 V1，显示 **142,629 px / 262,144 px**、整图覆盖率 **54.41%**。若已处于工作台，入口为 **Import image / mask**；选择 **Upload an image with its mask** 可以一并导入，**Use current image** 用于向已选影像导入新掩膜。选错文件可在同一窗口更换，已填写内容保留。
 3. 展开 **Measurement details**，点击 **Region & validity**，选择 **Right half**，保持已保存的有效范围，创建另一版本。
 4. 点击 **Compare versions**，比较整图和半幅版本，选择 **Restrict to shared valid pixels**。记录共同分母和差异解释，导出 comparison ZIP。
 5. 点击 **Inspect**，运行候选检查，点击一个候选定位，导出检查包。检查不应修改来源掩膜。
@@ -35,13 +35,15 @@ python -m venv ui-env
 
 该影像是真实 NAIP 数据，掩膜是未独立验证的颜色基线。覆盖率和内部校验都不是分割准确率。
 
+影像、目标掩膜及有效像元掩膜须使用同一像素网格。提示中的尺寸取自当前选中的影像；不是只接受该尺寸的所有输入。尺寸不一致时请先核对所选影像与掩膜是否配套，不要将掩膜直接拉伸到另一张影像。
+
 ## 在第二个环境重放
 
 停止网页。将下载的半幅证据包和比较包复制到源码目录之外的 `replay` 文件夹，分别重命名为 `selected-region-evidence.zip` 和 `comparison.zip`，记录原始文件名。在下载目录运行：
 
 ```powershell
 python -m venv cli-env
-.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc4-py3-none-any.whl
+.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc5-py3-none-any.whl
 .\cli-env\Scripts\python.exe -I -m geomasklab verify .\replay\selected-region-evidence.zip
 .\cli-env\Scripts\python.exe -I -m geomasklab verify-comparison .\replay\comparison.zip
 ```
