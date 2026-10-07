@@ -1,11 +1,14 @@
 # Run the optional models on your own computer
 
-These instructions target the `1.0.0 revised snapshot` development branch. The fixed
-`v1.0.0` release is unchanged and does not contain this deployment package.
-Until the branch is merged, obtain it explicitly:
+The revised **1.0.0** model integration is merged into `main`. Start with the
+[reviewer quickstart](reviewer_quickstart.md) to install and verify the core
+without model downloads, CUDA, or API credentials. This page is needed only
+for **fresh model-generated answers or masks**.
+
+Obtain the current repository:
 
 ```powershell
-git clone --branch softwarex-v1.0.0-revised https://github.com/pophip3/geomasklab.git
+git clone https://github.com/pophip3/geomasklab.git
 cd geomasklab
 ```
 
@@ -14,6 +17,39 @@ segmentation. A reviewer starts them on their own machine when needed. No
 connection to the author's computer or continuously hosted inference server is
 required. Downloads and environment setup need network access once; inference
 uses local files and local endpoints afterward.
+
+## Choose the shortest route
+
+- **Review measurements, exports and replay:** follow the three-step README
+  quickstart, then run `geomasklab-ui`. No model installation is required.
+- **Inspect an actual saved RemoteSAM prediction:** run
+  `python examples/replay_model_mask.py`. The image and mask are bundled.
+- **Ask new questions about your own image:** prepare RemoteAgent once using
+  the steps below; select `--only agent` when checking/starting its service.
+- **Generate a new mask from text:** prepare both models once using this guide.
+
+Saved-mask replay does not answer new questions or generate new predictions.
+Demo scene text is preset. The live route performs real inference. Model setup
+is optional for core review, but is required to evaluate these live capabilities.
+
+After the one-time setup and configuration, daily use is two commands in two
+terminals (keep both open):
+
+```powershell
+.\model-envs\core\Scripts\python.exe -m model_services.launcher start --config model_services/profile.local.json
+.\model-envs\core\Scripts\python.exe quickstart.py --port 4180
+```
+
+Open `http://127.0.0.1:4180` and select live mode. For questions without new
+segmentation, append `--only agent` to the first command. The initial setup below
+includes copying the generated endpoints to `.env`; it is not repeated on each
+launch. This is a local model interface, with task context rather than complete
+multi-turn conversational memory. Original replies are currently requested in
+English. Loading and answering can be slow on constrained hardware.
+
+For a fixed reviewed build, the existing `v1.0.0` release page includes the
+**20261007 dated revised source ZIP and wheel**. The tag and undated assets retain
+the earlier snapshot; use the dated revised files for this model integration.
 
 | Task | Required processes |
 | --- | --- |
@@ -215,10 +251,20 @@ Start the core in a separate terminal:
 Open `http://127.0.0.1:4180`, choose live mode, upload your image and use
 **Runtime settings -> Check connections**. A scene question should create a
 qualitative answer without segmentation measurements. `Extract all planes`
-should create a validated SAM request and a grid-aligned mask. Ask for the left
+is a supported extraction request, not a promise that planes will be detected.
+Inspect the actual SAM response and grid-aligned mask. Ask for the left
 half next: the Harness applies a deterministic pixel-half domain to the full
 prediction, so an object crossing the center line can be clipped. All displayed
 areas, denominators and ratios are computed by the core.
+
+There is no preset expected sentence or foreground count for an arbitrary new
+image. A successful service request can produce an empty mask or a semantically
+incorrect response. Readiness verifies loading, and the acceptance script
+verifies execution and exported-evidence consistency; neither establishes model
+accuracy. The saved real run and its nonempty separate SAM prompt result are
+documented in [local validation](local_model_validation.md), including the
+observed prompt sensitivity. Use the bundled saved mask to reproduce fixed
+counts, rather than expecting fresh inference to reproduce those counts.
 
 The two endpoints are on the machine running these services. On a reviewer's
 computer, `127.0.0.1` refers to that reviewer's own processes. When all assets

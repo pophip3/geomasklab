@@ -16,7 +16,7 @@ NAIP imagery and a retained color-baseline mask; they perform no model download.
 1. Clone and install in a virtual environment:
 
    ```sh
-   git clone --branch softwarex-v1.0.0-revised https://github.com/pophip3/geomasklab.git
+   git clone https://github.com/pophip3/geomasklab.git
    cd geomasklab
    python -m venv .venv
    ```
@@ -51,6 +51,13 @@ and text segmentation have a separate [local-model setup](docs/local_model_modul
 and real-inference acceptance command; their original weights need about 19.2 GB
 and suitable memory. The lightweight quickstart above does not rerun those models.
 
+**Start here for review:** the three steps above verify the measurement and
+evidence workflow without CUDA, model weights, service accounts or an online
+author computer. To inspect a saved real model prediction, use the command
+below. To evaluate **new image answers or new segmentation**, use the optional
+local-model guide; those capabilities require real model setup. Demo scene
+answers are preset and are not a replacement for live question answering.
+
 To inspect a retained **actual RemoteSAM prediction** without downloading weights,
 run `python examples/replay_model_mask.py`. It checks the bundled NAIP image and
 mask hashes, independently counts four scopes and exports replayable ZIPs. The
@@ -76,6 +83,11 @@ environment requirements, a supervised launcher and a portable configuration
 example. See [local setup and reviewer use](docs/local_model_modules.md) and
 [fixed upstream identities](docs/model_source_provenance.md).
 
+The integration is merged into `main`. The setup guide starts with a short route
+selector and, after one-time environment/asset preparation, two daily launch
+commands. It supports image question answering and restricted extraction tasks;
+complete multi-turn chat memory is not implemented.
+
 Reviewers run these services on their own computer after obtaining the external
 weights and architecture. After installation, inference uses local files only.
 The author's computer does not need to stay online. Original BF16 RemoteAgent
@@ -86,7 +98,7 @@ offline without either model. Replay does not generate a new scene answer or mas
 ## Install
 
 ```sh
-git clone --branch softwarex-v1.0.0-revised https://github.com/pophip3/geomasklab.git
+git clone https://github.com/pophip3/geomasklab.git
 cd geomasklab
 python -m venv .venv
 ```
@@ -99,7 +111,7 @@ python -m pip install .
 geomasklab --version
 ```
 
-For independent testing, use the **1.0.0 revised snapshot** source branch above,
+For independent testing, use the current `main` source above,
 or download its matching [dated source ZIP](https://github.com/pophip3/geomasklab/releases/download/v1.0.0/GeoMaskLab-1.0.0-20261007-revised-source.zip)
 and [dated wheel build](https://github.com/pophip3/geomasklab/releases/download/v1.0.0/geomasklab-1.0.0-20261007.1-py3-none-any.whl).
 Software version is still 1.0.0; the wheel build number identifies the revision.

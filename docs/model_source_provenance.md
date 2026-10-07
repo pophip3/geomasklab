@@ -1,7 +1,8 @@
 # Model and adapter provenance
 
-Checked on 7 October 2026 for the `1.0.0 revised snapshot` branch
-`softwarex-v1.0.0-revised`. The fixed `v1.0.0` release is unchanged.
+Checked on 7 October 2026 for the **1.0.0 revised snapshot**, now merged into
+`main`. The original `v1.0.0` tag and undated assets are preserved; the release
+page also supplies the dated revised source and wheel with fixed checksums.
 GeoMaskLab distributes its own HTTP adapters and
 measurement integration. Model checkpoints and the RemoteSAM architecture
 remain separately obtained dependencies. The workbench's MIT license does not

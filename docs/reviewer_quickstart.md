@@ -1,10 +1,41 @@
 # Reviewer quick start
 
-For the **revised 1.0.0 snapshot**, start with the [README's three commands](../README.md#reviewer-quickstart--bundled-data-no-models-required):
-install the source, run `examples/reproduce_table.py`, then run
-`examples/run_replay_demo.py`. The original release below is retained as a
-historical snapshot. [Local model setup](local_model_modules.md) covers fresh
-scene questions and segmentation on the reviewer's own computer.
+Start with the [README's three steps](../README.md#reviewer-quickstart--bundled-data-no-models-required):
+install the source from `main`, run `examples/reproduce_table.py`, then run
+`examples/run_replay_demo.py`. These verify measurements and evidence replay
+without GPU drivers, model weights, API credentials or the author's computer.
+Run `geomasklab-ui` to inspect the browser workbench.
+
+Expected results for the bundled, unchanged inputs:
+
+| Command | Verified expected output |
+| --- | --- |
+| `python examples/reproduce_table.py` | 54.41%, 48.09%, 53.52%; spread 6.32 pp |
+| `python examples/run_replay_demo.py` | Original PASS; altered valid-mask pixel produces the expected checksum FAIL; script exits 0 |
+| `python examples/replay_model_mask.py` | whole 6543, left 0, right 6543, rectangle 713 foreground pixels; four replay PASS results |
+| `python reviewer_demo.py` | `passed: true`; five examples match their expected counts and exported evidence verifies |
+
+These four commands were rerun on 7 October 2026 in the clean, minimal reviewer
+environment previously installed from the published wheel (Python 3.12.14,
+Pillow 12.3.0, GeoMaskLab 1.0.0). All exited 0. Output directories, elapsed times
+and ZIP container bytes can differ; retained pixels and reported counts are the
+reproducible results. The core CI also checks the reviewer workflow across
+Windows, Linux and macOS. This does not certify GPU model installation.
+
+For a saved **actual RemoteSAM prediction**, run
+`python examples/replay_model_mask.py`; its image and mask are already included.
+Demo scene text is preset. These lightweight steps do not evaluate fresh model
+question answering, new segmentation or model accuracy.
+
+Only to test new questions or new masks, follow the optional
+[local model setup](local_model_modules.md). RemoteAgent is needed for image
+questions; both RemoteAgent and RemoteSAM are needed for new text-driven masks.
+Prepare their environments/assets once, then use the two launch commands at the
+top of that guide. Hardware-dependent loading and inference can be slow.
+
+The revised integration is merged into `main`; software version remains 1.0.0.
+For a fixed source/wheel download, choose the **20261007 dated revised files**
+on the release page. The original tag and undated assets remain historical.
 
 Version 1.0.0 packages the complete browser workbench and Pillow-only replay core together.
 Use the [fixed 1.0.0 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0)
