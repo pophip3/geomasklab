@@ -9,8 +9,8 @@ import geomasklab
 from PIL import __version__ as pillow_version
 
 BASE=Path(__file__).with_name('publication-replay-baseline.json')
-URL='https://github.com/pophip3/geomasklab/releases/download/v1.0.0rc4/GeoMaskLab-rc4-independent-validation.zip'
-ARCHIVE_SHA='143e72ffe6f41035c1540613b8e409fe567ddcb4b2454f68798aff4d9b1dce9b'
+URL='https://github.com/pophip3/geomasklab/releases/download/v1.0.0rc4/GeoMaskLab-rc4-publication-packets.zip'
+ARCHIVE_SHA='7d5244fe79a358885f6248fbf9c8ce40c2c92cc0db9fed90614768f886bf0617'
 REGISTRY={'verify':('geomasklab.evidence','verify_bundle'),'verify-comparison':('geomasklab.comparison','verify_comparison_packet'),
           'verify-components':('geomasklab.components','verify_component_packet'),'verify-batch':('geomasklab.batch','verify_batch_packet')}
 def digest(b):return hashlib.sha256(b).hexdigest()
