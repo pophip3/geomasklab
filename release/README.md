@@ -1,6 +1,6 @@
 # Release and archival preparation
 
-The current software is a release candidate, `1.0.0rc4`. Automated software
+The current software version is `1.0.0`. Automated software
 checks and real-data arithmetic are distinct from confirmed creator attribution
 and observed human-study results.
 
@@ -29,7 +29,7 @@ and observed human-study results.
 
 `prepare_metadata.py` writes both complete files from real confirmed facts;
 the root CITATION.cff now records the author-confirmed Yun Xing, Hohai University
-and ORCID 0009-0009-1746-5019. A stable tag and archival DOI remain pending.
+and ORCID 0009-0009-1746-5019. Archival DOI registration remains a separate step.
 The creator template remains an input example, not an observed human result.
 
 The compatible core format remains `geoscope-evidence/1.0`; this is a legacy

@@ -28,7 +28,7 @@ b={**s,'id':'missing','image':'deliberately-missing.png'}
  const close=()=>page.click('#closeModal');
  try{
   await page.goto(process.env.GEOMASKLAB_UI_URL||'http://127.0.0.1:4197');await page.waitForFunction(()=>state.original&&!state.busy);
-  assert.equal(await page.evaluate(()=>state.status.version),'1.0.0rc4');await page.click('#enterWorkbench');
+  assert.equal(await page.evaluate(()=>state.status.version),'1.0.0');await page.click('#enterWorkbench');
   const dataRoot=path.resolve(__dirname,'../examples/data/naip-denver');
   await page.locator('#fileInput').setInputFiles(path.join(dataRoot,'image.png'));await page.waitForFunction(()=>state.original?.naturalWidth===512&&!state.busy);
   await page.locator('.more-tools>summary').click();await page.click('#importMaskBtn');await page.locator('#maskFile').setInputFiles(path.join(dataRoot,'mask.png'));
@@ -54,7 +54,7 @@ b={**s,'id':'missing','image':'deliberately-missing.png'}
   checks.push('Explicit batch isolates missing input, retains empty domain and supports verified resume');
   await page.locator('#reviewPacketInput').setInputFiles(path.join(output,'comparison.zip'));await page.locator('.replay-success').waitFor();await close();
   checks.push('Browser packet replay uses the same core as the independently installed CLI');
-  assert.deepEqual(errors,[]);await fs.writeFile(path.join(output,'handoff-browser.json'),JSON.stringify({passed:true,version:'1.0.0rc4',checks,browser_errors:errors,human_participants:0,scope:'Automated installed-wheel browser workflow and second-environment CLI replay; not a human handoff.'},null,2));
+  assert.deepEqual(errors,[]);await fs.writeFile(path.join(output,'handoff-browser.json'),JSON.stringify({passed:true,version:'1.0.0',checks,browser_errors:errors,human_participants:0,scope:'Automated installed-wheel browser workflow and second-environment CLI replay; not a human handoff.'},null,2));
   console.log('Installed-wheel five-stage browser handoff and CLI replay passed.');
  }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exitCode=1;});

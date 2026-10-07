@@ -1,7 +1,7 @@
 # Reviewer quick start
 
-Version 1.0.0rc4 packages the complete browser workbench and Pillow-only replay core together.
-Use the [fixed rc4 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4)
+Version 1.0.0 packages the complete browser workbench and Pillow-only replay core together.
+Use the [fixed 1.0.0 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0)
 for independent testing; the [handoff walkthrough](independent_handoff.md) records
 the installation, saved versions and exported evidence. After wheel installation,
 run `geomasklab-ui` and choose **Enter workbench** or **Run an offline example**

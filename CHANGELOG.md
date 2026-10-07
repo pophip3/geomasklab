@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 - 7 October 2026
+
+- Promote the restored complete rc4 core, CLI and browser baseline to the first stable version.
+- Preserve scientific algorithms and evidence schemas; retain prior producer versions in saved packets.
+- Add a fixed seven-packet compatibility replay workflow on Windows, Linux and macOS.
+- Keep archival DOI, scientific validity and independently measured adoption as separate claims.
+
 ## 1.0.0rc4 - 6 October 2026 (unified handoff candidate)
 
 - Ship the same introduction, compact workbench, canvas controls and publication-figure exports in the wheel and fixed source archive.

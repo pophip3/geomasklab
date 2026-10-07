@@ -1,0 +1,534 @@
+{
+  "commit": "350e9bfb6b7299a82fd10c426b0d9aa1a27e34c8",
+  "original_script_sha256": "cc80474edc853e78927c375493b0fa724f87ade3143fce698aba4e4af0985294",
+  "original_summary_sha256": "fc28ac2fac6262aee445f0a828c9947d67915f5d53059cc26efd278eb9ab06ae",
+  "packets": [
+    {
+      "filename": "selected-region-evidence.zip",
+      "member_sha256": {
+        "full_mask.png": "2015d44080c7a14eca37ecd92286f0b58dff8716717372b8f7800ee29f4dab9d",
+        "manifest.json": "7236335e52570e0e1e63a6dbe84d9d3ef6828667c3f5f22316c2c25aeeadc1f2",
+        "mask.png": "21c20a0b91492c345abe743d310db701e8c3a77e02f600a6bf2b529abf2c0d35",
+        "original.png": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "overlay.png": "ac6964b25c50381b7fe435b0d2d75626da571def0bd55181547c4e2eeb556493",
+        "report.md": "b9aa3724c61b21b84d0035a4f8c6dbb126d945382a9d096b9d2bf666352fd359",
+        "result.json": "3061245249f5a1a5ef1dbffc940a7ac86537c3ee1f6ff4ced0356bde937b7e98",
+        "run_log.json": "61ab8dfc3f0aff3b8976e54369ce257810b369959fbf4b252a3b0b3df0fe2d05",
+        "source_mask.png": "2015d44080c7a14eca37ecd92286f0b58dff8716717372b8f7800ee29f4dab9d",
+        "statistics.json": "19c915944a1c991854ce012b9d7dd0c7b96192c4d4c410f50cdbd370db6c515d"
+      },
+      "original_cli_operation": "verify",
+      "report": {
+        "area_ratio": 0.2404327392578125,
+        "files_checked": 9,
+        "height": 512,
+        "mode": "external",
+        "origin_authenticated": false,
+        "pixel_area": 63028,
+        "schema": "geoscope-evidence/1.0",
+        "scope": "right",
+        "semantic_accuracy_verified": false,
+        "semantic_review_state": "pending",
+        "verified": true,
+        "width": 512
+      },
+      "report_provenance": {
+        "log_sha256": "9cc93dbdcbb768fe1142fdacf83c8173e1ab6ec6e2149ea91a2b88bc33afe9fe",
+        "original_log": "logs/verify-region.txt"
+      },
+      "sha256": "da293a292988464b04098a62ed400bcf503f982b247e831dea3c45074fff1884"
+    },
+    {
+      "filename": "comparison.zip",
+      "member_sha256": {
+        "comparison.json": "781e8f5817ff81ec2edbe8cc8d45a59b34ce1657ac292e7a353c7e209e41e901",
+        "difference-classes.png": "43b2c6a371c20c70d3cec581a67c13ff02d8c37f7213317916d61769d2ac2402",
+        "difference.png": "1a4136f1f1b9d7003162b97ebbee8074803f40c92024f577ef8bc16282ca3f6f",
+        "manifest.json": "bf4fea19d967264e776bd0c4c8c1fe661f8d2e11ecc7f723ecb1b5cda92ee562",
+        "report.html": "921a4917083e691cb8483c2eff70e9ad32bd633c23ca0634aa710e95fed1c7ce",
+        "source-a.zip": "b847948b3ba90c3d374ea48975e2014fba5ddbbbe0b930e64630ad16164770f7",
+        "source-b.zip": "440da589899312861c758244f63c99aef35582b5fddbf6323b94870e37e27358"
+      },
+      "original_cli_operation": "verify-comparison",
+      "report": {
+        "comparison": {
+          "a": {
+            "coverage_of_valid_region": 0.5440864562988281,
+            "foreground_excluded_from_comparison_pixels": 79601,
+            "foreground_pixels": 142629,
+            "geometric_region_pixels": 262144,
+            "roi": null,
+            "run_id": "6cc3a784e846",
+            "scope": "all",
+            "software_version": "1.0.0rc4",
+            "valid_image_pixels": 262144,
+            "valid_region_pixels": 262144,
+            "validity_policy": "all_pixels_declared_valid",
+            "version": 1,
+            "whole_image_coverage": 0.5440864562988281
+          },
+          "a_domain_excluded_from_comparison_pixels": 131072,
+          "a_domain_pixels": 262144,
+          "a_foreground_in_common_scope": 63028,
+          "a_only_pixels": 0,
+          "analysis_domain_policy": "Intersection of both selected regions and both declared valid masks.",
+          "b": {
+            "coverage_of_valid_region": 0.480865478515625,
+            "foreground_excluded_from_comparison_pixels": 0,
+            "foreground_pixels": 63028,
+            "geometric_region_pixels": 131072,
+            "roi": null,
+            "run_id": "b0e65156aeec",
+            "scope": "right",
+            "software_version": "1.0.0rc4",
+            "valid_image_pixels": 262144,
+            "valid_region_pixels": 131072,
+            "validity_policy": "all_pixels_declared_valid",
+            "version": 2,
+            "whole_image_coverage": 0.2404327392578125
+          },
+          "b_domain_excluded_from_comparison_pixels": 0,
+          "b_domain_pixels": 131072,
+          "b_foreground_in_common_scope": 63028,
+          "b_only_pixels": 0,
+          "change_kind": "Analysis_Conditions_Only",
+          "changed_pixels": 0,
+          "common_scope_pixels": 131072,
+          "difference_classes": {
+            "0": "Outside common valid domain",
+            "1": "Common background",
+            "2": "Common foreground",
+            "3": "Removed foreground (A only)",
+            "4": "Added foreground (B only)"
+          },
+          "domain_policy": "intersection",
+          "explanation": "The saved full-image prediction pixels are identical; changes in totals come from analysis conditions.",
+          "foreground_change_accounting": {
+            "causal_attribution": false,
+            "common_domain_delta_pixels": 0,
+            "excluded_domain_delta_pixels": -79601,
+            "identity": "saved_total_delta = common_domain_delta + excluded_domain_delta",
+            "saved_total_delta_pixels": -79601
+          },
+          "full_prediction_pixels_equal": true,
+          "image_sha256": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+          "image_size": [
+            512,
+            512
+          ],
+          "inference_performed": false,
+          "interpretation": "Mask agreement uses the explicitly chosen common valid domain. Agreement is not ground-truth accuracy. Excluded-domain accounting is not a causal decomposition of model and configuration effects.",
+          "invert": false,
+          "legend": {
+            "a_only": "#4c83ff",
+            "b_only": "#f0ad4e",
+            "shared": "#45c5a1"
+          },
+          "mask_agreement_dice": 1.0,
+          "mask_agreement_iou": 1.0,
+          "operation_software_version": "1.0.0rc4",
+          "pixel_diff_available": true,
+          "schema": "geomasklab-result-comparison/2.0",
+          "selected_regions_equal": false,
+          "selected_valid_domains_equal": false,
+          "semantic_accuracy_measured": false,
+          "shared_foreground_pixels": 63028,
+          "source_a_sha256": "b847948b3ba90c3d374ea48975e2014fba5ddbbbe0b930e64630ad16164770f7",
+          "source_b_sha256": "440da589899312861c758244f63c99aef35582b5fddbf6323b94870e37e27358",
+          "status": "Compared",
+          "target": "tree",
+          "valid_masks_equal": true
+        },
+        "files_checked": 6,
+        "origin_authenticated": false,
+        "schema": "geomasklab-comparison-packet/1.0",
+        "semantic_accuracy_measured": false,
+        "verified": true
+      },
+      "report_provenance": {
+        "log_sha256": "b3b5b26248c8d79b10f092287173388d7ea835281415a69c68f1a81c218f4bc3",
+        "original_log": "logs/verify-comparison.txt"
+      },
+      "sha256": "3430976cb84c79005f4adcbbc95a45d9001fbde1b457784d7cce8eceb6be663e"
+    },
+    {
+      "filename": "inspection.zip",
+      "member_sha256": {
+        "components.csv": "3e25600b81b7c083b23d680578ae5cf2b636ccb5989debc0a1a450aa52f07a1e",
+        "evidence.zip": "2eb9a4fc2927731d12b7ec8148bc07e16dd0c4984dc1ae82a395ae8c47ec95eb",
+        "inspection.json": "fe6e5d1a230b75944cba07c49dbd84a1fd707f2eff47b53fc3bf643fc2314f26",
+        "manifest.json": "a314e64628e5a88658181bd38c3e852133822e4575de3c5f19d0d86fefd314a6",
+        "report.md": "1e60489580b7b80d57a834383cc39259607e42764ffd030d81fd58f1b4625074",
+        "selection.png": "21c20a0b91492c345abe743d310db701e8c3a77e02f600a6bf2b529abf2c0d35"
+      },
+      "original_cli_operation": "verify-components",
+      "report": {
+        "component_count": 559,
+        "foreground_pixels": 63028,
+        "inference_performed": false,
+        "origin_authenticated": false,
+        "schema": "geomasklab-component-packet/1.0",
+        "selected_component_count": 559,
+        "selected_foreground_pixels": 63028,
+        "semantic_objects_verified": false,
+        "source_mask_modified": false,
+        "verified": true
+      },
+      "report_provenance": {
+        "log_sha256": "a6c8570bb285d04fc3ad615c80f6b7d3bfb6d022906fb1893a5fd89873456daa",
+        "original_log": "logs/verify-inspection.txt"
+      },
+      "sha256": "dbb8523f464258a0f8c01e24b08fdcd47f9bf663e5c6deaed5bdaa2b0d6448dc"
+    },
+    {
+      "filename": "batch.zip",
+      "member_sha256": {
+        "baseline-valid/evidence.zip": "f4215431b899d34a4be3100326dcea5ae4647db2d4bcee2e773f352634e78c7c",
+        "baseline-valid/image-input.bin": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "baseline-valid/receipt.json": "ba7c5abe894292a2b82ce4f64f71412e447827a379e2eee634fcbe10d3d31b90",
+        "batch_identity.json": "7c25c65f4fb941a4fdc6ab2937501c1a72c3218e7f99dfced93d21f083876991",
+        "batch_manifest.json": "70d55ad6d9a8b644f11fe1e2671dae2f33e68bcc29d3aff9ae1d526e811c09f9",
+        "batch_summary.csv": "5721fa55395c3bb015dfc7e3cf3c8f8e1b15336a99f664ab0e2055e1f2602ad2",
+        "batch_summary.json": "9792756eef946b8113fc0df1f62d3e583d46aa390db1f9ec621d328fa958f2a0",
+        "empty-valid/evidence.zip": "8719f42755b80d55f569e2cc62dbf937cf96bb6cb3d59b91b7e0a0e2d1b399fe",
+        "empty-valid/image-input.bin": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "empty-valid/receipt.json": "c628c30e41f8911b056866493f96dc4749d904779b4fa1a969909a7c85b0b2fc",
+        "manifest.json": "aa8eed3f3812b3b5489d08945764c6e2f612b59efc1b98f39fe275b5ede4f54f",
+        "perturbed-right/evidence.zip": "d3aff0b1bd4642888ad10a3ff732770b038061596fb04353534921093386cefd",
+        "perturbed-right/image-input.bin": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "perturbed-right/receipt.json": "fc0336f89ffd3bdc7ea881bcadf347c4b39d779d1783f18fa67aee79c42b5d9f",
+        "perturbed-right/reference.zip": "3d1b7a8cf3534e29da992adc92d9c7029b7f08c0100a47df231ac1abcf5b9bfe"
+      },
+      "original_cli_operation": "verify-batch",
+      "report": {
+        "aggregate": {
+          "coverage_basis": "foreground / selected valid region",
+          "defined_coverage_samples": 2,
+          "failed_samples_included": false,
+          "macro_mean_coverage": 0.5087229410807292,
+          "micro_weighted_coverage": 0.51402587890625,
+          "summed_foreground_pixels": 168436,
+          "summed_valid_region_pixels": 327680,
+          "undefined_coverage_samples": 1
+        },
+        "batch_fingerprint": "5268ddd0d1bb183e1c2bf0816fc0241d28368e8295237ce9bcf7803b5cc30bcc",
+        "batch_id": "5268ddd0d1bb",
+        "cancelled_count": 0,
+        "completed_count": 3,
+        "failed_count": 1,
+        "inference_performed": false,
+        "origin_authenticated": false,
+        "pending_count": 0,
+        "sample_count": 4,
+        "samples": [
+          {
+            "coverage_of_valid_region": 0.5352376302083334,
+            "error": null,
+            "evidence": "baseline-valid/evidence.zip",
+            "excluded_region_pixels": 65536,
+            "foreground_pixels": 105232,
+            "geometric_region_pixels": 262144,
+            "id": "baseline-valid",
+            "reference": null,
+            "semantic_review_state": "pending",
+            "status": "completed",
+            "valid_region_pixels": 196608
+          },
+          {
+            "coverage_of_valid_region": 0.482208251953125,
+            "error": null,
+            "evidence": "perturbed-right/evidence.zip",
+            "excluded_region_pixels": 0,
+            "foreground_pixels": 63204,
+            "geometric_region_pixels": 131072,
+            "id": "perturbed-right",
+            "reference": "perturbed-right/reference.zip",
+            "semantic_review_state": "pending",
+            "status": "completed",
+            "valid_region_pixels": 131072
+          },
+          {
+            "coverage_of_valid_region": null,
+            "error": null,
+            "evidence": "empty-valid/evidence.zip",
+            "excluded_region_pixels": 262144,
+            "foreground_pixels": 0,
+            "geometric_region_pixels": 262144,
+            "id": "empty-valid",
+            "reference": null,
+            "semantic_review_state": "pending",
+            "status": "completed",
+            "valid_region_pixels": 0
+          },
+          {
+            "coverage_of_valid_region": null,
+            "error": {
+              "code": "InvalidInput",
+              "message": "Sample processing failed. Check its explicit inputs and settings; a local debug log records details."
+            },
+            "evidence": null,
+            "excluded_region_pixels": null,
+            "foreground_pixels": null,
+            "geometric_region_pixels": null,
+            "id": "deliberate-missing-input",
+            "reference": null,
+            "semantic_review_state": null,
+            "status": "failed",
+            "valid_region_pixels": null
+          }
+        ],
+        "schema": "geomasklab-batch-summary/1.0",
+        "software_version": "1.0.0rc4",
+        "status": "completed_with_errors",
+        "verification_scope": "Replay completed samples and aggregate arithmetic; failure causes and supplied provenance are not authenticated.",
+        "verified": true
+      },
+      "report_provenance": {
+        "log_sha256": "4eb83d7c50919e886b5b305130fa2e19afa5b3166b5fae8d923dd622b0eafdbe",
+        "original_log": "logs/verify-batch.txt"
+      },
+      "sha256": "3590f6675273f86c9910482dde1b850e44c1147fa11b0fcc480cdf9c07ee9f8b"
+    },
+    {
+      "filename": "resumed-batch.zip",
+      "member_sha256": {
+        "baseline-valid/evidence.zip": "f4215431b899d34a4be3100326dcea5ae4647db2d4bcee2e773f352634e78c7c",
+        "baseline-valid/image-input.bin": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "baseline-valid/receipt.json": "ba7c5abe894292a2b82ce4f64f71412e447827a379e2eee634fcbe10d3d31b90",
+        "batch_identity.json": "7c25c65f4fb941a4fdc6ab2937501c1a72c3218e7f99dfced93d21f083876991",
+        "batch_manifest.json": "70d55ad6d9a8b644f11fe1e2671dae2f33e68bcc29d3aff9ae1d526e811c09f9",
+        "batch_summary.csv": "5721fa55395c3bb015dfc7e3cf3c8f8e1b15336a99f664ab0e2055e1f2602ad2",
+        "batch_summary.json": "9792756eef946b8113fc0df1f62d3e583d46aa390db1f9ec621d328fa958f2a0",
+        "empty-valid/evidence.zip": "8719f42755b80d55f569e2cc62dbf937cf96bb6cb3d59b91b7e0a0e2d1b399fe",
+        "empty-valid/image-input.bin": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "empty-valid/receipt.json": "c628c30e41f8911b056866493f96dc4749d904779b4fa1a969909a7c85b0b2fc",
+        "manifest.json": "aa8eed3f3812b3b5489d08945764c6e2f612b59efc1b98f39fe275b5ede4f54f",
+        "perturbed-right/evidence.zip": "d3aff0b1bd4642888ad10a3ff732770b038061596fb04353534921093386cefd",
+        "perturbed-right/image-input.bin": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "perturbed-right/receipt.json": "fc0336f89ffd3bdc7ea881bcadf347c4b39d779d1783f18fa67aee79c42b5d9f",
+        "perturbed-right/reference.zip": "3d1b7a8cf3534e29da992adc92d9c7029b7f08c0100a47df231ac1abcf5b9bfe"
+      },
+      "original_cli_operation": "verify-batch",
+      "report": {
+        "aggregate": {
+          "coverage_basis": "foreground / selected valid region",
+          "defined_coverage_samples": 2,
+          "failed_samples_included": false,
+          "macro_mean_coverage": 0.5087229410807292,
+          "micro_weighted_coverage": 0.51402587890625,
+          "summed_foreground_pixels": 168436,
+          "summed_valid_region_pixels": 327680,
+          "undefined_coverage_samples": 1
+        },
+        "batch_fingerprint": "5268ddd0d1bb183e1c2bf0816fc0241d28368e8295237ce9bcf7803b5cc30bcc",
+        "batch_id": "5268ddd0d1bb",
+        "cancelled_count": 0,
+        "completed_count": 3,
+        "failed_count": 1,
+        "inference_performed": false,
+        "origin_authenticated": false,
+        "pending_count": 0,
+        "sample_count": 4,
+        "samples": [
+          {
+            "coverage_of_valid_region": 0.5352376302083334,
+            "error": null,
+            "evidence": "baseline-valid/evidence.zip",
+            "excluded_region_pixels": 65536,
+            "foreground_pixels": 105232,
+            "geometric_region_pixels": 262144,
+            "id": "baseline-valid",
+            "reference": null,
+            "semantic_review_state": "pending",
+            "status": "completed",
+            "valid_region_pixels": 196608
+          },
+          {
+            "coverage_of_valid_region": 0.482208251953125,
+            "error": null,
+            "evidence": "perturbed-right/evidence.zip",
+            "excluded_region_pixels": 0,
+            "foreground_pixels": 63204,
+            "geometric_region_pixels": 131072,
+            "id": "perturbed-right",
+            "reference": "perturbed-right/reference.zip",
+            "semantic_review_state": "pending",
+            "status": "completed",
+            "valid_region_pixels": 131072
+          },
+          {
+            "coverage_of_valid_region": null,
+            "error": null,
+            "evidence": "empty-valid/evidence.zip",
+            "excluded_region_pixels": 262144,
+            "foreground_pixels": 0,
+            "geometric_region_pixels": 262144,
+            "id": "empty-valid",
+            "reference": null,
+            "semantic_review_state": "pending",
+            "status": "completed",
+            "valid_region_pixels": 0
+          },
+          {
+            "coverage_of_valid_region": null,
+            "error": {
+              "code": "InvalidInput",
+              "message": "Sample processing failed. Check its explicit inputs and settings; a local debug log records details."
+            },
+            "evidence": null,
+            "excluded_region_pixels": null,
+            "foreground_pixels": null,
+            "geometric_region_pixels": null,
+            "id": "deliberate-missing-input",
+            "reference": null,
+            "semantic_review_state": null,
+            "status": "failed",
+            "valid_region_pixels": null
+          }
+        ],
+        "schema": "geomasklab-batch-summary/1.0",
+        "software_version": "1.0.0rc4",
+        "status": "completed_with_errors",
+        "verification_scope": "Replay completed samples and aggregate arithmetic; failure causes and supplied provenance are not authenticated.",
+        "verified": true
+      },
+      "report_provenance": {
+        "log_sha256": "4eb83d7c50919e886b5b305130fa2e19afa5b3166b5fae8d923dd622b0eafdbe",
+        "original_log": "logs/verify-resumed-batch.txt"
+      },
+      "sha256": "58d4b127970374958fb47beacc596ce7727240edc3a12f6441737b3116b008bb"
+    },
+    {
+      "filename": "valid-region-evidence.zip",
+      "member_sha256": {
+        "analysis.json": "de5168e70fd035562daaaab78d9a49779d833116679a804fabca398dc4c7aa7b",
+        "full_mask.png": "2015d44080c7a14eca37ecd92286f0b58dff8716717372b8f7800ee29f4dab9d",
+        "manifest.json": "bfc6548a1dcee21e656164d8cca38e2d09239a9b72402287b7eb6e71cf8da439",
+        "mask.png": "36c16403ad6627d4ec33269018fd3a64d2dfe06b2a9345bff5afb9530d55cb9c",
+        "original.png": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "overlay.png": "6f7e932f0c0a45682d0cc91e38f61537a60b7a028931f0d89af4e7df907aa854",
+        "report.md": "f04568012ac3b19be78e2f82edfe8a6e8d26a91b90a29663928735caa4152456",
+        "result.json": "1c6a1c66a7631696a2c68c870f39b8c3ebcbd487eec98c9bdf3008d869972219",
+        "run_log.json": "37a88999ae7e888ed2179df3aeef896ef5f04441199a6dc9f42d139fc200a9f3",
+        "source_mask.png": "2015d44080c7a14eca37ecd92286f0b58dff8716717372b8f7800ee29f4dab9d",
+        "source_valid_mask.png": "b8181678988f59301039c929ff119ed91d0c9286c341dd6209c3d2c16b91ceb4",
+        "statistics.json": "bbd6d35686df079d649c527c184d05ceb6e17b77916db7572f424cb3b01ae176",
+        "valid_mask.png": "b8181678988f59301039c929ff119ed91d0c9286c341dd6209c3d2c16b91ceb4"
+      },
+      "original_cli_operation": "verify",
+      "report": {
+        "area_ratio": 0.40142822265625,
+        "files_checked": 12,
+        "height": 512,
+        "mode": "external",
+        "origin_authenticated": false,
+        "pixel_area": 105232,
+        "schema": "geomasklab-evidence/2.0",
+        "scope": "all",
+        "semantic_accuracy_verified": false,
+        "semantic_review_state": "pending",
+        "validity_measurements": {
+          "coverage_of_valid_image": 0.5352376302083334,
+          "coverage_of_valid_region": 0.5352376302083334,
+          "excluded_foreground_pixels": 37397,
+          "excluded_image_pixels": 65536,
+          "excluded_region_pixels": 65536,
+          "foreground_pixels": 105232,
+          "geometric_image_pixels": 262144,
+          "geometric_region_pixels": 262144,
+          "schema": "geomasklab-validity-measurements/1.0",
+          "valid_image_pixels": 196608,
+          "valid_region_pixels": 196608
+        },
+        "verified": true,
+        "width": 512
+      },
+      "report_provenance": {
+        "log_sha256": "8a9efa397dc66990b627611784d87d044c1c0504977a888d8edf6b323b75eb36",
+        "original_log": "logs/verify-validity.txt"
+      },
+      "sha256": "1ca3039d9b8080da56426d478a8570b3817658b8dfb6176166a559c64feacc07"
+    },
+    {
+      "filename": "empty-valid-evidence.zip",
+      "member_sha256": {
+        "analysis.json": "5774cc09a4e3b5b5aa7faa034ce11dff924159844ee6eccb49b4014172bf9d7e",
+        "full_mask.png": "2015d44080c7a14eca37ecd92286f0b58dff8716717372b8f7800ee29f4dab9d",
+        "manifest.json": "740c56d1bc942665f5213209e081bd9be7cfe7b81814613526fe5126edf61f63",
+        "mask.png": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+        "original.png": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "overlay.png": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+        "report.md": "608c105ba48c1b4d25a175b6da66b14f25805965b9ecdea0c32b5b990bacfe39",
+        "result.json": "87117e7ad935a1fe5c0f5b60336c60c40ffe8466f38bc71c388d26f4ba1d3c21",
+        "run_log.json": "37a88999ae7e888ed2179df3aeef896ef5f04441199a6dc9f42d139fc200a9f3",
+        "source_mask.png": "2015d44080c7a14eca37ecd92286f0b58dff8716717372b8f7800ee29f4dab9d",
+        "source_valid_mask.png": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+        "statistics.json": "19203f749363758514e08528dd78d881cfcb7f70033fc5ea3eccf49b7f8b96d8",
+        "valid_mask.png": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257"
+      },
+      "original_cli_operation": "verify",
+      "report": {
+        "area_ratio": 0.0,
+        "files_checked": 12,
+        "height": 512,
+        "mode": "external",
+        "origin_authenticated": false,
+        "pixel_area": 0,
+        "schema": "geomasklab-evidence/2.0",
+        "scope": "all",
+        "semantic_accuracy_verified": false,
+        "semantic_review_state": "pending",
+        "validity_measurements": {
+          "coverage_of_valid_image": null,
+          "coverage_of_valid_region": null,
+          "excluded_foreground_pixels": 142629,
+          "excluded_image_pixels": 262144,
+          "excluded_region_pixels": 262144,
+          "foreground_pixels": 0,
+          "geometric_image_pixels": 262144,
+          "geometric_region_pixels": 262144,
+          "schema": "geomasklab-validity-measurements/1.0",
+          "valid_image_pixels": 0,
+          "valid_region_pixels": 0
+        },
+        "verified": true,
+        "width": 512
+      },
+      "report_provenance": {
+        "log_sha256": "2eda03d67f6b110b56206d97ffc4dadfc5aad6220e081b492fe0316b042ba2d5",
+        "original_log": "logs/verify-empty.txt"
+      },
+      "sha256": "cc7dad1bd0dbdaf1f7220320b4102d3e3531d75acdac909cf864e6ef50998b44"
+    }
+  ],
+  "schema": "geomasklab-fixed-publication-replay-reference/1.0",
+  "source_modules_sha256": {
+    "__init__.py": "1e82f987741b21aa803b552a6a7f6bd6eb1659a5077d24e44a857ca9f7fd011c",
+    "__main__.py": "8bcbc587d92475e49d66be6c8ad2e4539627e3ef368db0fabe595178ff3e5a24",
+    "_version.py": "45216b8fa43a659b4f52fb9770ddff0a1c09810cd1d929579e78b3ce0996a454",
+    "api.py": "2f2339a1ba1c40236b172c909666b5f5efdc66e4e9911aaaf701530b75275a8f",
+    "batch.py": "a3aeb5806efc430d6c2039b8e551ed3ad7b9b155aff31f68107593188c0e6ac7",
+    "cli.py": "00ce455b23e61ea14227510385cff968735423b0f056e3c854819b11ba1c5e80",
+    "comparison.py": "cfc941d5e85a2ec3ce575627512abc6e493916d91b6d7730413e85c6520be3d6",
+    "components.py": "8c82f2a75dab99db1c5b4243140e6197737d3e1a9bcdf5023461ce5492f65784",
+    "contract.py": "9f1a5be66ab29cfc6e869575e52465fcaf623a51731ee1f948eaba75e09bf155",
+    "domain.py": "182f51e97068ab115d672329ef6c12c47f7eeb0f4ec9c0275b96bac1ab650cc6",
+    "evidence.py": "2cdcbe8165b958517b5445e2160749e3b9f471eeb99e0a6deefa7c5c622ad602",
+    "geometry.py": "ad12ee9ac0ed4052df9cf0b018239f18863ebea7ea57de165798fffb5f7e4a35",
+    "geospatial.py": "a7ce191e0a830567e76ca987c7977ab573ca029bb35159b4b69a50d8e8767fe4",
+    "masks.py": "9f38f09b819dbdfd08bb13415cf5d300a5336f93c6476cb05274b795533d7136",
+    "measurements.py": "f67847db2e6a689ddaf2776e2b76cf2e16b3158a31eef2938e64fe79debef732",
+    "provenance.py": "38359df8c3ed8bd6398139cb1d8b647584a3aa737e0e1985596d0c46aa9ec545",
+    "providers.py": "f280dd747535b3c6c7138cda70ae50f8d08a21c2666b8c7735c97eaa16e75061",
+    "raster_input.py": "2092bc7e06e947dccb75ddccc457fa3ea5cbf693241e7bafeef43b93dcf20263",
+    "reference.py": "bca8be9471cc5ec2ea24c267d68cb775d8a9f60b77295943090487307605ee00",
+    "regions.py": "3bbe5bd1dcb770e0c3acca24093936829802e34b4634c2f9c16c7e4c26081f97",
+    "report.py": "53fe7666646700b8a7bfde58cd73872c7e16747f80630390e58163493dfc99f0",
+    "review.py": "503026a72bd30ae104d4a82caf357db691dfd52407ff8aaebead09299afe17a8",
+    "schema.py": "91d4a8157bb2e69eb1d32c9f3e4774bb4b542d7c827704cab8ddcb89cd7b6de5",
+    "signing.py": "04a922b354452d5f8aeeafccaefe47dd6b6910031418dcc24204d83b4ad70766",
+    "zonal.py": "daa81a11d72d2eef4c686b38b501a6c9ebf534f1d2481c649a58729888e84ce0"
+  },
+  "source_of_reports": "Original local submission replay-audit logs, existing Windows CLI environment.",
+  "version": "1.0.0rc4"
+}
