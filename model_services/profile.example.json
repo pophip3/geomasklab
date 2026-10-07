@@ -5,21 +5,21 @@
   "readiness_timeout_seconds": 1800,
   "agent": {
     "python": "../model-envs/agent",
-    "model_dir": "../model-assets/RemoteAgent",
+    "model_dir": "../model-runtime/RemoteAgent",
     "model_name": "RemoteAgent",
     "port": 8000,
     "device": "offload",
     "gpu_memory": "3GiB",
     "cpu_memory": "512MiB",
     "offload_dir": "../model-runtime/agent-offload",
-    "max_pixels": 262144,
+    "max_pixels": 65536,
     "max_context": 4096
   },
   "sam": {
     "python": "../model-envs/sam",
-    "source_root": "../external-source/RemoteSAM",
-    "checkpoint": "../model-assets/RemoteSAM/RemoteSAMv1.pth",
-    "tokenizer": "../model-assets/RemoteSAM/bert-base-uncased",
+    "source_root": "../model-runtime/RemoteSAM-src",
+    "checkpoint": "../model-runtime/RemoteSAM/RemoteSAMv1.pth",
+    "tokenizer": "../model-runtime/bert-base-uncased",
     "port": 6657,
     "device": "cuda:0",
     "fp16": true

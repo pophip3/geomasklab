@@ -44,7 +44,9 @@ class FakeProcess:
 class LauncherTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
-        self.root = Path(self.temp.name)
+        # Resolve macOS /var symlinks and Windows runner short-path aliases,
+        # matching the canonical paths produced by load_profile.
+        self.root = Path(self.temp.name).resolve()
         self.servers = []
         self.threads = []
         self.supervisors = []
