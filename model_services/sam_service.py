@@ -156,19 +156,8 @@ def make_handler(service: SAMService):
             if self.path != "/predict":
                 return self.send_json(404, {"status": "error", "message": "Unknown endpoint."})
             try:
-                raw_length = self.headers.get("Content-Length", "")
-                if not raw_length.isdigit() or not 0 < int(raw_length) <= MAX_REQUEST_BYTES:
-                    raise ValueError("Missing or excessive request Content-Length.")
-                self.connection.settimeout(30)
-                raw = self.rfile.read(int(raw_length))
-                if len(raw) != int(raw_length):
-                    raise ValueError("Incomplete request body.")
-                # Consume a bounded body before replying. Closing a Windows
-                # socket with unread bytes can discard the HTTP error response.
-                if self.headers.get("Transfer-Encoding"):
-                    raise ValueError("Chunked requests are unsupported; provide Content-Length.")
-                if self.headers.get_content_type() != "application/json":
-                    raise ValueError("Use Content-Type application/json.")
+                from model_services.http_body import read_json_body
+                raw = read_json_body(self, MAX_REQUEST_BYTES)
                 if not service.ready:
                     return self.send_json(503, {"status": "error", "message": "RemoteSAM is not ready."})
                 payload = json.loads(raw.decode("utf-8"))

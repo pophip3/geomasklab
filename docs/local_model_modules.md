@@ -54,6 +54,12 @@ helpers; its separate requirements include `mmcv==1.7.2`. The commands below use
 `model-envs/*/Scripts/python.exe` with `model-envs/*/bin/python` and use ordinary shell
 environment assignments.
 
+The CUDA installation commands are for Windows/Linux with an NVIDIA GPU.
+The Pillow-only quickstart and model HTTP contracts are checked on Windows,
+Linux and macOS. macOS has no CUDA support; its live models need a separate CPU
+setup with sufficient system memory, which this delivery does not claim to
+have verified.
+
 The commands are a pinned setup route, not a clean-install claim for every OS.
 The author's existing model environments used Python 3.9 separately from the
 Python >=3.10 core. Run setup from the repository root:
@@ -145,6 +151,10 @@ memory limits. Reserve additional memory for activations, SAM and the OS. Allow
 at least 20 GB of additional free SSD space for Agent offload. On a GPU with
 sufficient available memory, select `agent.device: cuda` instead. Use absolute
 paths for external assets stored elsewhere.
+
+The example limits Agent vision input to 65,536 pixels; SAM still receives
+the original uploaded image. This reduces the Agent's resource use and may
+reduce visible scene detail. Record this budget when testing your own imagery.
 
 Check all assets and full checkpoint hashes, then start both services:
 

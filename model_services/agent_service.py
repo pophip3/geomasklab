@@ -204,15 +204,8 @@ def make_handler(application):
             if self.path != '/v1/chat/completions':
                 return self.reply(404, {'error': 'Unknown endpoint.'})
             try:
-                length = int(self.headers.get('Content-Length', '0'))
-                if not 0 < length <= MAX_BODY:
-                    raise ValueError('Unsupported request size.')
-                self.connection.settimeout(30)
-                raw = self.rfile.read(length)
-                if len(raw) != length:
-                    raise ValueError('Incomplete request body.')
-                if self.headers.get('Transfer-Encoding') or self.headers.get_content_type() != 'application/json':
-                    raise ValueError('Use application/json with Content-Length.')
+                from model_services.http_body import read_json_body
+                raw = read_json_body(self, MAX_BODY)
                 result = application.chat(json.loads(raw))
                 self.reply(200, result)
             except BlockingIOError as exc:

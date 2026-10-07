@@ -1,5 +1,11 @@
 # Reviewer quick start
 
+For the **revised 1.0.0 snapshot**, start with the [README's three commands](../README.md#reviewer-quickstart--bundled-data-no-models-required):
+install the source, run `examples/reproduce_table.py`, then run
+`examples/run_replay_demo.py`. The original release below is retained as a
+historical snapshot. [Local model setup](local_model_modules.md) covers fresh
+scene questions and segmentation on the reviewer's own computer.
+
 Version 1.0.0 packages the complete browser workbench and Pillow-only replay core together.
 Use the [fixed 1.0.0 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0)
 for independent testing; the [handoff walkthrough](independent_handoff.md) records

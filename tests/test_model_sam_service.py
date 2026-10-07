@@ -1,6 +1,7 @@
 """Contract tests for the optional adapter; fixtures are never model evidence."""
 import base64
 from http.server import ThreadingHTTPServer
+import http.client
 import io
 import json
 import threading
@@ -141,6 +142,19 @@ class OptionalSAMServiceTests(unittest.TestCase):
         with caught.exception as response:
             self.assertEqual(response.code, 400)
             self.assertIn("application/json", json.load(response)["message"])
+        self.assertEqual(self.backend.calls, [])
+
+    def test_chunked_upload_returns_readable_rejection_without_inference(self):
+        connection = http.client.HTTPConnection(
+            '127.0.0.1', self.server.server_port, timeout=5)
+        try:
+            connection.request('POST', '/predict', body=iter([b'{}', b'\n']),
+                               headers={'Content-Type': 'application/json'}, encode_chunked=True)
+            response = connection.getresponse()
+            self.assertEqual(response.status, 400)
+            self.assertIn('Chunked', json.loads(response.read())['message'])
+        finally:
+            connection.close()
         self.assertEqual(self.backend.calls, [])
 
 
