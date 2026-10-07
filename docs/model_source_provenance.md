@@ -28,8 +28,8 @@ from this exact SAM commit through the GitHub API in base64 form. Decoded bytes
 were verified against each API Git blob SHA-1, with SHA-256/size records retained
 separately. These unmodified official files include `args.py`, the `lib` model
 files, `lib/mmcv_custom` checkpoint helpers and `arc` modules. This verifies
-source-byte identity, not completed real inference on the official-source
-model. The checkpoint helper imports MMCV 1 APIs, supplied by `mmcv==1.7.2`
+source-byte identity; subsequent official-source inference is separately recorded
+in [local validation](local_model_validation.md). The checkpoint helper imports MMCV 1 APIs, supplied by `mmcv==1.7.2`
 in the separate SAM requirements; the architecture import chain does not
 require CuPy.
 
@@ -117,6 +117,6 @@ Use the model authors' references when describing their models:
 Checkpoint hashes and source commits identify inputs; they do not establish
 new semantic performance. The existing six-image case evaluates a fixed
 RemoteSAM mask handoff and arithmetic replay. It does not evaluate RemoteAgent
-scene-answer accuracy or independently validate this newly packaged complete
-local chain. Report actual deployment and fresh-inference acceptance separately
+scene-answer accuracy. The complete local chain has a separate execution
+acceptance record; it is not an accuracy study. Report fresh-inference acceptance separately
 from CPU-only contract tests or successful evidence replay.

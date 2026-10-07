@@ -476,6 +476,11 @@ class Supervisor:
                     if child.poll() is not None:
                         raise RuntimeError(name + " exited before shutdown; inspect " + str(runtime / (name + ".log")))
                 report = readiness_report(self.config, self.only)
+                for name, item in report["services"].items():
+                    error = item.get("ready_declaration", {}).get("error")
+                    if not item["ready"] and item.get('ready_http_status') in (200, 503) and error:
+                        raise RuntimeError(name + " failed to load: " + str(error) +
+                                           "; inspect " + str(runtime / (name + ".log")))
                 if report["all_ready"]:
                     break
                 if time.monotonic() >= deadline:

@@ -146,6 +146,7 @@ def make_handler(service: SAMService):
             if self.path == "/ready":
                 return self.send_json(200 if service.ready else 503,
                     {"status": "ready" if service.ready else "not_ready", "model_ready": service.ready,
+                     "error": service.load_error,
                      "supported_quality_modes": ["fast"], **service.metadata()})
             if self.path == "/model-info":
                 return self.send_json(200, {"ready": service.ready, "error": service.load_error,

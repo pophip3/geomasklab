@@ -1,0 +1,396 @@
+{
+  "schema": "geomasklab-live-model-acceptance/1.0",
+  "started_at_utc": "2026-10-07T12:34:41.816901+00:00",
+  "software_version": "1.0.0",
+  "python_version": "3.12.14",
+  "pillow_version": "12.3.0",
+  "acceptance_script_sha256": "03c13f1792435c8266a6b2b580976479e3de9830fa4d4c56fe1d3f02c968ba19",
+  "target": "building",
+  "passed": true,
+  "failures": [],
+  "warnings": [],
+  "cases": [
+    {
+      "case": "whole-image-live",
+      "run_id": "a3c03958ddc2",
+      "version": 2,
+      "status": "needs_review",
+      "scope_box_xyxy": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "foreground_pixels": 0,
+      "whole_image_pixels": 262144,
+      "selected_region_pixels": 262144,
+      "whole_image_coverage": 0.0,
+      "within_region_coverage": 0.0,
+      "reference_pillow_pixel_set_exact": true,
+      "zip_file": "whole-image-live.zip",
+      "zip_sha256": "ffb58d0c72e062b52694a36296dbd5070ada73263942a51e23a70da249351d48",
+      "mask_sha256": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+      "full_mask_sha256": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+      "original_image_bytes_preserved": true,
+      "full_mask_bytes_preserved": true,
+      "bundle_verified": true,
+      "semantic_accuracy_verified": false,
+      "semantic_review_state": "pending",
+      "workbench_duration_ms": 1561755.58,
+      "execution_kind": "fresh_live_segmentation",
+      "saved_mask_replay": false
+    },
+    {
+      "case": "left-saved-mask",
+      "run_id": "8f14669ddc0b",
+      "version": 3,
+      "status": "needs_review",
+      "scope_box_xyxy": [
+        0,
+        0,
+        256,
+        512
+      ],
+      "foreground_pixels": 0,
+      "whole_image_pixels": 262144,
+      "selected_region_pixels": 131072,
+      "whole_image_coverage": 0.0,
+      "within_region_coverage": 0.0,
+      "reference_pillow_pixel_set_exact": true,
+      "zip_file": "left-saved-mask.zip",
+      "zip_sha256": "f6ecab3be3ebc49013169221d4bbd33fad5db0172693b823f10957338006ed4a",
+      "mask_sha256": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+      "full_mask_sha256": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+      "original_image_bytes_preserved": true,
+      "full_mask_bytes_preserved": true,
+      "bundle_verified": true,
+      "semantic_accuracy_verified": false,
+      "semantic_review_state": "pending",
+      "workbench_duration_ms": 68.4,
+      "execution_kind": "saved_mask_region_analysis",
+      "saved_mask_replay": true,
+      "inference_performed": false,
+      "elapsed_ms": 146.29
+    },
+    {
+      "case": "right-saved-mask",
+      "run_id": "4996fba4328b",
+      "version": 4,
+      "status": "needs_review",
+      "scope_box_xyxy": [
+        256,
+        0,
+        512,
+        512
+      ],
+      "foreground_pixels": 0,
+      "whole_image_pixels": 262144,
+      "selected_region_pixels": 131072,
+      "whole_image_coverage": 0.0,
+      "within_region_coverage": 0.0,
+      "reference_pillow_pixel_set_exact": true,
+      "zip_file": "right-saved-mask.zip",
+      "zip_sha256": "39b8b797aae04e674c04b6e76f3f13de033ba8d1244a6ba54af4f69abba1bb67",
+      "mask_sha256": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+      "full_mask_sha256": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+      "original_image_bytes_preserved": true,
+      "full_mask_bytes_preserved": true,
+      "bundle_verified": true,
+      "semantic_accuracy_verified": false,
+      "semantic_review_state": "pending",
+      "workbench_duration_ms": 63.32,
+      "execution_kind": "saved_mask_region_analysis",
+      "saved_mask_replay": true,
+      "inference_performed": false,
+      "elapsed_ms": 141.28
+    },
+    {
+      "case": "rectangle-saved-mask",
+      "run_id": "4bcc93167ed6",
+      "version": 5,
+      "status": "needs_review",
+      "scope_box_xyxy": [
+        128,
+        128,
+        384,
+        384
+      ],
+      "foreground_pixels": 0,
+      "whole_image_pixels": 262144,
+      "selected_region_pixels": 65536,
+      "whole_image_coverage": 0.0,
+      "within_region_coverage": 0.0,
+      "reference_pillow_pixel_set_exact": true,
+      "zip_file": "rectangle-saved-mask.zip",
+      "zip_sha256": "3356258247ab581ea960d66027e0d201423402d8b9862f25e432f3fc91801681",
+      "mask_sha256": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+      "full_mask_sha256": "65795a5b91030a2a433dae510d1edf494082a9cfa1153cd94f3797759f68f257",
+      "original_image_bytes_preserved": true,
+      "full_mask_bytes_preserved": true,
+      "bundle_verified": true,
+      "semantic_accuracy_verified": false,
+      "semantic_review_state": "pending",
+      "workbench_duration_ms": 64.06,
+      "execution_kind": "saved_mask_region_analysis",
+      "saved_mask_replay": true,
+      "inference_performed": false,
+      "elapsed_ms": 140.46
+    }
+  ],
+  "limits": [
+    "This is a single-image software acceptance run, not a semantic accuracy evaluation or user study.",
+    "The scene and whole-image extraction use configured live endpoints; the script provides no substitute outputs.",
+    "Left, right and rectangle cases replay the saved mask using deterministic pixel operations; they perform no new inference.",
+    "Bundle verification proves file integrity and deterministic pixel arithmetic; it does not authenticate model origin.",
+    "Pixel coverage uses image-grid denominators and is not geographic ground area.",
+    "Target identity and mask boundaries remain subject to separate semantic review."
+  ],
+  "semantic_accuracy_verified": false,
+  "human_participants": 0,
+  "client_settings": {
+    "max_tokens_override": "128",
+    "chat_timeout_seconds": "3600.0"
+  },
+  "agent_metadata_probe": {
+    "available": true,
+    "ready_declaration": true,
+    "metadata": {
+      "backend": "transformers",
+      "transformers": "4.57.6",
+      "torch": "2.6.0+cu124",
+      "dtype": "bfloat16",
+      "quantized": false,
+      "device_mode": "offload",
+      "device_map": {
+        "model.visual": "0",
+        "lm_head": "disk",
+        "model.language_model": "disk"
+      },
+      "processor_use_fast": false,
+      "max_image_pixels": 65536,
+      "max_context_tokens": 4096,
+      "checkpoint_diagnostics": {
+        "missing_keys": [],
+        "unexpected_keys": [],
+        "mismatched_keys": [],
+        "error_msgs": []
+      },
+      "model_index_sha256": "4be35310ddc165e46e88de4c3fec8c1210014b0b8717f4544d82cc740814ae0c",
+      "config_sha256": "bc1b137be8dd274f43120969a71dea0f11b66e01c38d8de06c2f82a89053d0fa",
+      "checkpoint_tensor_bytes": 16584333312,
+      "shards": [
+        "model-00001-of-00004.safetensors",
+        "model-00002-of-00004.safetensors",
+        "model-00003-of-00004.safetensors",
+        "model-00004-of-00004.safetensors"
+      ]
+    },
+    "identity_authenticated": false
+  },
+  "input": {
+    "uploaded_file_sha256": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+    "normalized_upload_sha256": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+    "width": 512,
+    "height": 512,
+    "normalization": "EXIF transpose, RGB conversion, PNG; image metadata removed.",
+    "saved_original_sha256": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff"
+  },
+  "session_id": "44447b299d9a",
+  "scene": {
+    "run_id": "157382ad5192",
+    "version": 1,
+    "status": "answered",
+    "agent_decision_status": "completed",
+    "answer": "The image shows an aerial view of a park-like area with greenery, pathways, and some scattered structures. There are vehicles on a road that curves through the landscape. The terrain includes grassy fields and trees, suggesting a recreational or natural setting.",
+    "workbench_duration_ms": 572594.58,
+    "elapsed_ms": 572599.1
+  },
+  "segmentation": {
+    "run_id": "a3c03958ddc2",
+    "version": 2,
+    "status": "needs_review",
+    "agent_decision_status": "tool_call",
+    "agent_feedback_status": "completed",
+    "workbench_duration_ms": 1561755.58,
+    "elapsed_ms": 1561786.86,
+    "fresh_perception_requested": true,
+    "cache_reuse_observed": false,
+    "model_metadata": {
+      "model": {
+        "service_version": "geomasklab-remotesam-adapter/1.0",
+        "model_name": "RemoteSAMv1",
+        "checkpoint_sha256": "f85dfa044a527f096b9e41eacfe298040d52e77fca642f46dfe1226745e137e7",
+        "checkpoint_diagnostics": {
+          "missing_keys": [
+            "text_encoder.embeddings.position_ids"
+          ],
+          "unexpected_keys": [],
+          "checkpoint_tensor_count": 1107
+        },
+        "device": "cuda:0",
+        "fp16": true,
+        "epoc": false,
+        "precision": "FP16 CUDA autocast",
+        "supported_quality_modes": [
+          "fast"
+        ],
+        "adapter_parameters": {
+          "strategy": "whole_image_probability_threshold",
+          "input_size": [
+            896,
+            896
+          ],
+          "image_resize": "bilinear",
+          "normalization_mean": [
+            0.485,
+            0.456,
+            0.406
+          ],
+          "normalization_std": [
+            0.229,
+            0.224,
+            0.225
+          ],
+          "max_tokens": 20,
+          "probability": "float32 two-class softmax foreground channel 1",
+          "restoration": "bilinear",
+          "align_corners": false,
+          "probability_threshold": 0.5,
+          "threshold_operator": ">=",
+          "epoc": false,
+          "scope": "whole image; region operations belong to the workbench"
+        },
+        "packages": {
+          "torch": "2.6.0+cu124",
+          "torchvision": "0.21.0+cu124",
+          "transformers": "4.30.2",
+          "numpy": "1.26.4",
+          "Pillow": "11.3.0",
+          "timm": "0.6.11",
+          "mmcv": "1.7.2"
+        },
+        "tokenizer_files_sha256": {
+          "vocab.txt": "07eced375cec144d27c900241f3e339478dec958f92fddbc551f295c992038a3",
+          "tokenizer_config.json": "a025160ef0431f1a392f6f050c1310f4c5d9fb6f275932dbccba73c4d214bf10"
+        },
+        "source_git_revision": null,
+        "source_dirty": null,
+        "source_tree_sha256": "7a7bb8c4bab0b9741960dec9568dcadd32e26fc19cc2697ffe8b1fc551c3772b",
+        "source_files_sha256": {
+          "arc/__init__.py": "201d8bd4cfcb6a2c03f8e9450caeff9556afdfbd0131d8dd7b4135ffe2e8c8db",
+          "arc/adaptive_rotated_conv.py": "5ba6f038a6b854c583738c49ec38f50061839fb597df12b02bf01586f54ac5a4",
+          "arc/routing_function.py": "acd1f4909cc3d9f28c02026f2750bb5085ee80c255bffcc16da3ae6f69591ab9",
+          "arc/weight_init.py": "ddd3f041fc9e58d278ac411392823aeb5a249b4e54cbb73154bc45b1bfe99bf2",
+          "args.py": "456ca878c9b5fe1b82949d548a71008a3482272e070aed9569c2836f1c5e8cc2",
+          "lib/_utils.py": "712c9ae922d523fbd45c70469290a942db530ee6f5294f0e024514145492e0ab",
+          "lib/backbone.py": "fbfcc673f6e35c636062cbb1debeedd39d2af0429e2e31be04f98b8d174f3204",
+          "lib/cross_scale_interaction.py": "bed62a544d55b64e56f55ed3c289d0f6f1f1235bbe0a233900a8a47b4cb86e2c",
+          "lib/mask_predictor.py": "43785f50722b90f8f06b6717660c322a1847ed1c904c0a08fc5482e3ee2714bb",
+          "lib/mmcv_custom/__init__.py": "9237ce78ee99ba95cfabac5e8dc170d66510ebd0f24e0c8338241af1cb11591d",
+          "lib/mmcv_custom/checkpoint.py": "644333b69e063abaffecdf8db6be1d57b120349cd0a85f75cb8eabe50e319c99",
+          "lib/segmentation.py": "cad4ef7e2e6363acf06986b08f2c1e439102936d1dd32236b29622df4dee4e97",
+          "lib/transformer.py": "51d633b41e44d9ed2707de6ffde3b3ca2bda4f5d857274de8267218575b3eede",
+          "lib/various_receptive.py": "506c5881bd448a50a1fae937c2e5818e33e9e3d4863a2d6946442d5809f57ecb",
+          "materialize_and_check.py": "47e44832c19215e7c5df211921b84cf3f469c5ef306ed12e370dbaaad1395b20"
+        },
+        "verified_architecture_revision": "ebb7bc278c7343c29c8c16b035289f78f40f0f72",
+        "architecture_files_sha256": {
+          "args.py": "456ca878c9b5fe1b82949d548a71008a3482272e070aed9569c2836f1c5e8cc2",
+          "lib/segmentation.py": "cad4ef7e2e6363acf06986b08f2c1e439102936d1dd32236b29622df4dee4e97",
+          "lib/_utils.py": "712c9ae922d523fbd45c70469290a942db530ee6f5294f0e024514145492e0ab",
+          "lib/backbone.py": "fbfcc673f6e35c636062cbb1debeedd39d2af0429e2e31be04f98b8d174f3204",
+          "lib/cross_scale_interaction.py": "bed62a544d55b64e56f55ed3c289d0f6f1f1235bbe0a233900a8a47b4cb86e2c",
+          "lib/mask_predictor.py": "43785f50722b90f8f06b6717660c322a1847ed1c904c0a08fc5482e3ee2714bb",
+          "lib/various_receptive.py": "506c5881bd448a50a1fae937c2e5818e33e9e3d4863a2d6946442d5809f57ecb",
+          "lib/transformer.py": "51d633b41e44d9ed2707de6ffde3b3ca2bda4f5d857274de8267218575b3eede",
+          "lib/mmcv_custom/__init__.py": "9237ce78ee99ba95cfabac5e8dc170d66510ebd0f24e0c8338241af1cb11591d",
+          "lib/mmcv_custom/checkpoint.py": "644333b69e063abaffecdf8db6be1d57b120349cd0a85f75cb8eabe50e319c99",
+          "arc/__init__.py": "201d8bd4cfcb6a2c03f8e9450caeff9556afdfbd0131d8dd7b4135ffe2e8c8db",
+          "arc/adaptive_rotated_conv.py": "5ba6f038a6b854c583738c49ec38f50061839fb597df12b02bf01586f54ac5a4",
+          "arc/routing_function.py": "acd1f4909cc3d9f28c02026f2750bb5085ee80c255bffcc16da3ae6f69591ab9",
+          "arc/weight_init.py": "ddd3f041fc9e58d278ac411392823aeb5a249b4e54cbb73154bc45b1bfe99bf2"
+        },
+        "architecture_file_lock_verified": true,
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU"
+      },
+      "timing_ms": {
+        "total": 488.17
+      },
+      "quality": {
+        "foreground_pixels": 0,
+        "foreground_ratio": 0.0,
+        "empty_mask": true
+      },
+      "quality_mode": "fast",
+      "requested_quality_mode": "fast",
+      "parameters": {
+        "strategy": "whole_image_probability_threshold",
+        "input_size": [
+          896,
+          896
+        ],
+        "image_resize": "bilinear",
+        "normalization_mean": [
+          0.485,
+          0.456,
+          0.406
+        ],
+        "normalization_std": [
+          0.229,
+          0.224,
+          0.225
+        ],
+        "max_tokens": 20,
+        "probability": "float32 two-class softmax foreground channel 1",
+        "restoration": "bilinear",
+        "align_corners": false,
+        "probability_threshold": 0.5,
+        "threshold_operator": ">=",
+        "epoc": false,
+        "scope": "whole image; region operations belong to the workbench"
+      },
+      "service_version": "geomasklab-remotesam-adapter/1.0",
+      "mode_parameters": {
+        "strategy": "whole_image_probability_threshold",
+        "input_size": [
+          896,
+          896
+        ],
+        "image_resize": "bilinear",
+        "normalization_mean": [
+          0.485,
+          0.456,
+          0.406
+        ],
+        "normalization_std": [
+          0.229,
+          0.224,
+          0.225
+        ],
+        "max_tokens": 20,
+        "probability": "float32 two-class softmax foreground channel 1",
+        "restoration": "bilinear",
+        "align_corners": false,
+        "probability_threshold": 0.5,
+        "threshold_operator": ">=",
+        "epoc": false,
+        "scope": "whole image; region operations belong to the workbench",
+        "requested_mode": "fast",
+        "resolved_mode": "fast",
+        "tile_count": 1
+      },
+      "original_size": [
+        512,
+        512
+      ],
+      "output_size": [
+        512,
+        512
+      ]
+    },
+    "planner_decision_sha256": "d045431110d29f56b2bf0db37fe7071eae83bffded621fecef8024a5aad05c72",
+    "feedback_response_sha256": "bdcd71bbae44e90022bfa63b57015dfaab8088c660e5beb0b56e6bb293a14d7a",
+    "failure_or_review_message": "No foreground was detected. Review this result; an empty mask does not prove target absence."
+  },
+  "elapsed_ms": 2135004.84
+}

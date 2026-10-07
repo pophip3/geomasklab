@@ -264,6 +264,31 @@ class LauncherTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 stop_supervisor(self.config)
 
+    def test_explicit_model_load_failure_stops_owned_children_without_waiting_for_timeout(self):
+        report = {'all_ready': False, 'services': {
+            'sam': {'ready': False, 'ready_http_status': 503,
+                    'ready_declaration': {'error': 'Missing fixture dependency'}}}}
+        supervisor = Supervisor(self.config, 'sam')
+        with patch('model_services.launcher.subprocess.Popen', side_effect=FakeProcess), \
+             patch('model_services.launcher.readiness_report', return_value=report):
+            with self.assertRaisesRegex(RuntimeError, 'sam failed to load: Missing fixture dependency'):
+                supervisor.run()
+        self.assertTrue(supervisor.children['sam'].terminated)
+        self.assertFalse((self.config['runtime_dir'] / 'supervisor.lock').exists())
+
+    def test_initial_connection_refusal_keeps_waiting_for_model_readiness(self):
+        unavailable = {'all_ready':False, 'services': {
+            name:{'ready':False, 'ready_http_status':None, 'ready_declaration':{'error':'URLError'}}
+            for name in ('agent','sam')}}
+        ready = readiness_report(self.config)
+        with patch('model_services.launcher.subprocess.Popen', side_effect=FakeProcess), \
+             patch('model_services.launcher.readiness_report', side_effect=[unavailable, ready]):
+            supervisor, thread, failure = self.run_supervisor()
+            stop_supervisor(self.config)
+            thread.join(timeout=5)
+        self.assertFalse(failure)
+        self.assertTrue(all(child.terminated for child in supervisor.children.values()))
+
 
 if __name__ == "__main__":
     unittest.main()

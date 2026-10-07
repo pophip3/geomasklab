@@ -263,13 +263,12 @@ the same way. Replay proves saved pixel arithmetic and internal consistency,
 not scene-answer accuracy, segmentation accuracy or authenticated model origin.
 The overlay still requires separate semantic review.
 
-Preliminary observations have narrower scope: original-BF16 Agent generation
-returned 44 tokens on a synthetic aircraft graphic in 591.287 seconds (about
-9.85 minutes). This is not a paper result on a real remote-sensing image. A SAM
-probe using the earlier competition architecture returned 6,543 foreground
-pixels on the NAIP building request in 1.965 seconds. It does not establish
-acceptance of the separately obtained official source or this complete newly
-packaged chain. Those require their own saved outcomes.
+The [saved validation record](local_model_validation.md) reports a completed
+real two-model NAIP run, separate nonempty SAM prediction and supervised
+start/status/stop checks. The laptop's disk-offload end-to-end run took about
+35.6 minutes. These are execution checks; segmentation and scene-answer accuracy
+were not established. Use the retained-model-mask replay for a short,
+weights-free walkthrough.
 
 ## Stop the local models
 

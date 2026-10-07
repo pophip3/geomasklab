@@ -46,7 +46,8 @@ def main():
         commands = [['reviewer_demo.py'], ['examples/recalculate_region.py', 'reviewer-output/right.zip'],
                     ['examples/reference_workflow.py'], ['examples/real_image_handoff.py'],
                     ['examples/five_step_workflow.py'], ['examples/reproduce_table.py'],
-                    ['examples/run_replay_demo.py'], ['-m', 'model_services.launcher', '--help'],
+                    ['examples/run_replay_demo.py'], ['examples/replay_model_mask.py'],
+                    ['-m', 'model_services.launcher', '--help'],
                     ['-m', 'model_services.agent_service', '--help'],
                     ['-m', 'model_services.sam_service', '--help']]
         for command in commands:
@@ -119,6 +120,7 @@ def main():
               'real_image_color_baseline_handoff': 'passed', 'new_generated_text': 'English',
               'real_naip_connected_five_step_example': 'passed',
               'bundled_denominator_and_single_pixel_tamper_examples': 'passed',
+              'retained_real_model_mask_four_scope_replay': 'passed',
               'model_adapter_cli_without_torch': 'passed',
               'isolated_server_startup_and_interface': 'passed',
               'offline_user_guide': 'passed', 'platform_launcher': 'passed',

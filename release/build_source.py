@@ -54,6 +54,8 @@ REQUIRED += ('model_services/launcher.py', 'model_services/agent_service.py',
              'docs/local_model_modules.md', 'docs/model_source_provenance.md',
              'examples/live_model_acceptance.py', 'examples/reproduce_table.py',
              'examples/run_replay_demo.py')
+REQUIRED += ('examples/replay_model_mask.py', 'examples/data/local-model-mask/mask.png',
+             'examples/data/local-model-mask/provenance.json')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
                    'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist',
                    'model-runtime', 'model-envs', 'model-assets', 'external-source'}

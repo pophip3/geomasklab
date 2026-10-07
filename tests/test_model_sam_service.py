@@ -123,6 +123,7 @@ class OptionalSAMServiceTests(unittest.TestCase):
         code, ready = self.request("/ready")
         self.assertEqual(code, 503)
         self.assertEqual(ready["status"], "not_ready")
+        self.assertEqual(ready['error'], 'test missing checkpoint')
         code, result = self.referring()
         self.assertEqual(code, 503)
         self.assertNotIn("mask", result)
