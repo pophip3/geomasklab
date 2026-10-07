@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import ast
 import base64
+import hashlib
 import json
 import re
 
@@ -26,7 +27,7 @@ class Decision:
     history: list = field(default_factory=list)
 
 
-def parse_decision(raw, image_path, allowed_tools):
+def parse_decision(raw, image_path, allowed_tools, *, allow_plain_answer=False):
     """Accept one literal call or one answer block; never evaluate model code."""
     body = re.sub(r'^\s*<think>.*?</think>\s*', '', raw, flags=re.S | re.I).strip()
     answer = re.fullmatch(r'<answer>(.*?)</answer>', body, flags=re.S | re.I)
@@ -70,12 +71,18 @@ def parse_decision(raw, image_path, allowed_tools):
     # A tool-like expression inside an answer cannot become an apparent success.
     if answer and 'T_call' not in source:
         return Decision('completed', raw, text=source)
+    if allow_plain_answer and source and not any(marker in source for marker in ('T_call', '<', '>')):
+        return Decision('completed', raw, text=source)
     return Decision('unparsed', raw, text='Unrecognized planner response.')
 
 
 class PlannerProtocol:
     def __init__(self, *, model_name, allowed_tools, max_tokens):
         self.model_name, self.allowed_tools, self.max_tokens = model_name, set(allowed_tools), max_tokens
+
+    def _feedback_system_prompt(self):
+        """Allow adapters to distinguish reporting from their initial route."""
+        return self._runtime_system_prompt()
 
     def _messages(self, query, image_path, context):
         image = Path(image_path)
@@ -90,25 +97,37 @@ class PlannerProtocol:
 
     def plan(self, query, image_path, *, context=None):
         raw = self._run_llm(self._messages(query, image_path, context))
-        result = parse_decision(raw, image_path, self.allowed_tools)
+        result = parse_decision(raw, image_path, self.allowed_tools,
+                                allow_plain_answer=self._allow_plain_answer())
         result.history.append({'round': 1, 'response': raw, 'status': result.status})
         return result
+
+    def _allow_plain_answer(self, *, feedback=False):
+        return False
 
     def continue_with_tool_result(self, query, image_path, decision, tool_result, *, context=None):
         if decision.status != 'tool_call':
             raise ValueError('No pending tool request.')
         def bounded(value):
             if isinstance(value, dict):
-                return {key: bounded(child) for key, child in value.items() if key.lower() not in {'image','mask','overlay'}}
+                omitted = {'image','mask','overlay','source_files_sha256','architecture_files_sha256',
+                           'tokenizer_files_sha256','candidates'}
+                result = {key: bounded(child) for key, child in value.items() if key.lower() not in omitted}
+                if set(value) & omitted:
+                    result['omitted_artifacts_sha256'] = hashlib.sha256(
+                        json.dumps({key: child for key, child in value.items() if key.lower() in omitted},
+                                   sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+                return result
             if isinstance(value, list):
                 return [bounded(child) for child in value]
             return '[large artifact omitted]' if isinstance(value, str) and len(value) > 2048 else value
         messages = self._messages(query, image_path, context)
+        messages[0] = {'role': 'system', 'content': self._feedback_system_prompt()}
         messages += [{'role': 'assistant', 'content': decision.raw_response},
                      {'role': 'user', 'content': '[Execution Result]\n' + json.dumps(bounded(tool_result), ensure_ascii=False) +
                       '\nReturn one <answer> block based on these recorded results. Do not invent measurements or call more tools.'}]
         raw = self._run_llm(messages)
         # Feedback is a reporting turn; no subsequent action is authorized here.
-        result = parse_decision(raw, image_path, set())
+        result = parse_decision(raw, image_path, set(), allow_plain_answer=self._allow_plain_answer(feedback=True))
         result.history = list(decision.history) + [{'round': 2, 'response': raw, 'status': result.status}]
         return result

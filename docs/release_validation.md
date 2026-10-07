@@ -1,3 +1,10 @@
+# Stable 1.0.0 validation
+
+Version 1.0.0 retains the restored rc4 scientific implementation and packet schemas.
+Exact-commit tests, installed-wheel/source checks and archived-packet compatibility results
+are recorded in the release assets and Actions runs. The rc4 records below remain historical.
+No regenerated ZIP byte-identity claim is made.
+
 # GeoMaskLab release validation
 
 The current handoff candidate is **1.0.0rc4**, which combines the complete browser

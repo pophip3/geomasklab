@@ -6,6 +6,10 @@ services. GeoMaskLab does not distribute RemoteAgent/RemoteSAM source trees or
 checkpoints. Service deployment and model licensing are separate from the
 workbench installation.
 
+The revised 1.0.0 source includes a [local two-model launcher](local_model_modules.md),
+with separate environments and fixed asset checks. Reviewers can run it on their
+own computer; no author-hosted endpoint is required.
+
 ## Configuration
 
 Copy `.env.example` to `.env` in the project root. Fill in actual, reachable
@@ -18,6 +22,8 @@ does not evaluate shell syntax. Keep `.env` out of Git and source archives.
 | --- | --- |
 | `GEO_AGENT_BASE_URL` | OpenAI-compatible API base, normally ending in `/v1` |
 | `GEO_AGENT_MODEL` | Exact multimodal model identifier available on the service |
+| `GEO_AGENT_TIMEOUT_SECONDS` | Chat timeout from 5 to 3600 seconds; default 120 |
+| `GEO_AGENT_MAX_TOKENS` | Optional 16–1024 output-token budget; truncated replies are rejected |
 | `GEO_AGENT_API_KEY` | Planner credential, if required; retained on the Python server |
 | `GEO_REMOTESAM_URL` | Compatible mask service `/predict` URL |
 | `GEO_REMOTESAM_REVISION` | Verified checkpoint/deployment revision; unknown revisions disable safe live reuse |

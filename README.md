@@ -4,6 +4,58 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Software checks](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml)
+[![Reviewer quickstart and core coverage gate](https://github.com/pophip3/geomasklab/actions/workflows/ci.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/ci.yml)
+[![Core line coverage](https://img.shields.io/badge/core_line_coverage-86.5%25-brightgreen)](docs/local_model_validation.md)
+
+## Reviewer quickstart — bundled data, no models required
+
+Use Python 3.10+ and this **1.0.0 revised snapshot**. The fixed source archive
+records its exact commit and checksums. The commands below use only bundled
+NAIP imagery and a retained color-baseline mask; they perform no model download.
+
+1. Clone and install in a virtual environment:
+
+   ```sh
+   git clone --branch softwarex-v1.0.0-revised https://github.com/pophip3/geomasklab.git
+   cd geomasklab
+   python -m venv .venv
+   ```
+
+   Activate `.venv` with `.\.venv\Scripts\Activate.ps1` on Windows or
+   `source .venv/bin/activate` on Linux/macOS, then run `python -m pip install .`.
+
+2. Recompute the manuscript's saved-domain example:
+
+   ```sh
+   python examples/reproduce_table.py
+   ```
+
+   Expected coverages: **54.41%, 48.09%, 53.52%**; spread **6.32 pp**. Each
+   line identifies its manuscript section/figure. These use different analysis
+   supports and retain the same source prediction. Output ZIPs and counts are
+   saved under `reviewer-output/denominators/`.
+
+3. Verify retained bytes and numerical replay, then reject one changed pixel:
+
+   ```sh
+   python examples/run_replay_demo.py
+   ```
+
+   The original reports PASS. The intentional mutation reports the expected
+   `manifest.checksums.valid_mask.png.sha256` failure; this successful rejection
+   leaves the script's exit code zero. Artifacts are saved under
+   `reviewer-output/replay-demo/`. Unsigned replay proves internal consistency.
+
+Run `geomasklab-ui` to open the complete local workbench. Fresh scene questions
+and text segmentation have a separate [local-model setup](docs/local_model_modules.md)
+and real-inference acceptance command; their original weights need about 19.2 GB
+and suitable memory. The lightweight quickstart above does not rerun those models.
+
+To inspect a retained **actual RemoteSAM prediction** without downloading weights,
+run `python examples/replay_model_mask.py`. It checks the bundled NAIP image and
+mask hashes, independently counts four scopes and exports replayable ZIPs. The
+whole-image `all buildings` prediction has 6,543 foreground pixels. This is saved
+mask replay; semantic accuracy remains unvalidated. See the [validation record](docs/local_model_validation.md).
 
 GeoMaskLab binds a binary mask to its image, target, spatial scope, declared valid
 pixels and coverage denominators. Compare results under explicit conditions,
@@ -16,10 +68,25 @@ only **Python 3.10+ and Pillow**. The complete browser workbench is included in 
 Visit the [GeoMaskLab documentation website](https://pophip3.github.io/geomasklab/)
 for the workbench guide, examples and service setup.
 
+## Optional local model modules
+
+Scene questions use **RemoteAgent**; text-driven extraction uses **RemoteAgent +
+RemoteSAM**. The source includes independent local HTTP adapters, separate model
+environment requirements, a supervised launcher and a portable configuration
+example. See [local setup and reviewer use](docs/local_model_modules.md) and
+[fixed upstream identities](docs/model_source_provenance.md).
+
+Reviewers run these services on their own computer after obtaining the external
+weights and architecture. After installation, inference uses local files only.
+The author's computer does not need to stay online. Original BF16 RemoteAgent
+weights require substantial memory; disk offload is slower and has separate
+image/token budgets. Saved evidence and the normal workbench remain usable
+offline without either model. Replay does not generate a new scene answer or mask.
+
 ## Install
 
 ```sh
-git clone https://github.com/pophip3/geomasklab.git
+git clone --branch softwarex-v1.0.0-revised https://github.com/pophip3/geomasklab.git
 cd geomasklab
 python -m venv .venv
 ```
@@ -32,8 +99,14 @@ python -m pip install .
 geomasklab --version
 ```
 
-For independent testing, download the fixed **1.0.0rc4** wheel and source ZIP
-from the [rc4 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4).
+For independent testing, use the **1.0.0 revised snapshot** source branch above,
+or download its matching [dated source ZIP](https://github.com/pophip3/geomasklab/releases/download/v1.0.0/GeoMaskLab-1.0.0-20261007-revised-source.zip)
+and [dated wheel build](https://github.com/pophip3/geomasklab/releases/download/v1.0.0/geomasklab-1.0.0-20261007.1-py3-none-any.whl).
+Software version is still 1.0.0; the wheel build number identifies the revision.
+The [release page](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0)
+also preserves the original tag and assets as a historical snapshot. Choose the
+dated revised pair for the local models and new reviewer scripts; the original
+undated downloads predate these additions.
 The wheel includes the complete browser interface, images, CLI and JSON Schemas;
 the source ZIP supplies the matching examples and handoff instructions. After
 installing the wheel, run `geomasklab-ui` and open the local URL it prints.
@@ -43,8 +116,7 @@ Core calculations and all five browser workflows use the same source in both
 artifacts. Optional geo, interoperability and signing dependencies are installed
 with the corresponding extras; model-service mode uses explicitly configured
 external endpoints. No private development configuration or model weights ship.
-PyPI publication,
-stable tagging and archival DOI remain pending. Confirmed citation metadata for
+PyPI publication and archival DOI remain pending. Confirmed citation metadata for
 Yun Xing, Hohai University ([ORCID](https://orcid.org/0009-0009-1746-5019)), is in [CITATION.cff](CITATION.cff).
 
 ## One connected offline workflow
@@ -168,7 +240,7 @@ replay; they do not replace independent semantic evaluation.
 The earlier fixed rc3 source rerun passed 271 of 272 tests. One native file-symlink
 test was skipped because the Windows account could not create file symlinks.
 The [release validation summary](docs/release_validation.md) distinguishes the
-current rc4 handoff candidate from the historical rc3 baseline. The rc4 release
+current rc4 handoff candidate from the historical rc3 baseline. The 1.0.0 release
 provides its own artifact hashes and current-commit technical acceptance. An
 [independent handoff walkthrough](docs/independent_handoff.md) and empty
 record sheet are ready for a colleague; a [Chinese handoff guide](docs/independent_handoff_zh.md)

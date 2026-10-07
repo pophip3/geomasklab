@@ -4,22 +4,22 @@
 
 ## 下载与启动
 
-从 [v1.0.0rc4 发布页面](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4) 的 Assets 下载：
+从 [v1.0.0 发布页面](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0) 的 Assets 下载：
 
-- `geomasklab-1.0.0rc4-py3-none-any.whl`：完整安装包。
-- `GeoMaskLab-1.0.0rc4-source.zip`：相同版本的源码、真实影像示例和交接说明。
+- `geomasklab-1.0.0-py3-none-any.whl`：完整安装包。
+- `GeoMaskLab-1.0.0-source.zip`：相同版本的源码、真实影像示例和交接说明。
 - `SHA256SUMS.txt`：核对下载文件。
 
 安装 Python 3.10 或更新版本，把文件放在新的可写目录，解压源码 ZIP。在此目录打开 PowerShell：
 
 ```powershell
 python -m venv ui-env
-.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc4-py3-none-any.whl
+.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0-py3-none-any.whl
 .\ui-env\Scripts\geomasklab.exe --version
 .\ui-env\Scripts\geomasklab-ui.exe --port 4180
 ```
 
-版本应为 `1.0.0rc4`。打开终端显示的 `http://127.0.0.1:4180`，先看到介绍首页。
+版本应为 `1.0.0`。打开终端显示的 `http://127.0.0.1:4180`，先看到介绍首页。
 点击 **Enter workbench** 进入工作台，**Overview** 返回首页。
 保持终端运行；停止时按 Ctrl+C。端口被占用可改成 `--port 4182`。
 安装包包含网页和图片，不需要另装前端工具。实验保存在运行目录下的 `experiments`，后续启动请使用同一目录。
@@ -41,7 +41,7 @@ python -m venv ui-env
 
 ```powershell
 python -m venv cli-env
-.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc4-py3-none-any.whl
+.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0-py3-none-any.whl
 .\cli-env\Scripts\python.exe -I -m geomasklab verify .\replay\selected-region-evidence.zip
 .\cli-env\Scripts\python.exe -I -m geomasklab verify-comparison .\replay\comparison.zip
 ```

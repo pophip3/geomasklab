@@ -1,0 +1,69 @@
+{
+  "schema": "geomasklab-retained-model-mask/1.0",
+  "inferred_at_utc": "2026-10-07T13:17:44.764604+00:00",
+  "input_image": "../naip-denver/image.png",
+  "input_sha256": "2fda170b2ad1b58dcd3956df6037ed68ad9b8dbfd35a925e28ce79d645971bff",
+  "mask_sha256": "21b0f6b880149ff0f02bba9706c24a803b932ec0c003131269a779f57e97dc53",
+  "task": "referring_seg",
+  "text": "all buildings",
+  "target": "building",
+  "foreground_pixels": 6543,
+  "checkpoint_sha256": "f85dfa044a527f096b9e41eacfe298040d52e77fca642f46dfe1226745e137e7",
+  "verified_architecture_revision": "ebb7bc278c7343c29c8c16b035289f78f40f0f72",
+  "architecture_files_sha256": {
+    "args.py": "456ca878c9b5fe1b82949d548a71008a3482272e070aed9569c2836f1c5e8cc2",
+    "lib/segmentation.py": "cad4ef7e2e6363acf06986b08f2c1e439102936d1dd32236b29622df4dee4e97",
+    "lib/_utils.py": "712c9ae922d523fbd45c70469290a942db530ee6f5294f0e024514145492e0ab",
+    "lib/backbone.py": "fbfcc673f6e35c636062cbb1debeedd39d2af0429e2e31be04f98b8d174f3204",
+    "lib/cross_scale_interaction.py": "bed62a544d55b64e56f55ed3c289d0f6f1f1235bbe0a233900a8a47b4cb86e2c",
+    "lib/mask_predictor.py": "43785f50722b90f8f06b6717660c322a1847ed1c904c0a08fc5482e3ee2714bb",
+    "lib/various_receptive.py": "506c5881bd448a50a1fae937c2e5818e33e9e3d4863a2d6946442d5809f57ecb",
+    "lib/transformer.py": "51d633b41e44d9ed2707de6ffde3b3ca2bda4f5d857274de8267218575b3eede",
+    "lib/mmcv_custom/__init__.py": "9237ce78ee99ba95cfabac5e8dc170d66510ebd0f24e0c8338241af1cb11591d",
+    "lib/mmcv_custom/checkpoint.py": "644333b69e063abaffecdf8db6be1d57b120349cd0a85f75cb8eabe50e319c99",
+    "arc/__init__.py": "201d8bd4cfcb6a2c03f8e9450caeff9556afdfbd0131d8dd7b4135ffe2e8c8db",
+    "arc/adaptive_rotated_conv.py": "5ba6f038a6b854c583738c49ec38f50061839fb597df12b02bf01586f54ac5a4",
+    "arc/routing_function.py": "acd1f4909cc3d9f28c02026f2750bb5085ee80c255bffcc16da3ae6f69591ab9",
+    "arc/weight_init.py": "ddd3f041fc9e58d278ac411392823aeb5a249b4e54cbb73154bc45b1bfe99bf2"
+  },
+  "parameters": {
+    "strategy": "whole_image_probability_threshold",
+    "input_size": [
+      896,
+      896
+    ],
+    "image_resize": "bilinear",
+    "normalization_mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "normalization_std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "max_tokens": 20,
+    "probability": "float32 two-class softmax foreground channel 1",
+    "restoration": "bilinear",
+    "align_corners": false,
+    "probability_threshold": 0.5,
+    "threshold_operator": ">=",
+    "epoc": false,
+    "scope": "whole image; region operations belong to the workbench"
+  },
+  "packages": {
+    "torch": "2.6.0+cu124",
+    "torchvision": "0.21.0+cu124",
+    "transformers": "4.30.2",
+    "numpy": "1.26.4",
+    "Pillow": "11.3.0",
+    "timm": "0.6.11",
+    "mmcv": "1.7.2"
+  },
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "semantic_accuracy_verified": false,
+  "execution": "Retained actual local RemoteSAM output; replay does not perform new inference.",
+  "image_credit": "USDA-FSA-APFO / USGS The National Map; public-domain NAIP chip.",
+  "measurement_notice": "Empty results do not prove target absence; all target boundaries require review."
+}

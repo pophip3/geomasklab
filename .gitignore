@@ -7,6 +7,7 @@ test-results/
 /test-out/
 *.whl
 .venv/
+.venv-*/
 venv/
 node_modules/
 .env.*
@@ -34,4 +35,13 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
+.coverage*
+coverage.xml
+htmlcov/
 *.private.pem
+/model-runtime/
+/model-profile.json
+/model_services/profile.local.json
+/model-envs/
+/model-assets/
+/external-source/

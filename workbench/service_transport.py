@@ -1,9 +1,33 @@
 """HTTP calls to configured model services, separate from download proxies."""
 import json
+import math
 import os
 import urllib.error
 import urllib.parse
 import urllib.request
+
+
+def agent_request_settings(default_tokens):
+    """Validate optional chat budgets without changing health/SAM timeouts."""
+    tokens = default_tokens
+    raw_tokens = os.environ.get('GEO_AGENT_MAX_TOKENS')
+    if raw_tokens is not None:
+        raw_tokens = raw_tokens.strip()
+        if not raw_tokens.isascii() or not raw_tokens.isdigit():
+            raise ValueError('GEO_AGENT_MAX_TOKENS must be an integer between 16 and 1024.')
+        tokens = int(raw_tokens)
+        if not 16 <= tokens <= 1024:
+            raise ValueError('GEO_AGENT_MAX_TOKENS must be an integer between 16 and 1024.')
+    timeout = 120
+    raw_timeout = os.environ.get('GEO_AGENT_TIMEOUT_SECONDS')
+    if raw_timeout is not None:
+        try:
+            timeout = float(raw_timeout)
+        except (TypeError, ValueError):
+            raise ValueError('GEO_AGENT_TIMEOUT_SECONDS must be finite and between 5 and 3600 seconds.') from None
+        if not math.isfinite(timeout) or not 5 <= timeout <= 3600:
+            raise ValueError('GEO_AGENT_TIMEOUT_SECONDS must be finite and between 5 and 3600 seconds.')
+    return tokens, timeout
 
 
 def request_json(url, payload=None, timeout=120, headers=None):

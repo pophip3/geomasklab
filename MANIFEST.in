@@ -7,5 +7,6 @@ graft bin
 graft release
 graft evaluation
 graft tests
+graft model_services
 prune evaluation/images
 global-exclude __pycache__ *.py[cod] *.log *.zip *.whl

@@ -47,8 +47,18 @@ REQUIRED += ('CITATION.cff', 'MANIFEST.in', 'workbench/launcher.py',
              'workbench/web/assets/naip-preview-provenance.json',
              'docs/independent_handoff.md', 'docs/independent_handoff_zh.md',
              'docs/handoff_record.csv', 'docs/presentation_workbench.md')
+REQUIRED += ('model_services/launcher.py', 'model_services/agent_service.py',
+             'model_services/sam_service.py', 'model_services/sam_backend.py',
+             'model_services/profile.example.json', 'model_services/model-lock.json',
+             'model_services/requirements-agent.txt', 'model_services/requirements-sam.txt',
+             'docs/local_model_modules.md', 'docs/model_source_provenance.md',
+             'examples/live_model_acceptance.py', 'examples/reproduce_table.py',
+             'examples/run_replay_demo.py')
+REQUIRED += ('examples/replay_model_mask.py', 'examples/data/local-model-mask/mask.png',
+             'examples/data/local-model-mask/provenance.json')
 FORBIDDEN_PARTS = {'.git', '.venv', 'venv', 'experiments', '__pycache__',
-                   'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist'}
+                   'node_modules', 'weights', 'checkpoints', 'pretrained_weights', 'build', 'dist',
+                   'model-runtime', 'model-envs', 'model-assets', 'external-source'}
 FORBIDDEN_SUFFIXES = {'.pth', '.pt', '.ckpt', '.safetensors', '.onnx', '.log', '.zip', '.whl'}
 
 

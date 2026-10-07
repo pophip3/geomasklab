@@ -44,6 +44,11 @@ def main():
         if len(base)!=1 or not base[0].lower().startswith('pillow'):
             raise ValueError('Headless runtime must require only Pillow.')
         checks.append('Installed core import and Pillow-only dependencies')
+        for module in ('launcher', 'agent_service', 'sam_service'):
+            help_text = run('-I', '-m', 'model_services.' + module, '--help')
+            assert 'usage:' in help_text
+        run('-I', '-c', 'import model_services,pathlib,json; root=pathlib.Path(model_services.__file__).parent; assert json.loads((root/"model-lock.json").read_text())["schema"]=="geomasklab-model-lock/1.0"; assert (root/"profile.example.json").is_file(); assert (root/"requirements-agent.txt").is_file(); assert (root/"requirements-sam.txt").is_file()')
+        checks.append('Installed optional-model CLI and fixed profile/identity resources without ML dependencies')
         run('-I','-c','from PIL import Image; a=Image.new("RGB",(7,5),(40,180,40)); a.save("image.png"); m=Image.new("L",(7,5)); m.paste(255,(1,1,5,4)); m.save("mask.png")')
         def cli(*argv):return run('-I','-m','geomasklab',*argv)
         cli('create','--image','image.png','--mask','mask.png','--target','tree','--source','Hand-counted fixture',

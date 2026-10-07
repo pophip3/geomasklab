@@ -40,12 +40,16 @@ def main():
         for name, expected in manifest['files'].items():
             if hashlib.sha256((root/name).read_bytes()).hexdigest() != expected:
                 raise ValueError(f'Source hash mismatch: {name}')
-        for name in ('.git', '.env', 'experiments', 'reviewer-output'):
+        for name in ('.git', '.env', 'experiments', 'reviewer-output', 'model-runtime', 'model-envs'):
             if (root/name).exists():
                 raise ValueError(f'Unexpected local artifact: {name}')
         commands = [['reviewer_demo.py'], ['examples/recalculate_region.py', 'reviewer-output/right.zip'],
                     ['examples/reference_workflow.py'], ['examples/real_image_handoff.py'],
-                    ['examples/five_step_workflow.py']]
+                    ['examples/five_step_workflow.py'], ['examples/reproduce_table.py'],
+                    ['examples/run_replay_demo.py'], ['examples/replay_model_mask.py'],
+                    ['-m', 'model_services.launcher', '--help'],
+                    ['-m', 'model_services.agent_service', '--help'],
+                    ['-m', 'model_services.sam_service', '--help']]
         for command in commands:
             result = subprocess.run([args.python, *command], cwd=root, env=environment,
                                     text=True, encoding='utf-8', capture_output=True, check=True)
@@ -115,6 +119,9 @@ def main():
               'saved_mask_region_example': 'passed', 'external_mask_reference_example': 'passed',
               'real_image_color_baseline_handoff': 'passed', 'new_generated_text': 'English',
               'real_naip_connected_five_step_example': 'passed',
+              'bundled_denominator_and_single_pixel_tamper_examples': 'passed',
+              'retained_real_model_mask_four_scope_replay': 'passed',
+              'model_adapter_cli_without_torch': 'passed',
               'isolated_server_startup_and_interface': 'passed',
               'offline_user_guide': 'passed', 'platform_launcher': 'passed',
               'python': args.python, 'duration_seconds': round(time.perf_counter()-started, 3),

@@ -1,13 +1,13 @@
 # GeoMaskLab independent release handoff
 
 Ask a colleague who did not develop GeoMaskLab to follow this path using the
-public rc4 release and its documentation. Record failures and any author help.
+public 1.0.0 release and its documentation. Record failures and any author help.
 Successful independent completion is a separate result from automated testing.
 
 ## Obtain and install the release
 
 Use Python 3.10 or newer. Download the source ZIP, wheel and `SHA256SUMS.txt`
-from [v1.0.0rc4](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4).
+from [v1.0.0](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0).
 Compare their digests using `Get-FileHash -Algorithm SHA256` on PowerShell,
 `sha256sum` on Linux or `shasum -a 256` on macOS. Extract the source ZIP.
 
@@ -15,7 +15,7 @@ Create a new environment beside the downloaded files. On Windows PowerShell:
 
 ```powershell
 python -m venv ui-env
-.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc4-py3-none-any.whl
+.\ui-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0-py3-none-any.whl
 .\ui-env\Scripts\geomasklab.exe --version
 .\ui-env\Scripts\geomasklab-ui.exe --port 4180
 ```
@@ -24,7 +24,7 @@ On Linux or macOS:
 
 ```sh
 python3 -m venv ui-env
-./ui-env/bin/python -m pip install ./geomasklab-1.0.0rc4-py3-none-any.whl
+./ui-env/bin/python -m pip install ./geomasklab-1.0.0-py3-none-any.whl
 ./ui-env/bin/geomasklab --version
 ./ui-env/bin/geomasklab-ui --port 4180
 ```
@@ -72,7 +72,7 @@ On Windows PowerShell:
 
 ```powershell
 python -m venv cli-env
-.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0rc4-py3-none-any.whl
+.\cli-env\Scripts\python.exe -m pip install .\geomasklab-1.0.0-py3-none-any.whl
 .\cli-env\Scripts\python.exe -I -m geomasklab --version
 .\cli-env\Scripts\python.exe -I -m geomasklab verify .\replay\selected-region-evidence.zip
 .\cli-env\Scripts\python.exe -I -m geomasklab verify-comparison .\replay\comparison.zip
