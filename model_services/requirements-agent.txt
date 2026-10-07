@@ -1,0 +1,10 @@
+# Separate RemoteAgent environment; Python 3.10 is the documented setup.
+# First install torch==2.6.0 and torchvision==0.21.0 from the official CUDA
+# 12.4 wheel index, as shown in docs/local_model_modules.md.
+# This adapter uses the original BF16 checkpoint; no quantization dependency.
+transformers==4.57.6
+accelerate==1.10.1
+tokenizers==0.22.0
+safetensors==0.7.0
+Pillow==11.3.0
+numpy==1.26.4

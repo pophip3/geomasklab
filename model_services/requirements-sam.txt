@@ -1,0 +1,15 @@
+# Separate RemoteSAM environment; do not combine with requirements-agent.txt.
+# First install torch==2.6.0 and torchvision==0.21.0 from the official CUDA
+# 12.4 wheel index, as shown in docs/local_model_modules.md.
+transformers==4.30.2
+tokenizers==0.13.3
+timm==0.6.11
+numpy==1.26.4
+Pillow==11.3.0
+einops==0.8.2
+termcolor==2.5.0
+# The fixed official RemoteSAM source imports the MMCV 1 checkpoint helpers.
+# This is the pure-Python mmcv package, not mmcv-full or MMCV 2.
+mmcv==1.7.2
+opencv-python==4.11.0.86
+yapf==0.40.1

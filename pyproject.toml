@@ -20,6 +20,9 @@ classifiers = [
 [project.scripts]
 geomasklab = "geomasklab.cli:main"
 geomasklab-ui = "workbench.launcher:main"
+geomasklab-models = "model_services.launcher:main"
+geomasklab-agent = "model_services.agent_service:main"
+geomasklab-sam = "model_services.sam_service:main"
 
 [project.urls]
 Documentation = "https://pophip3.github.io/geomasklab/"
@@ -34,7 +37,7 @@ signing = ["cryptography>=42,<47"]
 
 [tool.setuptools]
 include-package-data = false
-packages = ["geomasklab", "workbench"]
+packages = ["geomasklab", "workbench", "model_services"]
 py-modules = ["_source_package"]
 package-dir = {"" = ".", geomasklab = "src/geomasklab", workbench = "workbench"}
 
@@ -44,3 +47,4 @@ version = {attr = "geomasklab._version.VERSION"}
 [tool.setuptools.package-data]
 geomasklab = ["schemas/*.json"]
 workbench = ["web/*.html", "web/*.css", "web/*.js", "web/assets/*.png", "web/assets/*.jpg", "web/assets/*.json"]
+model_services = ["profile.example.json", "requirements-*.txt", "model-lock.json"]

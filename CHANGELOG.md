@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0 — revised delivery, 7 October 2026
+
+- Independent local RemoteAgent and RemoteSAM HTTP adapters with separate Python
+  environments, readiness endpoints, validation and explicit model metadata.
+- Foreground process supervisor, portable local profile and fixed upstream
+  source/model identities; external architecture and weights remain unbundled.
+- Configurable Agent token budget and timeout for slow original-weight offload.
+- Fresh-model acceptance workflow and independent replay of derived regions.
+- The frozen 1.0.0 release and its historical evaluation artifacts are preserved.
+
 ## 1.0.0 - 7 October 2026
 
 - Promote the restored complete rc4 core, CLI and browser baseline to the first stable version.

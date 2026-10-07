@@ -1,0 +1,27 @@
+{
+  "schema": "geomasklab-local-model-profile/1.0",
+  "notes": "Copy to profile.local.json and edit paths. Paths are relative to this file. Python may name an executable or a virtual-environment directory (Scripts/python.exe on Windows, bin/python on Linux). Obtain all model assets separately; no download occurs.",
+  "runtime_dir": "../model-runtime",
+  "readiness_timeout_seconds": 1800,
+  "agent": {
+    "python": "../model-envs/agent",
+    "model_dir": "../model-assets/RemoteAgent",
+    "model_name": "RemoteAgent",
+    "port": 8000,
+    "device": "offload",
+    "gpu_memory": "3GiB",
+    "cpu_memory": "512MiB",
+    "offload_dir": "../model-runtime/agent-offload",
+    "max_pixels": 262144,
+    "max_context": 4096
+  },
+  "sam": {
+    "python": "../model-envs/sam",
+    "source_root": "../external-source/RemoteSAM",
+    "checkpoint": "../model-assets/RemoteSAM/RemoteSAMv1.pth",
+    "tokenizer": "../model-assets/RemoteSAM/bert-base-uncased",
+    "port": 6657,
+    "device": "cuda:0",
+    "fp16": true
+  }
+}

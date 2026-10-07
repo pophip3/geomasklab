@@ -1,0 +1,67 @@
+{
+  "schema": "geomasklab-model-lock/1.0",
+  "agent": {
+    "provider": {
+      "provider": "ModelScope",
+      "repository": "AIMGroup/RemoteAgent",
+      "url": "https://modelscope.cn/models/AIMGroup/RemoteAgent/files",
+      "snapshot_downloaded_at": "2026-09-21",
+      "repository_revision": null,
+      "revision_note": "The exact ModelScope commit revision was not recorded by the download client; file SHA-256 values identify the downloaded snapshot."
+    },
+    "architecture": "Qwen2_5_VLForConditionalGeneration",
+    "dtype": "bfloat16",
+    "tensor_bytes": 16584333312,
+    "files": [
+      {
+        "name": "model.safetensors.index.json",
+        "size_bytes": 57655,
+        "sha256": "4be35310ddc165e46e88de4c3fec8c1210014b0b8717f4544d82cc740814ae0c"
+      },
+      {
+        "name": "model-00001-of-00004.safetensors",
+        "size_bytes": 4968243304,
+        "sha256": "f4f28b4714d1d9b93119af56ec9f9e35e3d641711a0a81a334e2f5f6eb783abf"
+      },
+      {
+        "name": "model-00002-of-00004.safetensors",
+        "size_bytes": 4991495816,
+        "sha256": "27b9a72fb6ed93ebb040546e496fa69396772a50ddd134660982c16590b06ec1"
+      },
+      {
+        "name": "model-00003-of-00004.safetensors",
+        "size_bytes": 4932751040,
+        "sha256": "2e2583c71bf4443b68b767ef848307a8104958b05ff544222253d3addfa9562b"
+      },
+      {
+        "name": "model-00004-of-00004.safetensors",
+        "size_bytes": 1691924384,
+        "sha256": "65800034ea0b5467e25abd1aac5bdd8e23973c06ac3ee8f019f3cc4b98d41319"
+      }
+    ]
+  },
+  "sam": {
+    "checkpoint_sha256": "f85dfa044a527f096b9e41eacfe298040d52e77fca642f46dfe1226745e137e7",
+    "checkpoint_size_bytes": 2566704235,
+    "repository": "1e12Leon/RemoteSAM",
+    "revision": "a6d09f44bac5b64be7f74980b15afb2a749b5e92"
+  },
+  "sam_source_revision": "ebb7bc278c7343c29c8c16b035289f78f40f0f72",
+  "bert_tokenizer_revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+  "sam_source_files": {
+    "args.py": "456ca878c9b5fe1b82949d548a71008a3482272e070aed9569c2836f1c5e8cc2",
+    "lib/segmentation.py": "cad4ef7e2e6363acf06986b08f2c1e439102936d1dd32236b29622df4dee4e97",
+    "lib/_utils.py": "712c9ae922d523fbd45c70469290a942db530ee6f5294f0e024514145492e0ab",
+    "lib/backbone.py": "fbfcc673f6e35c636062cbb1debeedd39d2af0429e2e31be04f98b8d174f3204",
+    "lib/cross_scale_interaction.py": "bed62a544d55b64e56f55ed3c289d0f6f1f1235bbe0a233900a8a47b4cb86e2c",
+    "lib/mask_predictor.py": "43785f50722b90f8f06b6717660c322a1847ed1c904c0a08fc5482e3ee2714bb",
+    "lib/various_receptive.py": "506c5881bd448a50a1fae937c2e5818e33e9e3d4863a2d6946442d5809f57ecb",
+    "lib/transformer.py": "51d633b41e44d9ed2707de6ffde3b3ca2bda4f5d857274de8267218575b3eede",
+    "lib/mmcv_custom/__init__.py": "9237ce78ee99ba95cfabac5e8dc170d66510ebd0f24e0c8338241af1cb11591d",
+    "lib/mmcv_custom/checkpoint.py": "644333b69e063abaffecdf8db6be1d57b120349cd0a85f75cb8eabe50e319c99",
+    "arc/__init__.py": "201d8bd4cfcb6a2c03f8e9450caeff9556afdfbd0131d8dd7b4135ffe2e8c8db",
+    "arc/adaptive_rotated_conv.py": "5ba6f038a6b854c583738c49ec38f50061839fb597df12b02bf01586f54ac5a4",
+    "arc/routing_function.py": "acd1f4909cc3d9f28c02026f2750bb5085ee80c255bffcc16da3ae6f69591ab9",
+    "arc/weight_init.py": "ddd3f041fc9e58d278ac411392823aeb5a249b4e54cbb73154bc45b1bfe99bf2"
+  }
+}

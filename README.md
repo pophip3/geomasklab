@@ -4,6 +4,51 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Software checks](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml)
+[![Reviewer quickstart and core coverage gate](https://github.com/pophip3/geomasklab/actions/workflows/ci.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/ci.yml)
+
+## Reviewer quickstart — bundled data, no models required
+
+Use Python 3.10+ and this **1.0.0 revised snapshot**. The fixed source archive
+records its exact commit and checksums. The commands below use only bundled
+NAIP imagery and a retained color-baseline mask; they perform no model download.
+
+1. Clone and install in a virtual environment:
+
+   ```sh
+   git clone --branch softwarex-v1.0.0-revised https://github.com/pophip3/geomasklab.git
+   cd geomasklab
+   python -m venv .venv
+   ```
+
+   Activate `.venv` with `.\.venv\Scripts\Activate.ps1` on Windows or
+   `source .venv/bin/activate` on Linux/macOS, then run `python -m pip install .`.
+
+2. Recompute the manuscript's saved-domain example:
+
+   ```sh
+   python examples/reproduce_table.py
+   ```
+
+   Expected coverages: **54.41%, 48.09%, 53.52%**; spread **6.32 pp**. Each
+   line identifies its manuscript section/figure. These use different analysis
+   supports and retain the same source prediction. Output ZIPs and counts are
+   saved under `reviewer-output/denominators/`.
+
+3. Verify retained bytes and numerical replay, then reject one changed pixel:
+
+   ```sh
+   python examples/run_replay_demo.py
+   ```
+
+   The original reports PASS. The intentional mutation reports the expected
+   `manifest.checksums.valid_mask.png.sha256` failure; this successful rejection
+   leaves the script's exit code zero. Artifacts are saved under
+   `reviewer-output/replay-demo/`. Unsigned replay proves internal consistency.
+
+Run `geomasklab-ui` to open the complete local workbench. Fresh scene questions
+and text segmentation have a separate [local-model setup](docs/local_model_modules.md)
+and real-inference acceptance command; their original weights need about 19.2 GB
+and suitable memory. The lightweight quickstart above does not rerun those models.
 
 GeoMaskLab binds a binary mask to its image, target, spatial scope, declared valid
 pixels and coverage denominators. Compare results under explicit conditions,
@@ -16,10 +61,25 @@ only **Python 3.10+ and Pillow**. The complete browser workbench is included in 
 Visit the [GeoMaskLab documentation website](https://pophip3.github.io/geomasklab/)
 for the workbench guide, examples and service setup.
 
+## Optional local model modules
+
+Scene questions use **RemoteAgent**; text-driven extraction uses **RemoteAgent +
+RemoteSAM**. The source includes independent local HTTP adapters, separate model
+environment requirements, a supervised launcher and a portable configuration
+example. See [local setup and reviewer use](docs/local_model_modules.md) and
+[fixed upstream identities](docs/model_source_provenance.md).
+
+Reviewers run these services on their own computer after obtaining the external
+weights and architecture. After installation, inference uses local files only.
+The author's computer does not need to stay online. Original BF16 RemoteAgent
+weights require substantial memory; disk offload is slower and has separate
+image/token budgets. Saved evidence and the normal workbench remain usable
+offline without either model. Replay does not generate a new scene answer or mask.
+
 ## Install
 
 ```sh
-git clone https://github.com/pophip3/geomasklab.git
+git clone --branch softwarex-v1.0.0-revised https://github.com/pophip3/geomasklab.git
 cd geomasklab
 python -m venv .venv
 ```
@@ -32,8 +92,10 @@ python -m pip install .
 geomasklab --version
 ```
 
-For independent testing, download the fixed **1.0.0** wheel and source ZIP
-from the [1.0.0 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0).
+For independent testing, use the **1.0.0 revised snapshot** source branch above.
+The [original 1.0.0 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0)
+is retained with its original tag and assets. It predates the local model package
+and the two new reviewer scripts; use matching revised artifacts when available.
 The wheel includes the complete browser interface, images, CLI and JSON Schemas;
 the source ZIP supplies the matching examples and handoff instructions. After
 installing the wheel, run `geomasklab-ui` and open the local URL it prints.
