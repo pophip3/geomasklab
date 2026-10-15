@@ -70,7 +70,8 @@ class AgentClientSettingsTests(unittest.TestCase):
             request.assert_called_once_with('http://example.invalid/v1/chat/completions', {
                 'model': 'EXPLICIT-FAKE-CLIENT-TEST', 'messages': messages,
                 'max_tokens': 128, 'temperature': 0,
-            }, timeout=1800, headers={'Authorization': 'Bearer fixture-only-key'})
+            }, timeout=1800, headers={'Authorization': 'Bearer fixture-only-key',
+                                     'X-Geo-Request-Budget-Seconds':'1795.0'})
 
     def test_default_chat_request_retains_120_second_timeout_and_route_budget(self):
         reply = {'choices': [{'message': {'content': '<answer>Explicit fake fixture.</answer>'}}]}

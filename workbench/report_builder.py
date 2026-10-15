@@ -33,7 +33,8 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
     region_coverage = f'{region_ratio * 100:.4f}%' if region_ratio is not None else 'Not recorded or empty scope'
     origin = {'demo': 'Procedural synthetic image and mask; not neural inference',
               'external': 'User-supplied binary mask; imported without model inference'}.get(result['mode'], 'Live model-service response')
-    category = 'Primary application category; human review required' if capabilities[task['target']]['level'] == 'primary' else 'Experimental category; no frozen semantic evaluation'
+    category = {'primary':'Primary application category','supported':'Supported supervised target',
+                'experimental':'Experimental category; no frozen semantic evaluation'}[capabilities[task['target']]['level']]
     scope = scope_labels[task['side']] + (f'; rectangle ROI {roi["xyxy"]}' if roi else '')
     lines = [f'# GeoMaskLab experiment report: {session["name"]}', '',
         '## Task and prediction provenance', '',

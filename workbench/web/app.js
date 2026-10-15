@@ -4,11 +4,12 @@ const state = { session:null, selected:null, last:null, original:null, mask:null
 const sideNames = {all:'Whole image',left:'Left half',right:'Right half',top:'Top half',bottom:'Bottom half'};
 const qualityNames = {auto:'Automatic',fast:'Fast',accurate:'Tiled refinement'};
 const executionLabel = run => run.execution_kind==='saved_mask_region_analysis'?'Offline region analysis':run.mode==='external'?'Imported prediction':run.mode==='demo'?'Procedural demonstration':'Model-service response';
-const targetNames = {building:'Buildings',aircraft:'Aircraft',road:'Roads',water:'Water',tree:'Vegetation',ship:'Ships'};
+const targetNames = {building:'Buildings',aircraft:'Aircraft',road:'Roads',water:'Water',tree:'Trees',vegetation:'Vegetation',ship:'Ships'};
 const targetLabel = run => (run?.task?.invert?'Non-':'')+(targetNames[run?.task?.target]||'Target').toLowerCase();
-const statusNames = {completed:'Pending semantic review',answered:'Answered',needs_clarification:'Clarification needed',failed:'Failed',needs_review:'Review required',export_ready:'Ready to export'};
-const reviewNames = {pending:'Pending review',accepted:'Accepted by reviewer',rejected:'Rejected by reviewer'};
-const runStateLabel = r => r.mask_url?(reviewNames[r.semantic_review?.state]||statusNames[r.status]):statusNames[r.status];
+const automaticWaterResult = run => run?.task?.target==='water' && run?.mode==='live' && run?.service_metadata?.model?.model_name?.startsWith('GeoMaskLab-Water-');
+const statusNames = {completed:'Completed',answered:'Answered',needs_clarification:'Clarification needed',failed:'Failed',needs_review:'Review required',export_ready:'Ready to export'};
+const reviewNames = {pending:'Unreviewed',accepted:'Accepted',rejected:'Rejected'};
+const runStateLabel = r => r.mask_url && ['accepted','rejected'].includes(r.semantic_review?.state)?reviewNames[r.semantic_review.state]:statusNames[r.status];
 const number = n => Number(n).toLocaleString('en-US');
 const escape = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icon = name => `<svg><use href="#i-${name}"/></svg>`;
@@ -25,6 +26,7 @@ $('modal').addEventListener('click',e=>{if(e.target===$('modal')){const r=$('mod
 async function newExperiment(sample='urban',image=null,name=null){
  if(state.busy)return toast('Wait for the current task to finish.');
  state.busy=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
+ if(typeof refreshWorkbench==='function')refreshWorkbench();
  try{
   const session=await api('/api/session',{sample,image,name});
   await showSession(session);
@@ -36,7 +38,11 @@ async function showSession(session){
   state.loadToken++;Object.assign(state,{session,original,selected:null,last:null,mask:null,view:'original',zoom:1,roi:null,roiDraft:null,roiStart:null,roiDrawing:false,roiClear:false});
   // Restore the mode that actually produced this experiment when the user has
   // not explicitly saved a different preference.
-  if(!session.imported_evidence&&session.runs.length&&!localStorage.getItem('geoscope-mode'))state.mode=session.runs.at(-1).mode;
+  const preference=localStorage.getItem('geoscope-mode');
+  const previousMode=session.runs.at(-1)?.mode;
+  if(['demo','live'].includes(preference))state.mode=preference;
+  else if(!session.imported_evidence&&['demo','live'].includes(previousMode))state.mode=previousMode;
+  if(!['demo','live'].includes(state.mode))state.mode='demo';
   clearTimeout(toastTimer);$('toast').hidden=true;
   $('chat').innerHTML=intro;
   if(session.sample==='airport'){
@@ -63,15 +69,22 @@ async function showSession(session){
 async function openExperiment(id){
  if(state.busy)return toast('Wait for the current task to finish.');
  state.busy=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
+ if(typeof refreshWorkbench==='function')refreshWorkbench();
  try{await showSession(await api('/api/session/'+encodeURIComponent(id)));}
  catch(e){toast(e.message);}finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('sendBtn').disabled=false;$('newBtn').disabled=false;}
+ await resumeActiveTask();
 }
 
 function updateMode(){
+ if($('quickRunBtn'))$('quickRunBtn').disabled=state.busy||(state.mode==='live'&&!state.status?.sam_configured);
+ const supported=state.status?.sam_supported_quality_modes;
+ const tiled=$('qualityMode').querySelector('[value="accurate"]');
+ tiled.disabled=state.mode==='live'&&Array.isArray(supported)&&!supported.includes('accurate');
+ tiled.textContent=tiled.disabled?'Tiled refinement · Unavailable for this service':'Tiled refinement';
  $('connectionLabel').textContent=state.mode==='demo'?'Demo mode':'Live mode';
  $('provenanceLabel').textContent=state.mode==='demo'?(state.session?.sample?'Synthetic example · Procedural mask':'Uploaded image · Import a mask or use model services'):'Live mode · External model services';
- $('composerNote').textContent=state.mode==='demo'?'Offline demonstration · No model calls':'Live mode sends images to your configured model services.';
- if(state.session?.imported_evidence)$('provenanceLabel').textContent='Imported evidence · No inference during import';
+ $('composerNote').textContent=state.mode==='demo'?'Offline demonstration':'Live mode sends images to your configured model services.';
+ if(state.session?.imported_evidence)$('provenanceLabel').textContent='Imported evidence';
  if(state.session?.imported_evidence&&state.mode==='demo')$('composerNote').textContent='Imported evidence supports offline review and region recalculation. New segmentation requests require model services.';
 }
 
@@ -81,10 +94,11 @@ $('bundleInput').onchange=async e=>{
  if(state.busy)return toast('Wait for the current task to finish.');
  if(file.size>12*1024*1024)return toast('Evidence bundles must be 12 MB or smaller.');
  state.busy=true;$('importBtn').disabled=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;
+ if(typeof refreshWorkbench==='function')refreshWorkbench();
  try{
   const bundle=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Could not read the evidence bundle.'));reader.readAsDataURL(file);});
   await showSession(await api('/api/import',{bundle,name:file.name}));
-  toast('Evidence verified and restored without inference. You can now review or recalculate a region.');
+  toast('Evidence restored. Open a result or calculate a region.');
  }catch(error){modal('Evidence verification failed',`<p>${escape(error.message)}</p><p>The current experiment is preserved. Check the source bundle before importing it again.</p>`,'EVIDENCE HANDOFF');}
  finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('importBtn').disabled=false;$('sendBtn').disabled=false;$('newBtn').disabled=false;}
 };
@@ -254,15 +268,21 @@ async function selectRun(run){
 }
 function renderReview(run){
  const review=run.semantic_review||{state:'pending',events:[]},last=review.events.at(-1);
+ if(automaticWaterResult(run)&&review.state==='pending'){
+  $('reviewPanel').hidden=true;$('reviewSummary').textContent='Water segmentation and coverage calculated.';
+  $('resultStatus').textContent='Completed';$('resultStatus').className='result-badge success';
+  $('resultSubtitle').textContent=`V${run.version} · Water segmentation`;
+  return;
+ }
  $('reviewPanel').hidden=false;$('reviewState').textContent=reviewNames[review.state]||reviewNames.pending;
- $('reviewSummary').textContent=last?`${last.reviewer} · ${new Date(last.at).toLocaleString('en-US')} · ${last.note}`:'Inspect target identity, omissions, false positives and boundaries before recording a decision.';
- $('resultStatus').textContent=reviewNames[review.state]||reviewNames.pending;
+ $('reviewSummary').textContent=last?`${last.reviewer} · ${new Date(last.at).toLocaleString('en-US')} · ${last.note}`:'Add an optional review note to this result.';
+ $('resultStatus').textContent=runStateLabel(run);
  $('resultStatus').className='result-badge '+(review.state==='accepted'?'success':review.state==='rejected'?'warning':'');
 }
 $('reviewBtn').onclick=()=>{
  if(state.busy||!state.selected)return toast('Wait for the task to finish before reviewing.');
  const selected=state.selected,sessionId=state.session.id;
- modal('Record review',`<p>Inspect the original image and overlay for target identity, omissions, false positives and boundary errors. This decision applies only to V${selected.version}; each new result starts pending review.</p><div class="modal-notice">Review does not edit masks or measurements. Decisions are self-reported; they are not independent accuracy estimates or authenticated identities.</div><form id="reviewForm" class="review-form"><label for="reviewDecision">Review decision</label><select id="reviewDecision" required><option value="">Choose a decision</option><option value="accepted">Accept this result</option><option value="rejected">Reject this result</option><option value="pending">Return to pending review</option></select><label for="reviewerName">Reviewer label</label><input id="reviewerName" required maxlength="100" autocomplete="off"><label for="reviewNote">Review rationale</label><textarea id="reviewNote" required maxlength="2000" rows="4" placeholder="Describe the regions inspected, any problems found, and suitability for the intended use."></textarea><button type="submit" class="primary" id="saveReview">Save review</button></form><h3>Review history</h3><div class="review-history">${(selected.semantic_review?.events||[]).map(e=>`<p><strong>${escape(reviewNames[e.decision])}</strong> · ${escape(e.reviewer)} · ${escape(new Date(e.at).toLocaleString('en-US'))}<br>${escape(e.note)}</p>`).join('')||'<p>No review records yet.</p>'}</div>`,'SEMANTIC REVIEW');
+ modal('Record review',`<p>Save a review for V${selected.version}. The mask stays unchanged.</p><form id="reviewForm" class="review-form"><label for="reviewDecision">Review decision</label><select id="reviewDecision" required><option value="">Choose a decision</option><option value="accepted">Accept this result</option><option value="rejected">Reject this result</option><option value="pending">Clear the decision</option></select><label for="reviewerName">Reviewer label</label><input id="reviewerName" required maxlength="100" autocomplete="off"><label for="reviewNote">Review rationale</label><textarea id="reviewNote" required maxlength="2000" rows="4" placeholder="Describe the regions inspected, any problems found, and suitability for the intended use."></textarea><button type="submit" class="primary" id="saveReview">Save review</button></form><h3>Review history</h3><div class="review-history">${(selected.semantic_review?.events||[]).map(e=>`<p><strong>${escape(reviewNames[e.decision])}</strong> · ${escape(e.reviewer)} · ${escape(new Date(e.at).toLocaleString('en-US'))}<br>${escape(e.note)}</p>`).join('')||'<p>No review records yet.</p>'}</div>`,'SEMANTIC REVIEW');
  $('reviewForm').onsubmit=async e=>{
   e.preventDefault();const button=$('saveReview');button.disabled=true;
   try{const updated=await api('/api/review',{session_id:sessionId,run_id:selected.id,decision:$('reviewDecision').value,reviewer:$('reviewerName').value,note:$('reviewNote').value});
@@ -271,10 +291,56 @@ $('reviewBtn').onclick=()=>{
   }catch(error){toast(error.message);button.disabled=false;}
  };
 };
+function taskBusy(busy){
+ state.busy=busy;$('sendBtn').disabled=busy;$('newBtn').disabled=busy;$('busyOverlay').hidden=!busy;
+ if(typeof refreshWorkbench==='function')refreshWorkbench();
+}
+async function displayTaskResult(result){
+ if(state.session.runs.some(r=>r.id===result.id))return;
+ state.session.runs.push(result);
+ state.last=result;
+ addMessage('assistant',result.message,['failed','needs_clarification','needs_review'].includes(result.status)?'warning':'',result);
+ if(result.mask_url)await selectRun(result);else{if(result.status==='answered')renderAnswer(result);renderTrace(result);}
+ if(result.status==='export_ready')download(result.export_url);
+ if(result.status==='failed'&&state.selected)toast('The task failed. The previous valid result remains on the canvas.');
+}
+async function followTask(job){
+ const key='geoscope-task-'+job.session_id;
+ localStorage.setItem(key,job.id);
+ let failures=0;
+ while(job.status==='running'){
+  $('busyOverlay').querySelector('span:last-child').textContent=job.phase+' · Task '+job.id;
+  await new Promise(resolve=>setTimeout(resolve,750));
+  try{
+   const response=await fetch('/api/task/'+encodeURIComponent(job.id),{signal:AbortSignal.timeout(15000)});
+   const data=await response.json();if(!response.ok)throw new Error(data.error||'Task unavailable');
+   job=data;failures=0;
+  }catch(error){
+   failures++;
+   $('busyOverlay').querySelector('span:last-child').textContent='Connection interrupted; reconnecting to saved task '+job.id+'.';
+   if(failures>=12)throw new Error('Cannot reconnect to task '+job.id+'. It may still be running. Reload this experiment to inspect its saved status; do not submit a duplicate task.');
+  }
+ }
+ localStorage.removeItem(key);
+ if(job.status!=='completed')throw new Error(job.error||'Task did not complete. Inspect the saved experiment before retrying.');
+ await displayTaskResult(job.result);
+}
+async function resumeActiveTask(){
+ if(state.busy||!state.session)return;
+ const sessionId=state.session.id,key='geoscope-task-'+sessionId;
+ let job;
+ taskBusy(true);
+ try{
+  const remembered=localStorage.getItem(key);
+  job=remembered?await api('/api/task/'+encodeURIComponent(remembered)):await api('/api/task-active/'+encodeURIComponent(sessionId));
+  if(job)await followTask(job);
+ }catch(error){addMessage('assistant',error.message,'warning');toast('Saved task status is unavailable. Inspect the experiment before retrying.');}
+ finally{taskBusy(false);}
+}
 async function run(query,simulateFailure=false){
  if(state.busy||!state.session)return;
  query=query.trim();if(!query)return;
- state.busy=true;$('sendBtn').disabled=true;$('newBtn').disabled=true;$('busyOverlay').hidden=false;$('query').value='';
+ taskBusy(true);$('query').value='';
  if($('starterList'))$('starterList').remove();
  const welcome=$('chat').querySelector('.assistant-intro');if(welcome)welcome.remove();
  addMessage('user',query);const parent=state.selected?.id||null;
@@ -284,14 +350,10 @@ async function run(query,simulateFailure=false){
   if(state.roi)payload.roi=state.roi;
   else if(state.roiClear)payload.roi={};
   if(state.roi)payload.scope='all';
-  const result=await api('/api/run',payload);
-  state.session.runs.push(result);state.last=result;
-  addMessage('assistant',result.message,['failed','needs_clarification','needs_review'].includes(result.status)?'warning':'',result);
-  if(result.mask_url)await selectRun(result);else{if(result.status==='answered')renderAnswer(result);renderTrace(result);}
-  if(result.status==='export_ready')download(result.export_url);
-  if(result.status==='failed'&&state.selected)toast('The task failed. The previous valid result remains on the canvas.');
- }catch(e){addMessage('assistant',e.message,'warning');toast('Request failed. No result was generated.');}
- finally{state.busy=false;if(typeof refreshWorkbench==='function')refreshWorkbench();$('sendBtn').disabled=false;$('newBtn').disabled=false;$('busyOverlay').hidden=true;}
+  const job=await api('/api/run/start',payload);
+  await followTask(job);
+ }catch(e){addMessage('assistant',e.message,'warning');toast('Task response unavailable. Inspect the saved task and experiment before retrying.');}
+ finally{taskBusy(false);}
 }
 $('taskForm').onsubmit=e=>{e.preventDefault();run($('query').value);};
 $('query').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();run($('query').value);}};
@@ -309,7 +371,7 @@ $('recalculateBtn').onclick=()=>{
    <p>${roi?`Current rectangle: ${escape(JSON.stringify(roi.xyxy))}.`:'To analyze a rectangle, close this dialog and draw an ROI on the image first.'}</p>
    <label for="validityAction">Valid-pixel condition</label><select id="validityAction"><option value="keep">Keep saved validity</option><option value="replace">Upload an aligned validity PNG</option><option value="all_valid">Declare every image pixel valid</option></select>
    <div id="validityUpload" hidden><label for="validityFile">Validity mask · white includes, black excludes</label><input id="validityFile" type="file" accept="image/png,.png"><label for="validitySource">Source and exclusion rationale</label><textarea id="validitySource" maxlength="1000" rows="3" placeholder="Describe who defined the exclusions, the method and intended use."></textarea><p>Use the displayed image grid. NoData, clouds or black borders are never inferred from image colors.</p></div>
-   <p>The semantic target and complement setting are retained. The new result will have a separate review record.</p>
+   <p>Save the region calculation as a new result version.</p>
    <button id="saveRegion" class="primary" type="submit">Create result version</button></form>`,'OFFLINE REGION ANALYSIS');
  $('regionScope').value=roi?'roi':state.selected.task.side;
  $('validityAction').onchange=()=>{const upload=$('validityAction').value==='replace';$('validityUpload').hidden=!upload;const file=$('validityFile');file.dataset.fileRequired=String(upload);file.required=upload&&!file.dataset.englishPicker;$('validitySource').required=upload;};
@@ -333,7 +395,7 @@ $('recalculateBtn').onclick=()=>{
 $('reportBtn').onclick=()=>{if(state.selected?.report_url)download(state.selected.report_url);};
 function gallery(){
  if(state.busy)return toast('Wait for the current task to finish.');
- modal('Choose an image',`<p>Upload an image and import an aligned external mask, or explore the procedural examples. Model services are optional.</p><div class="sample-grid">${Object.entries(state.status?.samples||{}).map(([key,s])=>`<button class="sample-card" data-sample="${key}"><img src="assets/${escape(s.file)}" alt="${escape(s.name)}"><strong>${escape(s.name)}</strong><small>${s.size.join(' × ')} px · Procedural ${targetNames[s.target].toLowerCase()} mask</small></button>`).join('')}</div><p style="margin-top:16px">Example masks demonstrate interactions and pixel operations. They are not RemoteSAM predictions or ground truth for EO accuracy evaluation.</p><button class="secondary" id="modalUpload">${icon('image')}Upload an image</button>`,'IMAGE LIBRARY');
+ modal('Choose an image',`<p>Upload an image or choose a built-in example.</p><div class="sample-grid">${Object.entries(state.status?.samples||{}).map(([key,s])=>`<button class="sample-card" data-sample="${key}"><img src="assets/${escape(s.file)}" alt="${escape(s.name)}"><strong>${escape(s.name)}</strong><small>${s.size.join(' × ')} px · Procedural ${targetNames[s.target].toLowerCase()} mask</small></button>`).join('')}</div><p style="margin-top:16px">Built-in examples use procedural masks.</p><button class="secondary" id="modalUpload">${icon('image')}Upload an image</button>`,'IMAGE LIBRARY');
  $('modalBody').querySelectorAll('[data-sample]').forEach(b=>b.onclick=()=>newExperiment(b.dataset.sample));$('modalUpload').onclick=()=>{closeModal();$('fileInput').click();};
 }
 $('galleryBtn').onclick=gallery;$('newBtn').onclick=gallery;$('uploadBtn').onclick=gallery;$('workspaceBtn').onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
@@ -409,30 +471,31 @@ $('historyBtn').onclick=history;
 function details(log=false){
  const r=log?state.last||state.selected:state.selected||state.last;
  if(!r)return modal('Run details','<p>No task has run yet. Execution events, provenance and parameters will appear here.</p>');
- modal(log?'Full execution log':'Result and execution details',`<p><strong>RUN ${r.id}</strong> · ${executionLabel(r)} · ${escape(runStateLabel(r))}</p><div class="modal-notice">${escape(r.provenance.perception)}</div>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>Complete evidence bundle ↓</a></div>`:''}<h3>Data source and method</h3><p>${escape(r.provenance.source)}</p><p>Planner: ${escape(r.provenance.planner)}. Coverage is measured from the binary mask; no geographic area is inferred.</p><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre>`,'RUN PROVENANCE');
+ modal(log?'Full execution log':'Result and execution details',`<p><strong>RUN ${r.id}</strong> · ${executionLabel(r)} · ${escape(runStateLabel(r))}</p><p><strong>Result source:</strong> ${escape(r.provenance.perception)}</p>${r.mask_url?`<div class="download-list"><a href="${r.mask_url}" download="mask.png">mask.png ↓</a><a href="${r.overlay_url}" download="overlay.png">overlay.png ↓</a><a href="${r.export_url}" download>Complete evidence bundle ↓</a></div>`:''}<h3>Data source and method</h3><p>${escape(r.provenance.source)}</p><p>Planner: ${escape(r.provenance.planner)}. Coverage is calculated from mask pixels.</p><details${log?' open':''}><summary>Technical details</summary><pre>${escape(JSON.stringify(log?r.trace:r,null,2))}</pre></details>`,'RUN PROVENANCE');
 }
 $('detailBtn').onclick=()=>details(false);$('logBtn').onclick=()=>details(true);
-$('sourceBtn').onclick=()=>modal('Image provenance',`<p>${escape(state.session?.source||'No image selected')}</p><p>Built-in masks are generated from geometric rules. They test interactions, context and pixel operations; they do not measure model accuracy.</p><p>Coordinates start at the top-left: X increases rightward and Y downward. Directions are image-relative. Whole-image coverage uses all image pixels as its denominator.</p>`,'DATA NOTES');
+$('sourceBtn').onclick=()=>modal('Image provenance',`<p>${escape(state.session?.source||'No image selected')}</p><p>Built-in examples use procedural masks.</p><p>Coordinates start at the top-left: X increases rightward and Y downward. Directions are image-relative. Whole-image coverage uses all image pixels as its denominator.</p>`,'DATA NOTES');
 async function connections(){
  try{state.status=await api('/api/status');}catch(e){return toast('The local server is unavailable.');}
- const canLive=state.status.agent_configured&&state.status.sam_configured;
- modal('Runtime settings',`<div class="mode-options"><button id="demoMode" class="${state.mode==='demo'?'selected':''}">Offline demo<small>Procedural masks · Deterministic measurements</small></button><button id="liveMode" class="${state.mode==='live'?'selected':''}" ${!canLive?'disabled':''}>Model services<small>${canLive?'Configured; verified on execution':'Planner and segmentation services required'}</small></button></div><div class="connection-list"><div><span>Planner service</span><b>${state.status.agent_configured?'Configured; inference not checked':'Not configured'}</b></div><div><span>RemoteSAM</span><b>${state.status.sam_configured?'Configured; inference not checked':'Not configured'}</b></div><div><span>Measurements and local storage</span><b style="color:#5d8850">Local server available</b></div></div><p>Live mode sends images to the services configured on the Python server. API keys stay on the server.</p><h3>Connection setup</h3><p>Set GEO_AGENT_BASE_URL, GEO_AGENT_MODEL and GEO_REMOTESAM_URL as described in the README, then restart. Configuration does not establish successful inference.</p><button class="secondary" id="failureDemo">Try a controlled failure</button>`,'RUNTIME SETTINGS');
+ const canLive=state.status.sam_configured||state.status.agent_configured;
+ const configuredLabel=canLive?'Configured model services':'Add a model service';
+ modal('Runtime settings',`<div class="mode-options"><button id="demoMode" class="${state.mode==='demo'?'selected':''}">Offline demo<small>Procedural masks · Deterministic measurements</small></button><button id="liveMode" class="${state.mode==='live'?'selected':''}" ${!canLive?'disabled':''}>Model services<small>${configuredLabel}</small></button></div><div class="connection-list"><div><span>Planner service</span><b>${state.status.agent_configured?'Configured':'Not configured'}</b></div><div><span>RemoteSAM</span><b>${state.status.sam_configured?'Configured':'Not configured'}</b></div><div><span>Measurements and local storage</span><b style="color:#5d8850">Local server available</b></div></div><p>Live mode sends images to the services configured on the Python server. API keys stay on the server.</p><h3>Connection setup</h3><p>Set GEO_AGENT_BASE_URL, GEO_AGENT_MODEL and GEO_REMOTESAM_URL as described in the README, then restart. </p><button class="secondary" id="failureDemo">Try a controlled failure</button>`,'RUNTIME SETTINGS');
  $('demoMode').onclick=()=>{state.mode='demo';localStorage.setItem('geoscope-mode','demo');updateMode();closeModal();toast('Switched to offline demo.');};$('liveMode').onclick=()=>{state.mode='live';localStorage.setItem('geoscope-mode','live');updateMode();closeModal();toast('Switched to live model services.');};
  $('failureDemo').onclick=()=>{closeModal();run('Test preservation of earlier results after a controlled tool failure.',true);};
- $('modalBody').insertAdjacentHTML('beforeend','<h3>Service connection checks</h3><p>The workbench validates RemoteAgent plans before calling RemoteSAM and returns tool feedback to the planner. These checks inspect service availability and readiness declarations without sending images; they do not evaluate inference quality.</p><button class="secondary" id="checkServices">Check connections</button><pre id="serviceReport" hidden></pre><p>Configure .env in the project root, then restart. Your machine must be able to reach the configured services.</p>');
+ $('modalBody').insertAdjacentHTML('beforeend','<h3>Service connection checks</h3><p>Check the configured model services.</p><button class="secondary" id="checkServices">Check connections</button><pre id="serviceReport" hidden></pre><p>Configure .env in the project root, then restart. Your machine must be able to reach the configured services.</p>');
  $('checkServices').onclick=async()=>{
   const button=$('checkServices'),box=$('serviceReport');button.disabled=true;box.hidden=false;box.textContent='Checking service availability…';
-  try{const report=await api('/api/check-services',{});box.textContent=`Planner service：${report.agent.message}\nRemoteSAM：${report.sam.message}\n\n${report.note}`;}
+  try{const report=await api('/api/check-services',{});if(report.sam.supported_quality_modes){state.status.sam_supported_quality_modes=report.sam.supported_quality_modes;updateMode();}box.textContent=`Planner service：${report.agent.message}\nRemoteSAM：${report.sam.message}\n\n${report.note}`;}
   catch(e){box.textContent=e.message;}finally{button.disabled=false;}
  };
 }
 $('connectionBtn').onclick=connections;
-$('aboutBtn').onclick=()=>modal('Measurements you can inspect and replay',`<p>GeoMaskLab turns externally supplied segmentation masks into measurements with explicit regions, valid pixels and portable evidence.</p><h3>Connected workflow</h3><p>Import a mask → define analysis conditions → measure and compare on a common valid domain → inspect candidate boundaries → export and replay the saved operation. Explicit manifests support isolated failures, cancellation and verified resume for offline batches.</p><h3>Reusable core</h3><p>The browser and command-line tools use the same installed Python core. Headless pixel workflows require only Pillow. Model services are optional; masks can come from another tool or a manual annotation workflow.</p><h3>Interpretation</h3><p>Comparison accounts separately for changes within the shared domain and differences outside it. This accounting does not establish a causal effect of model or configuration changes. Components are review candidates, not verified object counts. Declared validity and alignment require user judgment.</p><h3>Data and limitations</h3><p>The bundled real NAIP workflow uses an unvalidated color baseline and controlled pixel edits to check software behavior. Procedural examples also demonstrate interactions. Semantic accuracy and human usability require separate evaluation. Geographic area requires explicit georeferencing and the optional geospatial extension; internal packet replay establishes consistency, while trusted signatures or external digests address origin authenticity.</p><p>Experiments are stored locally and can be restored after a page reload or server restart.</p>`,'ABOUT GEOMASKLAB');
+$('aboutBtn').onclick=()=>modal('About GeoMaskLab',`<p>Segment remote-sensing images, calculate coverage and save the complete experiment.</p><h3>Workflow</h3><p>Choose an image and target → run segmentation → compare versions → export images, masks, measurements and logs.</p><h3>Measurements</h3><p>Calculate coverage for the whole image or a selected region. Compare masks on a shared valid pixel domain and inspect changed pixels.</p><h3>Local workspace</h3><p>The browser and CLI use the same Python core. Experiments are stored locally and reopen after a reload or restart.</p><h3>Examples and extensions</h3><p>Built-in examples use procedural masks. The NAIP preview shows a vegetation color baseline. Model services provide image segmentation; the geospatial extension supports georeferenced area calculations.</p>`,'GEOMASKLAB');
 
 async function init(){
  try{
   state.status=await api('/api/status');const saved=localStorage.getItem('geoscope-session');
-  if(saved){try{await showSession(await api('/api/session/'+encodeURIComponent(saved)));return;}catch(e){localStorage.removeItem('geoscope-session');}}
+  if(saved){try{await showSession(await api('/api/session/'+encodeURIComponent(saved)));await resumeActiveTask();return;}catch(e){localStorage.removeItem('geoscope-session');}}
   await newExperiment('urban');
  }
  catch(e){modal('Local server not running','<p>Start the local server as described in the README, then open http://127.0.0.1:4180.</p>');}

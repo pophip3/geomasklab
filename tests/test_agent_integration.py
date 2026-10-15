@@ -61,6 +61,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
         self.env = patch.dict(os.environ,{'GEO_AGENT_BASE_URL':self.base+'/v1',
             'GEO_AGENT_MODEL':'EXPLICIT-FAKE-MODEL','GEO_AGENT_API_KEY':'test-key-not-a-secret',
             'GEO_REMOTESAM_URL':self.base+'/predict','GEO_REMOTESAM_REVISION':'fake-v1',
+            'GEO_BUILDING_MODEL_REVISION':'fake-building-v1',
             'GEO_SERVICE_PROXY_MODE':'direct'}); self.env.start()
         FakeAgentAndSAM.decision = 'T_call(referring_expression_segmentation, "/wrong.png", "all buildings")'
         FakeAgentAndSAM.final = '<answer>已收到执行结果。</answer>'

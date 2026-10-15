@@ -91,7 +91,36 @@ def inspect_services():
             declared = data.get('ready') is True or data.get('status') == 'ready'
             report['sam'] = {'status': 'ready' if declared else 'not_ready',
                              'message': 'Service declares readiness; real segmentation remains unverified.' if declared else 'No explicit ready=true or status=ready declaration was received.'}
+            supported=data.get('supported_quality_modes',data.get('metadata',{}).get('supported_quality_modes'))
+            if isinstance(supported,list) and all(item in ('fast','accurate') for item in supported):
+                report['sam']['supported_quality_modes']=supported
         except Exception as exc:
             report['sam'] = {'status': 'unknown', 'message': (str(exc) if isinstance(exc, ValueError) else 'Invalid readiness-response format.') + '; services without /ready require separate /predict acceptance.'}
     report['services_ready'] = all(report[key]['status'] == 'ready' for key in ('agent', 'sam'))
     return report
+
+
+def validate_sam_quality(quality):
+    """Reject explicitly unsupported tiled requests before expensive planning.
+
+    Legacy services without declarations retain response-time validation.
+    A missing declaration never establishes tiled-inference support.
+    """
+    if quality!='accurate':
+        return
+    configured=os.environ.get('GEO_REMOTESAM_QUALITY_MODES','')
+    if configured:
+        supported=configured.split(',')
+        if any(item not in ('fast','accurate') for item in supported):
+            raise ValueError('GEO_REMOTESAM_QUALITY_MODES must list fast and/or accurate.')
+    else:
+        url=os.environ.get('GEO_REMOTESAM_URL','')
+        if not url:return
+        parts=urllib.parse.urlsplit(url)
+        ready=urllib.parse.urlunsplit((parts.scheme,parts.netloc,parts.path.rstrip('/').rsplit('/',1)[0]+'/ready','',''))
+        try:
+            data=request_json(ready,timeout=5)
+            supported=data.get('supported_quality_modes',data.get('metadata',{}).get('supported_quality_modes'))
+        except ValueError:return
+    if isinstance(supported,list) and 'accurate' not in supported:
+        raise ValueError('This segmentation service does not support tiled refinement. Select Fast or Automatic. No planner or segmentation inference was called.')

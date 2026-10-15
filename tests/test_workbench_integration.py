@@ -63,6 +63,7 @@ class IntegrationTests(unittest.TestCase):
         self.env_patch = patch.dict(os.environ, {
             'GEO_AGENT_BASE_URL': self.endpoint + '/v1', 'GEO_AGENT_MODEL': 'TEST-FAKE-ONLY',
             'GEO_REMOTESAM_URL': self.endpoint + '/predict', 'GEO_REMOTESAM_REVISION': 'fake-fixture-v1',
+            'GEO_BUILDING_MODEL_REVISION': 'fake-building-v1',
             'GEO_SERVICE_PROXY_MODE': 'direct', 'http_proxy': 'http://127.0.0.1:1',
             'https_proxy': 'http://127.0.0.1:1', 'no_proxy': '', 'NO_PROXY': '',
         }); self.env_patch.start()
@@ -85,13 +86,13 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(server.session_index()[0]['run_count'], 2)
     def test_revision_change_invalidates_cached_segmentation(self):
         first = self.run_task('提取右侧建筑')
-        os.environ['GEO_REMOTESAM_REVISION'] = 'fake-fixture-v2'
+        os.environ['GEO_BUILDING_MODEL_REVISION'] = 'fake-building-v2'
         second = self.run_task('改成左侧', parent_run_id=first['id'])
         self.assertEqual(FakeModels.calls, 2); self.assertNotIn('reused_from_run_id', second)
     def test_unknown_revision_and_force_do_not_reuse(self):
         first = self.run_task('提取右侧建筑')
         self.run_task('改成左侧', parent_run_id=first['id'], force_perception=True)
-        os.environ['GEO_REMOTESAM_REVISION'] = ''
+        os.environ['GEO_BUILDING_MODEL_REVISION'] = ''
         self.run_task('改成左侧', parent_run_id=first['id'])
         self.assertEqual(FakeModels.calls, 3)
     def test_corrupt_cached_mask_triggers_new_inference(self):
@@ -104,6 +105,14 @@ class IntegrationTests(unittest.TestCase):
             result = self.run_task('提取右侧建筑')
         self.assertEqual(result['status'], 'failed'); self.assertNotIn('metrics', result)
         self.assertFalse((server.DATA/self.session['id']/result['id']/'mask.png').exists())
+    def test_quick_building_uses_building_mask_without_planner(self):
+        response={'status':'success','masks':{'building':server.image_b64(Image.new('L',(11,7),255))},'quality_mode':'fast'}
+        with patch.object(server,'post_json',return_value=response) as transport, patch.object(server,'AgentTurn',side_effect=AssertionError('Quick task must preserve its explicit target')):
+            result=self.run_task('Extract only buildings in the whole image.',quality_mode='fast')
+        self.assertEqual(result['status'],'completed')
+        self.assertEqual(result['task']['target'],'building')
+        self.assertEqual(transport.call_args.args[1]['classes'],['building'])
+        self.assertEqual(result['metrics']['pixel_area'],77)
     def test_service_probe_does_not_infer_and_requires_true_readiness(self):
         report = inspect_services()
         self.assertTrue(report['services_ready']); self.assertFalse(report['inference_verified'])
@@ -170,17 +179,17 @@ class IntegrationTests(unittest.TestCase):
         self.assertIn('fixture-checkpoint',report)
         self.assertTrue(result['capability']['semantic_review_required'])
 
-    def test_experimental_category_stays_available_and_explicitly_labelled(self):
-        response={'status':'success','mask':server.image_b64(Image.new('L',(11,7),255)),'quality_mode':'fast'}
+    def test_road_uses_explicit_semantic_route_and_plain_result(self):
+        response={'status':'success','masks':{'road':server.image_b64(Image.new('L',(11,7),255))},'quality_mode':'fast'}
         with patch('workbench.agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all roads")'), \
              patch.object(server,'post_json',return_value=response):
             result=self.run_task('提取道路',quality_mode='fast')
         self.assertEqual(result['status'],'completed')
-        self.assertEqual(result['capability']['level'],'experimental')
-        self.assertIn('experimental',result['message'])
+        self.assertEqual(result['capability']['level'],'supported')
+        self.assertNotIn('experimental',result['message'])
         report=(server.DATA/self.session['id']/result['id']/'report.md').read_text(encoding='utf-8')
-        self.assertIn('"text": "all roads"',report)
-        self.assertIn('Experimental category',report)
+        self.assertIn('"classes": ["road"]',report)
+        self.assertNotIn('Experimental category',report)
 
     def test_demo_report_never_invents_a_model_prompt(self):
         s=server.SESSIONS[server.new_session('urban')['id']]

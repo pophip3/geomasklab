@@ -17,7 +17,7 @@ def main(argv=None):
     from workbench import server
     from geomasklab import __version__
     try:
-        httpd = ThreadingHTTPServer(('127.0.0.1', args.port), server.Handler)
+        httpd = server.WorkbenchHTTPServer(('127.0.0.1', args.port), server.Handler)
     except OSError as exc:
         parser.exit(1, f'Cannot open local port {args.port}: {exc}. Try --port 4182\n')
     print(f'GeoMaskLab {__version__}: http://127.0.0.1:{args.port}\n'

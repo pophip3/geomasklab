@@ -42,6 +42,15 @@ class FakeProcess:
 
 
 class LauncherTests(unittest.TestCase):
+    def test_installed_adapter_bootstrap_uses_the_exact_package_directory(self):
+        installed_root = Path('installed-package-root').resolve()
+        with patch('model_services.launcher.REPO_ROOT', installed_root):
+            command = build_command(self.config, 'sam')
+        self.assertEqual(command[1:3], ['-u', '-c'])
+        self.assertIn(repr(str(installed_root)), command[3])
+        self.assertIn('model_services.sam_service', command[3])
+        self.assertNotIn('PYTHONPATH', command[3])
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         # Resolve macOS /var symlinks and Windows runner short-path aliases,
@@ -104,10 +113,12 @@ class LauncherTests(unittest.TestCase):
         settings = workbench_settings(self.config)
         self.assertIn("GEO_AGENT_MAX_TOKENS=128", settings)
         self.assertIn("GEO_AGENT_TIMEOUT_SECONDS=3600", settings)
+        self.assertIn("GEO_AGENT_FEEDBACK_TIMEOUT_SECONDS=1800", settings)
         self.config["agent"]["device"] = "cuda"
         settings = workbench_settings(self.config)
         self.assertNotIn("GEO_AGENT_MAX_TOKENS=", settings)
         self.assertNotIn("GEO_AGENT_TIMEOUT_SECONDS=", settings)
+        self.assertNotIn("GEO_AGENT_FEEDBACK_TIMEOUT_SECONDS=", settings)
 
     def test_sam_revision_changes_with_precision_and_adapter_parameters(self):
         metadata = {"checkpoint_sha256": "same-weight", "source_tree_sha256": "same-source",
@@ -123,6 +134,21 @@ class LauncherTests(unittest.TestCase):
         changed_parameters = workbench_settings(self.config, "sam", report)
         self.assertNotEqual(float32, changed_parameters)
         self.assertIn(":weights=same-weight:source=same-source:pipeline=", original)
+
+    def test_declared_tiled_capability_and_implementation_change_cache_identity(self):
+        metadata = {'checkpoint_sha256': 'same-weight', 'source_tree_sha256': 'same-source',
+                    'supported_quality_modes': ['fast', 'accurate'],
+                    'adapter_files_sha256': {'tiled_inference.py': 'first'},
+                    'tiled_parameters': {'core_size_pixels': 512}}
+        report = {'services': {'sam': {'ready_declaration': metadata}}}
+        first = workbench_settings(self.config, 'sam', report)
+        self.assertIn('GEO_REMOTESAM_QUALITY_MODES=fast,accurate', first)
+        metadata['adapter_files_sha256']['tiled_inference.py'] = 'changed'
+        changed = workbench_settings(self.config, 'sam', report)
+        self.assertNotEqual(first.split('GEO_REMOTESAM_REVISION=')[1],
+                            changed.split('GEO_REMOTESAM_REVISION=')[1])
+        metadata['supported_quality_modes'] = ['fast']
+        self.assertIn('GEO_REMOTESAM_QUALITY_MODES=fast\n', workbench_settings(self.config, 'sam', report))
 
     def test_installed_children_avoid_another_environment_site_packages(self):
         installed_root = self.root / "core-environment/site-packages"

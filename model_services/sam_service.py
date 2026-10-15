@@ -5,6 +5,7 @@ import argparse
 import base64
 import io
 import json
+from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import threading
 import time
@@ -12,11 +13,14 @@ import time
 from PIL import Image, UnidentifiedImageError
 
 from model_services.sam_backend import PARAMETERS, SERVICE_VERSION, RemoteSAMBackend
+from model_services.tiled_inference import TILED_PARAMETERS, predict_tiled
+from model_services.water_backend import OEMWaterBackend, default_water_model, is_water_request
+from model_services.landcover_backend import LandcoverBackend, default_landcover_model, landcover_target
 
 MAX_IMAGE_BYTES = 20 * 1024 * 1024
 MAX_IMAGE_PIXELS = 64_000_000
 MAX_REQUEST_BYTES = 28 * 1024 * 1024
-CLASSES = {"building", "aircraft", "road", "water", "tree", "ship"}
+CLASSES = {"building", "aircraft", "road", "water", "tree", "vegetation", "ship"}
 
 
 def decode_image(encoded: str) -> Image.Image:
@@ -61,8 +65,8 @@ def validate_request(payload: dict) -> tuple[str, str, str | None, str]:
     if set(payload) - {"task", "image", "text", "classes", "quality_mode", "return_probability"}:
         raise ValueError("Unknown request fields; ROI and mask resizing are workbench operations.")
     requested = payload.get("quality_mode", "fast")
-    if requested not in ("fast", "auto"):
-        raise ValueError("This adapter supports fast only. Accurate tiled inference is not implemented.")
+    if requested not in ("fast", "auto", "accurate"):
+        raise ValueError("Choose auto, fast or accurate (contextual tiled inference).")
     if payload.get("return_probability", False) is not False:
         raise ValueError("This adapter returns a binary mask only.")
     task = payload.get("task")
@@ -88,37 +92,77 @@ def validate_request(payload: dict) -> tuple[str, str, str | None, str]:
 class SAMService:
     """Protocol facade with an injectable backend for CPU-only contract tests."""
 
-    def __init__(self, backend=None, load_error=None):
+    def __init__(self, backend=None, load_error=None, water_backend=None, landcover_backends=None):
         self.backend = backend
         self.load_error = load_error
+        self.water_backend = water_backend
+        self.landcover_backends = landcover_backends or {}
         self.lock = threading.Lock()
+        # Request threads are short-lived. Reuse one model thread so CUDA
+        # contexts and tensor allocator state do not accumulate per request.
+        self.worker = ThreadPoolExecutor(max_workers=1, thread_name_prefix='geomasklab-model')
+
+    def close(self):
+        self.worker.shutdown(wait=True, cancel_futures=True)
 
     @property
     def ready(self):
         return self.backend is not None
 
     def metadata(self):
-        return dict(getattr(self.backend, "metadata", {}))
+        return {**getattr(self.backend, "metadata", {}),
+                "supported_quality_modes": ["fast", "accurate"],
+                "tiled_parameters": dict(TILED_PARAMETERS),
+                "water_model": getattr(self.water_backend, 'metadata', None),
+                "landcover_models": {k:v.metadata for k,v in self.landcover_backends.items()}}
 
     def predict(self, payload):
+        return self.worker.submit(self._predict, payload).result()
+
+    def _predict(self, payload):
         if not self.ready:
             raise RuntimeError("RemoteSAM is not ready; inspect /model-info and the startup log.")
         started = time.perf_counter()
         task, prompt, label, requested = validate_request(payload)
         image = decode_image(payload.get("image"))
+        water = is_water_request(label, prompt)
+        land = landcover_target(label, prompt)
         with self.lock:
-            mask = self.backend.predict_mask(image, prompt)
+            if water:
+                if self.water_backend is None:
+                    self.water_backend = OEMWaterBackend(default_water_model(), device=getattr(self.backend, 'device', 'cpu'))
+                resolved = 'accurate' if requested == 'accurate' else 'fast'
+                mask, parameters = self.water_backend.predict(image, resolved)
+                parameters = {**parameters, 'requested_mode': requested, 'resolved_mode': resolved}
+                tiled = None
+            elif land:
+                key=land if land in ('road','building') else 'vegetation'
+                if key not in self.landcover_backends:
+                    self.landcover_backends[key]=LandcoverBackend(default_landcover_model(land),device=getattr(self.backend,'device','cpu'))
+                resolved='accurate' if requested=='accurate' else 'fast'
+                mask,parameters=self.landcover_backends[key].predict(image,land,resolved)
+                parameters={**parameters,'requested_mode':requested,'resolved_mode':resolved}
+                tiled=None
+            elif requested == "accurate":
+                mask, tiled = predict_tiled(self.backend, image, prompt)
+            else:
+                mask, tiled = self.backend.predict_mask(image, prompt), None
             encoded, area = encode_binary_mask(mask, image.size)
-        parameters = {**PARAMETERS, "requested_mode": requested, "resolved_mode": "fast", "tile_count": 1}
+        if not water and not land:
+            resolved = "accurate" if tiled else "fast"
+            parameters = {**PARAMETERS, **(tiled or {}), "requested_mode": requested,
+                          "resolved_mode": resolved, "tile_count": tiled['tile_count'] if tiled else 1}
         result = {
             "status": "success", "task": task, "mask": encoded,
             "original_size": list(image.size), "output_size": list(mask.size),
-            "quality_mode": "fast", "requested_quality_mode": requested,
-            "mode_parameters": parameters, "parameters": dict(PARAMETERS),
-            "service_version": SERVICE_VERSION, "model": self.metadata(),
+            "quality_mode": resolved, "requested_quality_mode": requested,
+            "mode_parameters": parameters, "parameters": parameters if water or land else dict(PARAMETERS),
+            "service_version": SERVICE_VERSION,
+            "model": {**(self.water_backend.metadata if water else self.landcover_backends[key].metadata), 'service_version': SERVICE_VERSION} if water or land else self.metadata(),
             "quality": {"foreground_pixels": area, "foreground_ratio": area / (image.width * image.height),
                         "empty_mask": area == 0},
-            "warnings": ["An empty prediction does not prove target absence."] if not area else [],
+            "warnings": (["An empty prediction does not prove target absence."] if not area and not water and not land else []) +
+                        (["Tiled sampling changes predictions; higher semantic accuracy is not established."] if tiled else []),
             "timing_ms": {"total": round((time.perf_counter() - started) * 1000, 2)},
         }
         if label:
@@ -147,7 +191,7 @@ def make_handler(service: SAMService):
                 return self.send_json(200 if service.ready else 503,
                     {"status": "ready" if service.ready else "not_ready", "model_ready": service.ready,
                      "error": service.load_error,
-                     "supported_quality_modes": ["fast"], **service.metadata()})
+                     **service.metadata()})
             if self.path == "/model-info":
                 return self.send_json(200, {"ready": service.ready, "error": service.load_error,
                                             "service_version": SERVICE_VERSION, **service.metadata()})
@@ -180,13 +224,17 @@ def main(argv=None):
     parser.add_argument("--tokenizer", required=True)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--no-fp16", action="store_true")
+    parser.add_argument("--water-model-dir", help="Local supervised water-model directory")
+    parser.add_argument("--building-model-dir", help="Local supervised building-model directory")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=6657)
     args = parser.parse_args(argv)
     try:
         backend = RemoteSAMBackend(args.source_root, args.checkpoint, args.tokenizer,
                                    device=args.device, fp16=not args.no_fp16)
-        service = SAMService(backend)
+        water_backend = OEMWaterBackend(args.water_model_dir or default_water_model(), device=args.device)
+        building_backend = LandcoverBackend(args.building_model_dir or default_landcover_model('building'), device=args.device)
+        service = SAMService(backend, water_backend=water_backend, landcover_backends={'building':building_backend})
     except Exception as exc:
         import traceback
         traceback.print_exc()
@@ -199,6 +247,7 @@ def main(argv=None):
         pass
     finally:
         server.server_close()
+        service.close()
 
 
 if __name__ == "__main__":

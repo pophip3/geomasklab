@@ -10,7 +10,8 @@ TARGET_PATTERNS = {
     'aircraft': r'飞机|\b(?:aircraft|airplanes?|planes?)\b',
     'road': r'道路|公路|\broads?\b',
     'water': r'水体|河流|\bwater(?: bodies| body)?\b',
-    'tree': r'植被|树木|\b(?:trees?|vegetation)\b',
+    'tree': r'树木|\btrees?\b',
+    'vegetation': r'植被|\bvegetation\b',
     'ship': r'船|\bships?\b',
 }
 SEGMENT_WORDS = r'提取|分割|标注|标记|圈出|勾勒|蒙版|掩膜|面积|占比|像素|\b(?:segment|segmentation|mask|extract|annotate|coverage|pixels?)\b'

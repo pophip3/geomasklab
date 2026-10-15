@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import re
 import hashlib
-from workbench.planner_protocol import PlannerProtocol
+from workbench.planner_protocol import PlannerProtocol, Decision
 
 from workbench.service_transport import agent_request_settings, request_json
 
@@ -15,18 +15,27 @@ LABELS = {
     'aircraft': ('aircraft', 'airplane', 'airplanes', 'plane', 'planes', '飞机'),
     'road': ('road', 'roads', '道路'),
     'water': ('water', 'water body', 'water bodies', '水体'),
-    'tree': ('tree', 'trees', 'vegetation', 'trees and vegetation', '植被', '树木'),
+    'tree': ('tree', 'trees', '树木'),
+    'vegetation': ('vegetation', '植被'),
     'ship': ('ship', 'ships', '船舶'),
 }
 PROMPTS = {'building':'all buildings', 'aircraft':'all planes', 'road':'all roads',
-           'water':'water bodies', 'tree':'trees and vegetation', 'ship':'all ships'}
+           'water':'water bodies', 'tree':'all trees', 'vegetation':'all vegetation', 'ship':'all ships'}
 CLASSES = {'building':'building', 'aircraft':'aircraft', 'road':'road',
-           'water':'water', 'tree':'tree', 'ship':'ship'}
+           'water':'water', 'tree':'tree', 'vegetation':'vegetation', 'ship':'ship'}
 SIDES = {'all', 'left', 'right', 'top', 'bottom'}
 
 
 class Clarification(ValueError):
     """A task outside the explicit workbench contract, not a service failure."""
+
+
+class PlannerResponseError(ValueError):
+    """Rejected actual reply retained as diagnostics, never a successful answer."""
+    def __init__(self, message, raw_response='', *, reason):
+        super().__init__(message)
+        self.reason=reason
+        self.response_record=decision_record(Decision(reason,raw_response)) if raw_response else None
 
 
 def resolve_scope(query, context, selected=None):
@@ -126,7 +135,8 @@ class WorkbenchAgent(PlannerProtocol):
             'model': self.model_name, 'messages': messages, 'max_tokens': self.max_tokens,
             'temperature': 0,
         }, timeout=self.request_timeout,
-           headers={'Authorization': 'Bearer ' + os.environ.get('GEO_AGENT_API_KEY', 'EMPTY')})
+           headers={'Authorization': 'Bearer ' + os.environ.get('GEO_AGENT_API_KEY', 'EMPTY'),
+                    'X-Geo-Request-Budget-Seconds':str(max(1,self.request_timeout-5))})
         try:
             message = response['choices'][0]['message']['content']
         except (KeyError, IndexError, TypeError):
@@ -134,7 +144,8 @@ class WorkbenchAgent(PlannerProtocol):
         if not isinstance(message, str) or not message.strip():
             raise ValueError('The planner service returned an empty response.')
         if response['choices'][0].get('finish_reason') == 'length':
-            raise ValueError('The model reply was truncated. Increase GEO_AGENT_MAX_TOKENS and retry.')
+            raise PlannerResponseError('The model reply was truncated. Increase the appropriate planning or feedback token budget and retry.',
+                                       message,reason='truncated_reply')
         return message.strip()
 
 
@@ -219,5 +230,26 @@ class AgentTurn:
         self.decision = self.agent.plan(query, image_path, context=self.context)
 
     def feedback(self, result):
-        return self.agent.continue_with_tool_result(self.query, self.image_path, self.decision,
-                                                   result, context=self.context)
+        # Feedback cannot invalidate completed deterministic artifacts. Give it
+        # a separate bounded reporting budget instead of the planning timeout.
+        timeout,tokens=self.agent.request_timeout,self.agent.max_tokens
+        try:
+            raw=os.environ.get('GEO_AGENT_FEEDBACK_TIMEOUT_SECONDS','60')
+            budget=float(raw)
+            import math
+            if not math.isfinite(budget) or not 5<=budget<=3600:
+                raise ValueError('GEO_AGENT_FEEDBACK_TIMEOUT_SECONDS must be between 5 and 3600 seconds.')
+            self.agent.request_timeout=min(timeout,budget)
+            raw_tokens=os.environ.get('GEO_AGENT_FEEDBACK_MAX_TOKENS')
+            if raw_tokens is None:
+                feedback_tokens=min(tokens,96)
+            else:
+                raw_tokens=raw_tokens.strip()
+                if not raw_tokens.isascii() or not raw_tokens.isdigit() or not 16<=int(raw_tokens)<=1024:
+                    raise ValueError('GEO_AGENT_FEEDBACK_MAX_TOKENS must be an integer between 16 and 1024.')
+                feedback_tokens=int(raw_tokens)
+            self.agent.max_tokens=feedback_tokens
+            return self.agent.continue_with_tool_result(self.query, self.image_path, self.decision,
+                                                       result, context=self.context)
+        finally:
+            self.agent.request_timeout,self.agent.max_tokens=timeout,tokens

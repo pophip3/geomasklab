@@ -6,6 +6,7 @@ import io
 import json
 import threading
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -26,10 +27,12 @@ class FixtureBackend:
 
     def __init__(self):
         self.calls = []
+        self.thread_ids = set()
         self.result = Image.new("L", (13, 7), 0)
         self.result.paste(255, (6, 0, 13, 7))
 
     def predict_mask(self, image, prompt):
+        self.thread_ids.add(threading.get_ident())
         self.calls.append((image.size, prompt))
         return self.result.copy()
 
@@ -48,6 +51,7 @@ class OptionalSAMServiceTests(unittest.TestCase):
         self.server.shutdown()
         self.server.server_close()
         self.thread.join(timeout=5)
+        self.service.close()
 
     def request(self, path="/predict", payload=None):
         raw = None if payload is None else json.dumps(payload).encode("utf-8")
@@ -62,6 +66,14 @@ class OptionalSAMServiceTests(unittest.TestCase):
     def referring(self, **fields):
         return self.request(payload={"task": "referring_seg", "image": self.image,
                                      "text": "all planes", "quality_mode": "fast", **fields})
+
+    def test_concurrent_http_requests_reuse_one_model_thread(self):
+        with ThreadPoolExecutor(max_workers=4) as clients:
+            results=list(clients.map(lambda _:self.referring(),range(12)))
+        self.assertTrue(all(code==200 for code,_ in results))
+        self.assertEqual(len(self.backend.calls),12)
+        self.assertEqual(len(self.backend.thread_ids),1)
+        self.assertNotIn(threading.get_ident(),self.backend.thread_ids)
 
     def test_original_dimensions_binary_values_and_traceable_mode(self):
         code, result = self.referring()
@@ -81,15 +93,20 @@ class OptionalSAMServiceTests(unittest.TestCase):
         self.assertEqual(result["masks"], {"aircraft": result["mask"]})
         self.assertEqual(self.backend.calls[-1], ((13, 7), "aircraft in the image"))
 
-    def test_auto_reports_actual_fast_while_accurate_is_rejected_before_inference(self):
+    def test_auto_reports_fast_and_explicit_tiled_reports_actual_tile_execution(self):
         code, result = self.referring(quality_mode="auto")
         self.assertEqual(code, 200)
         self.assertEqual((result["requested_quality_mode"], result["quality_mode"]), ("auto", "fast"))
         before = len(self.backend.calls)
         code, result = self.referring(quality_mode="accurate")
+        self.assertEqual(code, 200)
+        self.assertEqual(result['quality_mode'], 'accurate')
+        self.assertEqual(result['mode_parameters']['tile_count'], 1)
+        self.assertEqual(result['mode_parameters']['strategy'], 'contextual_tiles_core_stitch')
+        self.assertEqual(len(self.backend.calls), before + 1)
+        code, result = self.referring(quality_mode='unknown')
         self.assertEqual(code, 400)
-        self.assertNotIn("mask", result)
-        self.assertEqual(len(self.backend.calls), before)
+        self.assertNotIn('mask', result)
 
     def test_invalid_base64_unknown_region_fields_and_multiple_classes_fail_closed(self):
         for payload in (

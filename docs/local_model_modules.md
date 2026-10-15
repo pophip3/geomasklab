@@ -213,10 +213,22 @@ terminal open. In another terminal, inspect readiness:
 agent` or `--only sam` permits individual component check/start/status. An HTTP
 health response alone is insufficient for readiness or inference acceptance.
 
-The SAM adapter implements **Fast** only: 896 x 896 whole-image inference, FP16
-CUDA autocast, foreground softmax probabilities restored bilinearly to the
-original grid, threshold 0.5 and no EPOC refinement. Explicit accurate/tiled
-requests are rejected; they cannot pass under a misleading mode label.
+For original BF16 disk offload, generated `workbench.env` includes a 3600-second
+planning budget and a separate 1800-second feedback budget. These are request
+limits, not expected runtimes; retain actual elapsed times in the run records.
+
+The SAM adapter provides two recorded sampling paths. **Fast** retains 896 x
+896 whole-image inference, FP16 CUDA autocast, bilinear foreground-probability
+restoration, threshold 0.5 and no EPOC refinement. **Tiled** (`accurate` in the
+interface contract) divides the original image into non-overlapping 512-pixel
+cores with up to 64 pixels of context on each side. It runs the same backend on
+each crop, restores its binary mask to crop coordinates and copies only that
+crop's core into the output. Every output pixel belongs to exactly one core.
+The response records all core/read windows and the actual tile count; more than
+256 tiles are rejected before inference. This optional path changes sampling
+and has not been shown to improve semantic accuracy. Existing Fast scientific
+reproduction results are not replaced by tiled predictions. On images no larger
+than 512 x 512, Tiled uses one crop and matches Fast.
 
 ## Connect the workbench and tune slow requests
 
@@ -233,6 +245,7 @@ Add the following explicit generation/time settings to `.env`:
 ```dotenv
 GEO_AGENT_MAX_TOKENS=128
 GEO_AGENT_TIMEOUT_SECONDS=1800
+GEO_AGENT_FEEDBACK_TIMEOUT_SECONDS=900
 GEO_PORT=4180
 ```
 
@@ -241,6 +254,15 @@ The default chat timeout is 120 seconds. Slow disk-offload requests may need
 128-token budget can truncate answers, so increase it if necessary and record
 the setting. A timeout increase permits slow execution; it does not accelerate
 inference. Shell `GEO_` variables override `.env`; clear or update stale values.
+
+The feedback timeout is separate (default 60 seconds) and cannot exceed the
+planning timeout. Original-weight disk offload may require an explicitly recorded
+larger budget, as above. A feedback timeout preserves computed masks and
+measurements and records a warning; it does not count as a successful full
+Agent–SAM–Agent chain. Browser tasks now use saved IDs and progress polling, so
+refreshing the page reconnects to the same task without repeating inference.
+The local Agent checks generation deadlines cooperatively between token steps;
+an individual slow CPU/GPU operation may finish after its deadline.
 
 Start the core in a separate terminal:
 

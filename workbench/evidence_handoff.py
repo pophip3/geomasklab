@@ -20,7 +20,7 @@ def prepare_import(payload):
             raise ValueError('Invalid run ID.')
         if result['status'] not in ('completed', 'needs_review') or result['mode'] not in ('demo', 'live', 'external'):
             raise ValueError('Only bundles with a valid segmentation result are supported.')
-        if result['task']['target'] not in ('building', 'aircraft', 'road', 'water', 'tree', 'ship'):
+        if result['task']['target'] not in ('building', 'aircraft', 'road', 'water', 'tree', 'vegetation', 'ship'):
             raise ValueError('Unsupported target in the evidence bundle.')
         for key in ('query', 'message', 'created_at'):
             if not isinstance(result[key], str) or len(result[key]) > 20000:

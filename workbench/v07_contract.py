@@ -12,7 +12,8 @@ TARGET_WORDS = {
     'aircraft': r'飞机|\b(?:aircraft|airplanes?|planes?)\b',
     'road': r'道路|\broads?\b',
     'water': r'水体|\bwater\b',
-    'tree': r'植被|树木|\btrees?\b',
+    'tree': r'树木|\btrees?\b',
+    'vegetation': r'植被|\bvegetation\b',
     'ship': r'船舶?|\bships?\b',
 }
 

@@ -20,7 +20,7 @@ from unittest.mock import patch
 from PIL import Image
 
 OFFICIAL_CHECKPOINT_SHA256 = "f85dfa044a527f096b9e41eacfe298040d52e77fca642f46dfe1226745e137e7"
-SERVICE_VERSION = "geomasklab-remotesam-adapter/1.0"
+SERVICE_VERSION = "geomasklab-remotesam-adapter/1.2.0"
 STRATEGY = "whole_image_probability_threshold"
 PARAMETERS = {
     "strategy": STRATEGY,
@@ -182,7 +182,9 @@ class RemoteSAMBackend:
             "checkpoint_sha256": actual_hash, "checkpoint_diagnostics": diagnostics,
             "device": device, "fp16": self.fp16, "epoc": False,
             "precision": "FP16 CUDA autocast" if self.fp16 else "float32",
-            "supported_quality_modes": ["fast"], "adapter_parameters": dict(PARAMETERS),
+            "supported_quality_modes": ["fast", "accurate"], "adapter_parameters": dict(PARAMETERS),
+            "adapter_files_sha256": {name: sha256_file(Path(__file__).with_name(name))
+                                     for name in ('sam_backend.py', 'sam_service.py', 'tiled_inference.py')},
             "packages": {name: importlib.metadata.version(name) for name in
                          ("torch", "torchvision", "transformers", "numpy", "Pillow", "timm", "mmcv")},
             "tokenizer_files_sha256": {

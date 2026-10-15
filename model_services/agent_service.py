@@ -11,12 +11,29 @@ import base64
 import hashlib
 import io
 import json
+import math
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 MAX_BODY = 18 * 1024 * 1024
+
+
+class GenerationDeadline:
+    """Cooperative stop after a token step; cannot interrupt a GPU kernel."""
+    def __init__(self,deadline):
+        self.deadline=deadline
+        self.expired=False
+
+    def check(self):
+        self.expired=self.expired or time.monotonic()>=self.deadline
+        if self.expired:
+            raise TimeoutError('Model generation exceeded its request budget; no partial answer is returned.')
+
+    def __call__(self,input_ids,scores,**kwargs):
+        self.expired=self.expired or time.monotonic()>=self.deadline
+        return self.expired
 
 
 def prepare_messages(messages):
@@ -120,7 +137,11 @@ class TransformersBackend:
             'config_sha256': hashlib.sha256((root / 'config.json').read_bytes()).hexdigest(),
             'checkpoint_tensor_bytes': index.get('metadata', {}).get('total_size'), 'shards': shards}
 
-    def complete(self, messages, max_tokens, temperature):
+    supports_deadline=True
+
+    def complete(self, messages, max_tokens, temperature, *, deadline):
+        stop=GenerationDeadline(deadline)
+        stop.check()
         normalized, images = prepare_messages(messages)
         text = self.processor.apply_chat_template(normalized, tokenize=False, add_generation_prompt=True)
         inputs = self.processor(text=[text], images=images, padding=True, return_tensors='pt')
@@ -131,9 +152,13 @@ class TransformersBackend:
         if str(device) == 'meta':
             device = self.torch.device('cuda:0' if self.torch.cuda.is_available() else 'cpu')
         inputs = inputs.to(device)
+        stop.check()
+        from transformers import StoppingCriteriaList
         with self.torch.inference_mode():
             generated = self.model.generate(**inputs, max_new_tokens=max_tokens,
+                stopping_criteria=StoppingCriteriaList([stop]),
                 do_sample=temperature > 0, **({'temperature': temperature} if temperature > 0 else {}))
+        stop.check()
         answer = self.processor.batch_decode(generated[:, length:], skip_special_tokens=True,
                                             clean_up_tokenization_spaces=False)[0]
         return answer, {'prompt_tokens': int(length), 'completion_tokens': int(generated.shape[1] - length),
@@ -147,7 +172,7 @@ class AgentApplication:
         self.error = None
         self.lock = threading.Lock()
 
-    def chat(self, payload):
+    def chat(self, payload, request_budget=None):
         if self.backend is None:
             raise RuntimeError(self.error or 'Model is still loading.')
         if not isinstance(payload, dict) or payload.get('model') != self.model_name:
@@ -162,11 +187,21 @@ class AgentApplication:
             raise ValueError('temperature must be between 0 and 2.')
         # Validate before queuing, even when a test backend is supplied.
         prepare_messages(payload.get('messages'))
+        budget=120 if request_budget is None else request_budget
+        if type(budget) not in (int,float) or not math.isfinite(budget) or not 1<=budget<=3600:
+            raise ValueError('Request budget must be finite and between 1 and 3600 seconds.')
         if not self.lock.acquire(blocking=False):
             raise BlockingIOError('A model request is already running. Retry after it completes.')
         started = time.perf_counter()
         try:
-            answer, usage = self.backend.complete(payload['messages'], limit, temperature)
+            deadline=time.monotonic()+budget
+            if getattr(self.backend,'supports_deadline',False):
+                answer,usage=self.backend.complete(payload['messages'],limit,temperature,deadline=deadline)
+            else:
+                answer,usage=self.backend.complete(payload['messages'],limit,temperature)
+            # Never report a late/partially generated response as successful.
+            if time.monotonic()>=deadline:
+                raise TimeoutError('Model generation exceeded its request budget.')
             return {'object': 'chat.completion', 'model': self.model_name,
                 'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': answer},
                              'finish_reason': 'length' if usage['completion_tokens'] >= limit else 'stop'}],
@@ -197,6 +232,8 @@ def make_handler(application):
                 return self.reply(200 if ready or self.path == '/health' else 503,
                     {'ready': ready, 'error': application.error,
                      'model': application.model_name,
+                     'busy':application.lock.locked(),
+                     'generation_deadline':'cooperative_token_boundary',
                      'metadata': application.backend.metadata if ready else None})
             self.reply(404, {'error': 'Unknown endpoint.'})
 
@@ -206,8 +243,11 @@ def make_handler(application):
             try:
                 from model_services.http_body import read_json_body
                 raw = read_json_body(self, MAX_BODY)
-                result = application.chat(json.loads(raw))
+                budget=self.headers.get('X-Geo-Request-Budget-Seconds')
+                result = application.chat(json.loads(raw),None if budget is None else float(budget))
                 self.reply(200, result)
+            except TimeoutError as exc:
+                self.reply(504, {'error':str(exc)})
             except BlockingIOError as exc:
                 self.reply(429, {'error': str(exc)})
             except (ValueError, TypeError) as exc:

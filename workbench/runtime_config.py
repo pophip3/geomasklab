@@ -28,6 +28,10 @@ def settings_status():
     return {
         'agent_configured': bool(os.environ.get('GEO_AGENT_BASE_URL') and os.environ.get('GEO_AGENT_MODEL')),
         'sam_configured': bool(os.environ.get('GEO_REMOTESAM_URL')),
+        'water_pipeline_revision': os.environ.get('GEO_WATER_MODEL_REVISION', ''),
+        'landcover_pipeline_revision': os.environ.get('GEO_LANDCOVER_MODEL_REVISION', ''),
+        'building_pipeline_revision': os.environ.get('GEO_BUILDING_MODEL_REVISION', ''),
+        'sam_supported_quality_modes':os.environ.get('GEO_REMOTESAM_QUALITY_MODES','').split(',') if os.environ.get('GEO_REMOTESAM_QUALITY_MODES') else None,
         'agent_model': os.environ.get('GEO_AGENT_MODEL', ''),
         'agent_protocol': 'remoteagent',
         'service_proxy_mode': os.environ.get('GEO_SERVICE_PROXY_MODE', 'direct'),

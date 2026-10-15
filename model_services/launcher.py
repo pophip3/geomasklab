@@ -92,6 +92,10 @@ def load_profile(path) -> dict:
                 raise ValueError("sam.device must be cpu or an explicit CUDA device.")
             if type(section["fp16"]) is not bool:
                 raise ValueError("sam.fp16 must be true or false.")
+            if item.get('water_model_dir'):
+                section['water_model_dir'] = _path(base, item['water_model_dir'], 'sam.water_model_dir')
+            if item.get('building_model_dir'):
+                section['building_model_dir'] = _path(base, item['building_model_dir'], 'sam.building_model_dir')
         config[name] = section
     if config["agent"]["port"] == config["sam"]["port"]:
         raise ValueError("Agent and SAM must use different local ports.")
@@ -105,6 +109,13 @@ def selected_services(only: str) -> tuple[str, ...]:
 def build_command(config: dict, name: str) -> list[str]:
     item = config[name]
     command = [str(item["python"]), "-u", "-m", "model_services." + name + "_service"]
+    if not (REPO_ROOT / 'src/geomasklab').is_dir():
+        # Separate model runtimes need only the adapters, and may use a different
+        # Python version. Load this exact installed directory without inheriting
+        # arbitrary PYTHONPATH entries or installing the UI/core in that runtime.
+        bootstrap = ('import runpy,sys;sys.path.insert(0,' + repr(str(REPO_ROOT)) + ');'
+                     'runpy.run_module(' + repr('model_services.' + name + '_service') + ',run_name="__main__")')
+        command = [str(item['python']), '-u', '-c', bootstrap]
     if name == "agent":
         for key, option in (("model_dir", "--model-dir"), ("model_name", "--model-name"),
                             ("device", "--device"), ("gpu_memory", "--gpu-memory"),
@@ -118,6 +129,10 @@ def build_command(config: dict, name: str) -> list[str]:
         command.extend(["--host", "127.0.0.1"])
         if not item["fp16"]:
             command.append("--no-fp16")
+        if item.get('water_model_dir'):
+            command.extend(['--water-model-dir', str(item['water_model_dir'])])
+        if item.get('building_model_dir'):
+            command.extend(['--building-model-dir', str(item['building_model_dir'])])
     return command
 
 
@@ -324,14 +339,27 @@ def workbench_settings(config: dict, only="both", readiness=None) -> str:
                       "GEO_AGENT_MODEL=" + config["agent"]["model_name"], "GEO_AGENT_API_KEY=EMPTY"])
         if config["agent"]["device"] == "offload":
             lines.extend(["# Original BF16 disk offload can take several minutes per model response.",
-                          "GEO_AGENT_MAX_TOKENS=128", "GEO_AGENT_TIMEOUT_SECONDS=3600"])
+                          "GEO_AGENT_MAX_TOKENS=128", "GEO_AGENT_TIMEOUT_SECONDS=3600",
+                          "GEO_AGENT_FEEDBACK_TIMEOUT_SECONDS=1800"])
     if "sam" in selected_services(only):
         lines.append("GEO_REMOTESAM_URL=http://127.0.0.1:" + str(config["sam"]["port"]) + "/predict")
         metadata = (readiness or {}).get("services", {}).get("sam", {}).get("ready_declaration", {})
+        supported = metadata.get('supported_quality_modes', ['fast'])
+        modes = [mode for mode in ('fast', 'accurate') if mode in supported]
+        lines.append("GEO_REMOTESAM_QUALITY_MODES=" + ','.join(modes or ['fast']))
+        water = metadata.get('water_model') or {}
+        if water.get('checkpoint_sha256'):
+            fingerprint = hashlib.sha256(json.dumps(water,sort_keys=True).encode('utf-8')).hexdigest()
+            lines.append('GEO_WATER_MODEL_REVISION=supervised-water:' + fingerprint)
+        building = metadata.get('landcover_models', {}).get('building') or {}
+        if building.get('checkpoint_sha256'):
+            fingerprint = hashlib.sha256(json.dumps(building,sort_keys=True).encode('utf-8')).hexdigest()
+            lines.append('GEO_BUILDING_MODEL_REVISION=supervised-building:' + fingerprint)
         checkpoint, source = metadata.get("checkpoint_sha256"), metadata.get("source_tree_sha256")
         if checkpoint and source:
             pipeline = {key: metadata.get(key) for key in
-                        ("service_version", "adapter_parameters", "precision", "fp16", "epoc", "packages")}
+                        ("service_version", "adapter_parameters", "adapter_files_sha256", "tiled_parameters",
+                         "precision", "fp16", "epoc", "packages")}
             fingerprint = hashlib.sha256(json.dumps(
                 pipeline, sort_keys=True, separators=(",", ":"), allow_nan=False).encode("utf-8")).hexdigest()
             lines.append("GEO_REMOTESAM_REVISION=geomasklab-probability-adapter:weights=" + checkpoint +

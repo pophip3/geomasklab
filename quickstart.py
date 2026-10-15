@@ -18,7 +18,7 @@ def main():
         raise
     assets=Path(__file__).parent/'workbench/web/assets'
     if not all((assets/name).is_file() for name in ('urban.png','airport.jpg')): write_assets(assets)
-    try: httpd=ThreadingHTTPServer(('127.0.0.1',args.port),server.Handler)
+    try: httpd=server.WorkbenchHTTPServer(('127.0.0.1',args.port),server.Handler)
     except OSError as exc: parser.exit(1,f'Cannot open local port {args.port}: {exc}. Try --port 4182\n')
     print(f'GeoMaskLab: http://127.0.0.1:{args.port}\nOpen this URL in your browser. Ctrl+C stops the server.',flush=True)
     print('Synthetic examples require no GPU, model weights, accounts or inference service.',flush=True)

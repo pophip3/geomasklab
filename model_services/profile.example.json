@@ -20,6 +20,7 @@
     "source_root": "../model-runtime/RemoteSAM-src",
     "checkpoint": "../model-runtime/RemoteSAM/RemoteSAMv1.pth",
     "tokenizer": "../model-runtime/bert-base-uncased",
+    "building_model_dir": "../models/landcover-oem-base",
     "port": 6657,
     "device": "cuda:0",
     "fp16": true

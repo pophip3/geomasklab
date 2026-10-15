@@ -6,9 +6,10 @@ PRODUCT_NAME = 'GeoMaskLab'
 TARGET_CAPABILITIES = {
     'building': {'label': 'Buildings', 'level': 'primary', 'evidence': 'limited_prior_version_application_study'},
     'aircraft': {'label': 'Aircraft', 'level': 'primary', 'evidence': 'limited_prior_version_application_study'},
-    'road': {'label': 'Roads', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
-    'water': {'label': 'Water', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
-    'tree': {'label': 'Vegetation', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
+    'road': {'label': 'Roads', 'level': 'supported', 'evidence': 'regional_road_validation_20261013'},
+    'water': {'label': 'Water', 'level': 'supported', 'evidence': 'supervised_water_regression_20261012'},
+    'tree': {'label': 'Trees', 'level': 'supported', 'evidence': 'landcover_validation_20261013'},
+    'vegetation': {'label': 'Vegetation', 'level': 'supported', 'evidence': 'landcover_validation_20261013'},
     'ship': {'label': 'Ships', 'level': 'experimental', 'evidence': 'no_frozen_semantic_evaluation'},
 }
 

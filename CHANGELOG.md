@@ -1,5 +1,48 @@
 # Changelog
 
+## 1.0.0 — submission build, 15 October 2026
+
+- Publish the tested 14 October implementation with a concise installation and
+  offline-example README, bundled example data and a fixed source download.
+- Include the current building, land-cover, water and road model adapters,
+  together with task recovery and model-service diagnostics.
+- Preserve the earlier release and its historical experiment records.
+
+## 1.0.0 — building inference update, 14 October 2026
+
+- Route building-class requests and canonical whole-building prompts through the
+  supervised OpenEarthMap building channel for every uploaded image. Use
+  overlapping 512-pixel tiles, four rotations and a fixed 0.5 probability threshold.
+- Verify and report building weights at service startup. Add portable
+  `sam.building_model_dir` and `--building-model-dir` configuration.
+- Use a separate verified building revision for cache reuse and exported
+  provenance, so prior RemoteSAM building masks cannot be reused after upgrade.
+- Keep historical 1.0.0 studies separate from the new model evaluation.
+
+## 1.0.0 — unarchived repair candidate, 11 October 2026
+
+- Keep external-mask provenance separate from the demo/live runtime mode and
+  restore an explicitly saved runtime preference after reload.
+- Save single-image task IDs and progress, poll completion, and recover after
+  browser refresh without repeating inference.
+- Save computed masks and measurements before a separately budgeted planner
+  feedback turn. Reject expired local Agent output with cooperative generation
+  deadlines and release the service lock when inference exits.
+- Add actual contextual tiled inference to the local SAM adapter, with recorded
+  512-pixel cores, 64-pixel context margins and a 256-tile request limit. Keep the
+  existing Fast prediction path and its scientific reproduction results separate;
+  no improvement in semantic accuracy is claimed. Reject unsupported modes from
+  other services before expensive planning.
+- Allow scene questions with an Agent-only deployment; disable quick
+  segmentation and reject new-mask requests before planning when SAM is absent.
+- Accept the actual quick-selector label `vegetation` in the live task guard;
+  test all six UI labels and all planner label aliases against that guard.
+- Generate a separate 1800-second feedback budget for original BF16 disk-offload
+  deployment, alongside its 3600-second planning budget.
+- This candidate is still under real-model verification and has no new software
+  archival DOI. Historical tests, failures and demonstration recordings remain
+  preserved as pre-repair evidence.
+
 ## 1.0.0 — revised delivery, 7 October 2026
 
 - Independent local RemoteAgent and RemoteSAM HTTP adapters with separate Python
@@ -139,3 +182,16 @@ artifact; it does not imply journal submission, acceptance or a permanent DOI.
 - Added an optional Label Studio SDK brush-prediction bridge and controlled
   artifact/metadata handoff checks; full Label Studio GUI acceptance remains pending.
 - Verified the source version on Windows, Linux and macOS with Python 3.10/3.13.
+# Local water correction — 2026-10-13
+
+- Route water to a supervised RGB land-cover model with correction training for
+  the known park false positive and water/land/walkway interiors.
+- Refine shorelines and exclude piers with automatic image-edge prompts inside
+  the semantic boundary band; keep the normal water selection and run controls.
+- Use a separate water pipeline cache identity and direct explicit-task routing.
+- Preserve mask dimensions, scopes, validity, exports and actual model metadata.
+- Preserve non-water interiors during boundary refinement so oblique pier views
+  cannot be refilled by the edge model. Stream checkpoint checksums and release
+  refiner GPU state after failed requests as well as successful requests.
+- Reuse one inference thread across HTTP requests to keep CUDA contexts and
+  allocator state bounded during continuous use.
