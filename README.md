@@ -1,32 +1,33 @@
 # GeoMaskLab
 
-Remote sensing interpretation and quantitative mask analysis.
+**Measure, compare and verify segmentation masks from remote sensing imagery.**
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776ab)](https://www.python.org/)
 [![MIT license](https://img.shields.io/badge/license-MIT-24836b)](LICENSE)
 [![Release 1.0.0](https://img.shields.io/badge/release-1.0.0-2563eb)](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-build.20261015)
 [![Research software checks](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml)
 
-GeoMaskLab is an open-source workbench for remote sensing image interpretation
-and quantitative mask analysis. Use model-generated or imported masks to measure
-selected regions, assess predictions and compare saved results. Portable exports
-keep the inputs and settings together so that measurements can be verified and
-reused.
+GeoMaskLab brings regional measurement, segmentation assessment and result
+comparison into one open-source workbench. Work interactively in the browser or
+run repeatable analyses from the command line. Saved masks, analysis settings and
+results travel together in portable evidence packets.
 
 [Install](#install) · [Offline example](#run-the-offline-example) ·
 [Browser workbench](#open-the-browser-workbench) ·
-[Documentation](https://pophip3.github.io/geomasklab/)
+[Documentation](https://pophip3.github.io/geomasklab/) · [Example data](#example-data)
 
 ## Features
 
 | Feature | What you can do |
 | :--- | :--- |
-| 📐 Regional measurement | Measure coverage for a whole image or selected region, with explicit valid-pixel domains. |
-| 🎯 Reference assessment | Inspect IoU, Dice and other metrics alongside spatial error overlays. |
-| 🔄 Version comparison | Compare shared, added and removed foreground within a common valid domain. |
-| 🔎 Component inspection | Review component sizes, locations and contact with analysis boundaries. |
-| 📂 Batch processing | Run a shared workflow across multiple inputs and collect their results. |
-| 📦 Export and verification | Share evidence packets and recompute recorded measurements offline. |
+| 📐 **Regional measurement** | Measure mask coverage across an image or selected region using valid pixels. |
+| 🎯 **Segmentation assessment** | Compare predictions with reference masks using IoU, Dice and error overlays. |
+| 🔄 **Version comparison** | Inspect shared, added and removed foreground over the same valid area. |
+| 🔎 **Component inspection** | Examine individual regions, their sizes and their contact with boundaries. |
+| 📂 **Batch processing** | Apply a shared workflow to multiple inputs and collect the results. |
+| 📦 **Export and verification** | Share saved inputs and results, then recompute measurements offline. |
+
+**Try it first:** [install the package](#install), then [run the bundled example](#run-the-offline-example) to generate a local results page.
 
 ## Install
 
@@ -126,16 +127,24 @@ download is needed for the offline example.
 - [Data source, processing details and attribution](examples/data/naip-denver/README.md).
 - [USGS NAIP collection](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-aerial-photography-national-agriculture-imagery-program-naip).
 
-## Source and documentation
+## Documentation
 
-- `src/geomasklab/`: shared measurement core and command-line interface.
-- `workbench/`: browser interface and local server.
-- `model_services/`: optional local model adapters.
-- `examples/`: runnable examples and bundled data.
-- `tests/`: software tests.
-- [API and evidence format](docs/core_package.md).
-- [Browser workbench guide](docs/presentation_workbench.md).
-- [Optional local-model setup](docs/local_model_modules.md).
+| Guide | Use it to |
+| :--- | :--- |
+| [Browser workbench](docs/presentation_workbench.md) | Explore the interactive tools and workflows. |
+| [API and evidence format](docs/core_package.md) | Integrate the measurement core and understand exported records. |
+| [Local-model setup](docs/local_model_modules.md) | Configure optional model adapters. |
+
+## Source layout
+
+- [`src/geomasklab/`](src/geomasklab/): measurement core and command-line interface.
+- [`workbench/`](workbench/): browser interface and local server.
+- [`model_services/`](model_services/): optional local model adapters.
+- [`examples/`](examples/): runnable examples and bundled data.
+- [`tests/`](tests/): software tests.
+
+Report bugs or suggest improvements through [GitHub Issues](https://github.com/pophip3/geomasklab/issues).
+For development setup and checks, see [Contributing](CONTRIBUTING.md).
 
 ## License and contact
 
