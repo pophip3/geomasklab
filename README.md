@@ -1,10 +1,32 @@
 # GeoMaskLab
 
+Remote sensing interpretation and quantitative mask analysis.
+
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776ab)](https://www.python.org/)
+[![MIT license](https://img.shields.io/badge/license-MIT-24836b)](LICENSE)
+[![Release 1.0.0](https://img.shields.io/badge/release-1.0.0-2563eb)](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-build.20261015)
+[![Research software checks](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml)
+
 GeoMaskLab is an open-source workbench for remote sensing image interpretation
-and quantitative mask analysis. It supports regional coverage measurements,
-reference-mask assessment, saved-version comparison, connected-component
-inspection and batch processing. Results can be exported as portable evidence
-packets and verified through the command line.
+and quantitative mask analysis. Use model-generated or imported masks to measure
+selected regions, assess predictions and compare saved results. Portable exports
+keep the inputs and settings together so that measurements can be verified and
+reused.
+
+[Install](#install) · [Offline example](#run-the-offline-example) ·
+[Browser workbench](#open-the-browser-workbench) ·
+[Documentation](https://pophip3.github.io/geomasklab/)
+
+## Features
+
+| Feature | What you can do |
+| :--- | :--- |
+| 📐 Regional measurement | Measure coverage for a whole image or selected region, with explicit valid-pixel domains. |
+| 🎯 Reference assessment | Inspect IoU, Dice and other metrics alongside spatial error overlays. |
+| 🔄 Version comparison | Compare shared, added and removed foreground within a common valid domain. |
+| 🔎 Component inspection | Review component sizes, locations and contact with analysis boundaries. |
+| 📂 Batch processing | Run a shared workflow across multiple inputs and collect their results. |
+| 📦 Export and verification | Share evidence packets and recompute recorded measurements offline. |
 
 ## Install
 
