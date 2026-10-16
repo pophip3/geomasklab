@@ -170,7 +170,7 @@ with the article's LaTeX source.
 
 For **Table 4, Supplementary Figure S1 and Section 3.4**, download
 `GeoMaskLab_Supplementary_Experiment_Records.zip` from the
-[archived research data](https://doi.org/10.5281/zenodo.23419528), place it in the
+[reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016), place it in the
 repository root and run:
 
 ```powershell
@@ -262,7 +262,7 @@ Bundled imagery and third-party components retain the terms recorded in
 Use [CITATION.cff](CITATION.cff) for the software author, version and fixed release.
 The manuscript is **GeoMaskLab: Replayable measurements for segmentation masks**,
 by Yun Xing, submitted to SoftwareX. Its article DOI will be added after publication.
-The [research-data DOI](https://doi.org/10.5281/zenodo.23419528) identifies the
+The [versioned reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016) supplies the
 reproduction materials and experiment records.
 
 ## Contact

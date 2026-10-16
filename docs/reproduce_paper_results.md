@@ -46,8 +46,8 @@ on a mismatch. Use `--output output/paper-results-2` for another run.
 ## Numerical records for Table 4 and the water assessment
 
 Download `GeoMaskLab_Supplementary_Experiment_Records.zip` from
-[Zenodo record 23419528](https://doi.org/10.5281/zenodo.23419528).
-Check the file checksum shown on the record page.
+[the reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016).
+Check the file checksum in SHA256SUMS.txt on the release page.
 Keep the ZIP in the repository root and run:
 
 ```powershell

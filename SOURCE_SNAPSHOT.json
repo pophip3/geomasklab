@@ -64,7 +64,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "c9ff3078e933d79bb41ce2b268804190e03d105a06b6958a0d6cb399ac48ae95"
+      "sha256": "9f899ada24b71a029b6939aa670ade40abc8e9cdc1989aa3a32a19f86fcd38ce"
     },
     {
       "path": "SECURITY.md",
@@ -188,7 +188,7 @@
     },
     {
       "path": "docs/reproduce_paper_results.md",
-      "sha256": "e553030907e0401c699670baa32437cecd5f4689986c059024d2168ea051b349"
+      "sha256": "668e26df7bd0976de9dac490b57fe57914896fd943559c6294e36d893b88476a"
     },
     {
       "path": "docs/reviewer_quickstart.md",
@@ -684,7 +684,7 @@
     },
     {
       "path": "release/check_english_assets.py",
-      "sha256": "b5f7672e354379ed79b30ff8074a0031872d37fc6fe6fc27003e19745879f303"
+      "sha256": "a2781a4bcab5fd0eeb7f4e116fb23df140f73b9e8ce64bb692e37279d2f148a1"
     },
     {
       "path": "release/check_wheel.py",
