@@ -1,1 +1,2 @@
-Pillow>=10,<13
+# Runtime for the offline demo and paper measurement reproduction.
+Pillow==12.3.0

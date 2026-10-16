@@ -25,6 +25,7 @@ checkpoints/
 weights/
 .pytest_cache/
 outputs/
+/output/
 reviewer-output/
 workflow-output/
 five-step-output/

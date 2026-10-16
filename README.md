@@ -7,12 +7,15 @@
 [![Release 1.0.0](https://img.shields.io/badge/release-1.0.0-2563eb)](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-build.20261015)
 [![Research software checks](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml)
 
+## Description
+
 GeoMaskLab brings regional measurement, segmentation assessment and result
 comparison into one open-source workbench. Work interactively in the browser or
 run repeatable analyses from the command line. Saved masks, analysis settings and
 results travel together in portable evidence packets.
 
-[Install](#install) · [Offline example](#run-the-offline-example) ·
+[Installation](#installation) · [Demo](#quick-start--demo) ·
+[Reproduce paper results](#reproduce-paper-results) ·
 [Browser workbench](#open-the-browser-workbench) ·
 [Documentation](https://pophip3.github.io/geomasklab/) · [Example data](#example-data)
 
@@ -27,25 +30,42 @@ results travel together in portable evidence packets.
 | 📂 **Batch processing** | Apply a shared workflow to multiple inputs and collect the results. |
 | 📦 **Export and verification** | Share saved inputs and results, then recompute measurements offline. |
 
-**Try it first:** [install the package](#install), then [run the bundled example](#run-the-offline-example) to generate a local results page.
+**Try it first:** [install the package](#installation), then [run the bundled example](#quick-start--demo) to generate a local results page.
 
-## Install
+## System Requirements
 
-Requirements: Python 3.10 or later. The installation command installs Pillow
-automatically. The example below uses the image and mask included in the source
-package and runs without a GPU, RemoteAgent or RemoteSAM.
+- Operating system: Windows, Linux or macOS.
+- Python: 3.10 or later; the submission reproduction was checked with Python 3.12.14 on Windows.
+- Offline demo and measurement reproduction: CPU only; no CUDA or model downloads.
+- Browser workbench: a current browser and a free local port (4180 by default).
+- Fresh model inference: separate model environments and GPU setup described in [Local-model setup](docs/local_model_modules.md), including PyTorch 2.6.0 / CUDA 12.4.
 
-Download and extract the [fixed source package](https://github.com/pophip3/geomasklab/releases/download/v1.0.0-build.20261015/GeoMaskLab-1.0.0-build-20261015-source.zip), then open a
-terminal in the extracted project directory containing this README and
-`pyproject.toml`.
+## Dependencies
 
-This package is GeoMaskLab 1.0.0, submission build 15 October 2026.
+The offline workflow uses **Pillow 12.3.0**, fixed in [requirements.txt](requirements.txt).
+[requirements-build.txt](requirements-build.txt) fixes setuptools 80.9.0 and wheel 0.45.1 for source installation.
+The commands below install both files, then build the package with those tools.
+Optional model adapters have their own pinned requirements; see the model guide.
+
+## Installation
+
+Clone the public repository and keep the terminal in its root directory:
+
+```sh
+git clone https://github.com/pophip3/geomasklab.git
+cd geomasklab
+```
+
+The manuscript's fixed implementation is [commit 2be0c18](https://github.com/pophip3/geomasklab/tree/2be0c18f54333df2f560b8ae8a9311ae0a6b267f),
+also available as the [1.0.0 submission release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-build.20261015).
+The current `main` adds the reproduction instructions and helper below to that implementation.
 
 ### Windows PowerShell
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install .
+.\.venv\Scripts\python.exe -m pip install -r requirements-build.txt -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install --no-build-isolation --no-deps .
 .\.venv\Scripts\geomasklab.exe --version
 ```
 
@@ -53,22 +73,30 @@ python -m venv .venv
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install .
+.venv/bin/python -m pip install -r requirements-build.txt -r requirements.txt
+.venv/bin/python -m pip install --no-build-isolation --no-deps .
 .venv/bin/geomasklab --version
 ```
 
 The version command prints `1.0.0`.
 
-## Run the offline example
+## Quick Start / Demo
 
 Keep the terminal in the project directory. The example measures a saved mask,
 selects a region, compares mask versions, inspects connected components and
 processes a batch. It writes its results to `five-step-output/`.
 
+Run the complete demo with one command after installation:
+
 ### Windows PowerShell
 
 ```powershell
 .\.venv\Scripts\python.exe examples/five_step_workflow.py
+```
+
+Then verify its five exported packet types:
+
+```powershell
 .\.venv\Scripts\geomasklab.exe verify five-step-output/baseline.zip
 .\.venv\Scripts\geomasklab.exe verify-comparison five-step-output/comparison.zip
 .\.venv\Scripts\geomasklab.exe verify-components five-step-output/components.zip
@@ -80,6 +108,11 @@ processes a batch. It writes its results to `five-step-output/`.
 
 ```sh
 .venv/bin/python examples/five_step_workflow.py
+```
+
+Then verify the exports:
+
+```sh
 .venv/bin/geomasklab verify five-step-output/baseline.zip
 .venv/bin/geomasklab verify-comparison five-step-output/comparison.zip
 .venv/bin/geomasklab verify-components five-step-output/components.zip
@@ -96,6 +129,75 @@ To repeat the example, use a new output directory:
 ```
 
 On Linux/macOS, use `.venv/bin/python` in place of the Windows Python path.
+
+Expected demo measurements: **105,232 foreground pixels / 196,608 valid pixels**.
+Its batch completes three samples and records one deliberately missing input;
+the empty valid domain has undefined coverage. `five-step-output/summary.json`
+reports `"passed": true` when all checks succeed.
+
+## Reproduce paper results
+
+### How to reproduce results
+
+After installation, run the paper measurement helper from the repository root:
+
+```powershell
+.\.venv\Scripts\python.exe examples/reproduce_paper_results.py
+```
+
+On Linux/macOS:
+
+```sh
+.venv/bin/python examples/reproduce_paper_results.py
+```
+
+The bundled NAIP image and mask need no additional download. The command checks
+the four conditions in **Section 3.1 / Figure 4**, exports verified packets and
+writes `output/paper-results/figure4_metrics.csv`, `figure4_measurements.png`,
+`comparison.json` and `summary.json`.
+
+| Condition | Foreground / valid pixels | Expected coverage |
+| :--- | ---: | ---: |
+| Whole image | 142,629 / 262,144 | 54.41% |
+| Right half | 63,028 / 131,072 | 48.09% |
+| Exclude left quarter | 105,232 / 196,608 | 53.52% |
+| Empty valid domain | 0 / 0 | Undefined |
+
+The whole/right comparison has **0 changed pixels** in the common domain;
+the saved foreground difference is **-79,601 pixels**, entirely outside that domain.
+The PNG reconstructs the measurement panels; publication artwork is supplied
+with the article's LaTeX source.
+
+For **Table 4, Supplementary Figure S1 and Section 3.4**, download
+`GeoMaskLab_Supplementary_Experiment_Records.zip` from the
+[archived research data](https://doi.org/10.5281/zenodo.23397371), place it in the
+repository root and run:
+
+```powershell
+.\.venv\Scripts\python.exe examples/reproduce_paper_results.py --records GeoMaskLab_Supplementary_Experiment_Records.zip --output output/paper-results-with-records
+```
+
+Use `.venv/bin/python` on Linux/macOS. This recalculates all six table rows and
+the twelve S1 coverage values from recorded counts, plus the 65-scene water
+totals: **IoU 82.27%, Dice 90.27%, precision 97.43%, recall 84.09%**.
+Results are saved as `table4_metrics.csv` and `water_metrics.json`.
+
+For new inference on the six selected WHU/iSAID images and the Figure 5 aircraft
+case, obtain the official inputs and model assets and follow the reconstruction
+guides in the reproducibility supplement. The water v5 checkpoint is identified
+by hash in the records; it is not distributed in the public deposit.
+See the [result-by-result reproduction guide](docs/reproduce_paper_results.md)
+for commands, data locations and the complete figure/metric mapping.
+
+### Check the software
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py" -q
+.\.venv\Scripts\python.exe reviewer_demo.py
+```
+
+On Linux/macOS, replace the Python path with `.venv/bin/python`.
+Optional geospatial, schema and signing checks run when their extras are installed.
 
 ## Open the browser workbench
 
@@ -146,10 +248,20 @@ download is needed for the offline example.
 Report bugs or suggest improvements through [GitHub Issues](https://github.com/pophip3/geomasklab/issues).
 For development setup and checks, see [Contributing](CONTRIBUTING.md).
 
-## License and contact
+## License
 
 GeoMaskLab is distributed under the [MIT License](LICENSE).
 Bundled imagery and third-party components retain the terms recorded in
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-Contact: [2416010301@hhu.edu.cn](mailto:2416010301@hhu.edu.cn).
+## Citation
+
+Use [CITATION.cff](CITATION.cff) for the software author, version and fixed release.
+The manuscript is **GeoMaskLab: Replayable measurements for segmentation masks**,
+by Yun Xing, submitted to SoftwareX. Its article DOI will be added after publication.
+The [research-data DOI](https://doi.org/10.5281/zenodo.23397371) identifies the
+reproduction materials and experiment records.
+
+## Contact
+
+[2416010301@hhu.edu.cn](mailto:2416010301@hhu.edu.cn)
