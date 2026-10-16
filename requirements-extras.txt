@@ -1,0 +1,12 @@
+# Fixed optional schema, geospatial, provenance, and signing environment.
+# CPython 3.10-3.12 on Windows/Linux x86-64; see evaluation/locks/README.md.
+-c evaluation/locks/constraints-python310-312.txt
+-r requirements.txt
+jsonschema==4.26.0
+cryptography==46.0.7
+prov==2.5.3
+rasterio==1.4.4 ; python_version < "3.12"
+rasterio==1.5.2 ; python_version >= "3.12"
+pyproj==3.7.1 ; python_version < "3.11"
+pyproj==3.7.2 ; python_version == "3.11"
+pyproj==3.8.0 ; python_version >= "3.12"

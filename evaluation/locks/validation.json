@@ -1,0 +1,275 @@
+{
+  "schema": "geomasklab-optional-dependency-validation/1.0",
+  "validation_date": "2026-10-17",
+  "resolver": "uv 0.13.1",
+  "lock_scope": "CPython 3.10-3.12; Windows x86-64 and Linux x86-64 (glibc >= 2.28)",
+  "files_sha256": {
+    "evaluation/requirements-evaluation.txt": "6684822b31c9368e43907dd0a0c72cd7c8865b5635fa94f2b78e1d2e6c4c4827",
+    "evaluation/requirements-report.txt": "4e95d763ff87af2096b523bd4184b98db9c6e187449c0f83f21a1b0a849b773d",
+    "evaluation/requirements-workflow.txt": "0fedf40a0086db83e56bab09ba06e811679513e9fae488e3e545acf1e80be101",
+    "requirements-extras.txt": "14c4e6ddf3a47ea07388862fe22869d54440829cd481cf613d1f15587faba80f",
+    "evaluation/locks/constraints-python310-312.txt": "ac91203434e8b855b8d963a7b3deb6bf34b31d92df09eb581645bf9716c7da52",
+    "evaluation/locks/pyproject.toml": "2fc23c206931078344b595dd0984be9b6385f9226862390079c88aac39faa247"
+  },
+  "pip_resolution_matrix": [
+    {
+      "target": "cp310-windows-x86_64",
+      "returncode": 0,
+      "expected_packages": 92,
+      "target_marker_closure_errors": [],
+      "host_marker_only_packages": [],
+      "passed": true
+    },
+    {
+      "target": "cp310-linux-x86_64",
+      "returncode": 0,
+      "expected_packages": 91,
+      "target_marker_closure_errors": [],
+      "host_marker_only_packages": [
+        "colorama"
+      ],
+      "passed": true
+    },
+    {
+      "target": "cp312-windows-x86_64",
+      "returncode": 0,
+      "expected_packages": 87,
+      "target_marker_closure_errors": [],
+      "host_marker_only_packages": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-linux-x86_64",
+      "returncode": 0,
+      "expected_packages": 85,
+      "target_marker_closure_errors": [],
+      "host_marker_only_packages": [
+        "colorama",
+        "tzdata"
+      ],
+      "passed": true
+    }
+  ],
+  "entrypoint_closure_checks": [
+    {
+      "target": "cp310-windows-x86_64",
+      "entrypoint": "evaluation/requirements-evaluation.txt",
+      "dependency_count": 7,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp310-windows-x86_64",
+      "entrypoint": "evaluation/requirements-report.txt",
+      "dependency_count": 16,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp310-windows-x86_64",
+      "entrypoint": "evaluation/requirements-workflow.txt",
+      "dependency_count": 75,
+      "activated_extras": {
+        "smart-open": [
+          "http"
+        ]
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp310-windows-x86_64",
+      "entrypoint": "requirements-extras.txt",
+      "dependency_count": 24,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp310-linux-x86_64",
+      "entrypoint": "evaluation/requirements-evaluation.txt",
+      "dependency_count": 7,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp310-linux-x86_64",
+      "entrypoint": "evaluation/requirements-report.txt",
+      "dependency_count": 16,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp310-linux-x86_64",
+      "entrypoint": "evaluation/requirements-workflow.txt",
+      "dependency_count": 74,
+      "activated_extras": {
+        "smart-open": [
+          "http"
+        ]
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp310-linux-x86_64",
+      "entrypoint": "requirements-extras.txt",
+      "dependency_count": 24,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-windows-x86_64",
+      "entrypoint": "evaluation/requirements-evaluation.txt",
+      "dependency_count": 7,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-windows-x86_64",
+      "entrypoint": "evaluation/requirements-report.txt",
+      "dependency_count": 16,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-windows-x86_64",
+      "entrypoint": "evaluation/requirements-workflow.txt",
+      "dependency_count": 72,
+      "activated_extras": {
+        "smart-open": [
+          "http"
+        ]
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-windows-x86_64",
+      "entrypoint": "requirements-extras.txt",
+      "dependency_count": 22,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-linux-x86_64",
+      "entrypoint": "evaluation/requirements-evaluation.txt",
+      "dependency_count": 7,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-linux-x86_64",
+      "entrypoint": "evaluation/requirements-report.txt",
+      "dependency_count": 16,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-linux-x86_64",
+      "entrypoint": "evaluation/requirements-workflow.txt",
+      "dependency_count": 70,
+      "activated_extras": {
+        "smart-open": [
+          "http"
+        ]
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "target": "cp312-linux-x86_64",
+      "entrypoint": "requirements-extras.txt",
+      "dependency_count": 22,
+      "activated_extras": {},
+      "errors": [],
+      "passed": true
+    }
+  ],
+  "fresh_windows_environments": [
+    {
+      "python": "3.10.19",
+      "platform": "Windows x86-64",
+      "new_virtual_environment": true,
+      "pip_check": "passed",
+      "versions": {
+        "numpy": "2.2.6",
+        "requests": "2.34.2",
+        "matplotlib": "3.10.6",
+        "Pillow": "12.3.0",
+        "label-studio-sdk": "2.1.2",
+        "rasterio": "1.4.4",
+        "pyproj": "3.7.1",
+        "jsonschema": "4.26.0",
+        "prov": "2.5.3",
+        "cryptography": "46.0.7"
+      },
+      "score_and_report_dependency_smoke": "passed",
+      "targeted_tests": {
+        "geospatial-provenance-tests": 16,
+        "schema-tests": 17,
+        "signing-tests": 9
+      },
+      "converter_cases": 5,
+      "converter_controlled_faults": 4,
+      "converter_passed": true,
+      "download_retry_needed": false
+    },
+    {
+      "python": "3.12.14",
+      "platform": "Windows x86-64",
+      "new_virtual_environment": true,
+      "pip_check": "passed",
+      "versions": {
+        "numpy": "2.2.6",
+        "requests": "2.34.2",
+        "matplotlib": "3.10.6",
+        "Pillow": "12.3.0",
+        "label-studio-sdk": "2.1.2",
+        "rasterio": "1.5.2",
+        "pyproj": "3.8.0",
+        "jsonschema": "4.26.0",
+        "prov": "2.5.3",
+        "cryptography": "46.0.7"
+      },
+      "score_and_report_dependency_smoke": "passed",
+      "targeted_tests": {
+        "geospatial-provenance-tests": 16,
+        "schema-tests": 17,
+        "signing-tests": 9
+      },
+      "converter_cases": 5,
+      "converter_controlled_faults": 4,
+      "converter_passed": true,
+      "download_retry_needed": true
+    }
+  ],
+  "full_suite": {
+    "python": "3.12.14",
+    "passed": true,
+    "tests_run": 381,
+    "skipped": [
+      {
+        "test": "test_manifest_batch.ManifestBatch.test_symlink_escape_rejected_when_supported",
+        "reason": "File symlinks unavailable for this account."
+      }
+    ],
+    "initial_attempt_transport_error": "One localhost HTTP request raised Windows socket error 10053; its entire HTTP test module passed on an immediate independent rerun, and the full suite was repeated."
+  },
+  "recorded_report_regenerated": true,
+  "limits": [
+    "Linux was checked by cross-target pip wheel resolution and independent target-marker closure auditing, not by Linux execution.",
+    "The complete Label Studio SDK dependency metadata was resolved and installed; its official brush converter was exercised, not its web application.",
+    "No live model inference or new scientific accuracy measurement is claimed by these environment checks."
+  ]
+}

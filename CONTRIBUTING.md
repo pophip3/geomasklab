@@ -6,10 +6,10 @@ extending the documented area models, adding model training or multi-user hostin
 
 ## Development checks
 
-Use Python 3.10 or newer. Install `requirements.txt` and the optional
-`evaluation/requirements-evaluation.txt` for the full test suite. Install
-`python -m pip install ".[schema,geo,interop]"` to exercise optional geospatial
-operations and independent provenance parsing. Run:
+Use the separate Python 3.10-3.12 evaluation environment in
+[Reproduction environments](docs/reproduction_environments.md). Its fixed
+requirements include schema, geospatial, provenance, signing, plotting and the
+Label Studio brush converter. After installing that environment, run:
 
 ```sh
 python -m unittest discover -s tests -p "test_*.py" -q
@@ -18,9 +18,10 @@ python evaluation/run_integrity_matrix.py
 python examples/recalculate_region.py reviewer-output/right.zip
 ```
 
-Optional Label Studio converter tests require the dependency versions documented
-in the README. Keep basic startup and the reviewer workflow dependent only on
-Pillow. CI covers Windows, Linux and macOS with Python 3.10 and 3.13.
+Keep basic startup and the reviewer workflow dependent only on Pillow. The
+research CI checks the complete optional lock on Windows and Linux with Python
+3.10 and 3.12. Its minimal environment also runs on Windows, Linux and macOS
+with Python 3.13.
 
 Write comments, docstrings, messages and documentation in clear English. New
 examples must use English requests. Legacy input-language compatibility and

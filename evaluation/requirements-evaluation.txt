@@ -1,2 +1,6 @@
-numpy>=1.26,<3
-requests>=2.31,<3
+# Fixed evaluation environment: CPython 3.10-3.12, Windows/Linux x86-64.
+# All transitive dependencies are constrained by the shared resolver lock.
+-c locks/constraints-python310-312.txt
+-r ../requirements.txt
+numpy==2.2.6
+requests==2.34.2

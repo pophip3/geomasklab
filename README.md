@@ -33,6 +33,20 @@ land-cover measurement, vegetation monitoring and surface-water assessment.
 
 **Try it first:** [install the package](#installation), then [run the bundled example](#quick-start--demo) to generate a local results page.
 
+## Source layout
+
+| Directory | Contents |
+| --- | --- |
+| `src/geomasklab/` | Shared analysis library, command-line interface, schemas and packet verification |
+| `workbench/` | Browser workbench package and web assets |
+| `model_services/` | Optional model adapters, service launcher and fixed environment files |
+| `examples/` | Runnable demonstrations and bundled example inputs |
+| `evaluation/` | Paper measurements, validation scripts and model reproduction guides |
+| `tests/` | Automated software checks |
+
+`pyproject.toml` declares the installable packages and command-line entry points.
+Root-level launch scripts provide convenient source-checkout commands.
+
 ## System Requirements
 
 - Operating system: Windows, Linux or macOS.
@@ -46,7 +60,9 @@ land-cover measurement, vegetation monitoring and surface-water assessment.
 The offline workflow uses **Pillow 12.3.0**, fixed in [requirements.txt](requirements.txt).
 [requirements-build.txt](requirements-build.txt) fixes setuptools 80.9.0 and wheel 0.45.1 for source installation.
 The commands below install both files, then build the package with those tools.
-Optional model adapters have their own pinned requirements; see the model guide.
+Evaluation, plotting, export integrations, RemoteAgent, RemoteSAM and water V5 each
+have complete dependency locks, including indirect and platform-specific packages.
+Use the separate environments and commands in [Reproduction environments](docs/reproduction_environments.md).
 
 ## Installation
 
@@ -61,8 +77,11 @@ The manuscript's fixed reproduction edition is [commit 15233af](https://github.c
 also available as the [English reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016).
 The repository, fixed commit and release downloads are public and require no login.
 These are ordinary repository and version URLs, not expiring download tokens.
-The commands below work on the current `main`; to use the exact manuscript source,
-run `git checkout 15233afa4db75b59a813cdaa3b62c59eb7c5e457` before installation.
+This dependency edition includes complete locks and preserves the inference code.
+When using the dependency supplement, extract its source ZIP and run the commands
+below from that directory. `SOURCE_SNAPSHOT.json` and the source archive manifest
+identify the exact files and Git commit. The original manuscript snapshot remains
+available at the fixed commit above for source comparison.
 
 ### Windows PowerShell
 
@@ -140,8 +159,9 @@ the empty valid domain has undefined coverage. `five-step-output/summary.json`
 reports `"passed": true` when all checks succeed.
 
 <a id="how-to-reproduce-results"></a>
+<a id="reproduce-paper-results"></a>
 
-## Reproduce paper results
+## Reproduce paper results (How to reproduce results)
 
 After installation, run the paper measurement helper from the repository root:
 

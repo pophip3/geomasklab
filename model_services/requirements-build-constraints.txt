@@ -1,0 +1,5 @@
+# Build dependencies for the fixed CPython 3.10 model environments.
+# Use pip install --build-constraint model_services/requirements-build-constraints.txt -r model_services/requirements-sam.txt
+setuptools==79.0.1
+wheel==0.45.1
+packaging==24.2

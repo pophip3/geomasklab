@@ -1,10 +1,10 @@
 {
   "software_version": "1.0.0",
-  "build_date": "2026-10-16",
-  "release_tag": "v1.0.0-repro.20261016",
-  "source_permalink": "https://github.com/pophip3/geomasklab/tree/v1.0.0-repro.20261016",
-  "identification": "English reproduction edition with the original water V5 checkpoint and validated inference procedure.",
-  "historical_submission_commit": "2be0c18f54333df2f560b8ae8a9311ae0a6b267f",
+  "build_date": "2026-10-17",
+  "release_tag": "v1.0.0-dependencies.20261017",
+  "publication_status_at_packaging": "Prepared for publication; consult the release for availability.",
+  "identification": "Complete reproduction dependency locks with fixed build tools and platform-specific transitive dependencies.",
+  "historical_reproduction_commit": "15233afa4db75b59a813cdaa3b62c59eb7c5e457",
   "files": [
     {
       "path": ".env.example",
@@ -28,7 +28,7 @@
     },
     {
       "path": ".github/workflows/research-checks.yml",
-      "sha256": "5ea8aab1ad4f8d631432764551822ebfa7985b107cbfcb07d5ea1faa545cc524"
+      "sha256": "7431f2b8c3307db46dddcc0bab3f5629ef1226a2603a0c9ad8b43c7120adf611"
     },
     {
       "path": ".gitignore",
@@ -44,7 +44,7 @@
     },
     {
       "path": "CONTRIBUTING.md",
-      "sha256": "5373e0eaf3ccd6af4a61152b96c8a0e6e60a9b48aa835a0619c41bec9623abbd"
+      "sha256": "944f88213711df8046bc838b18658c8d6fc7306176adcae36f92eb410fe0958e"
     },
     {
       "path": "LICENSE",
@@ -64,7 +64,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "9f899ada24b71a029b6939aa670ade40abc8e9cdc1989aa3a32a19f86fcd38ce"
+      "sha256": "4cbcf8adc8b5cf3e5c2ea44b9db3a9867ce26eab74fae94c6082296e4f202dad"
     },
     {
       "path": "SECURITY.md",
@@ -144,7 +144,7 @@
     },
     {
       "path": "docs/local_model_modules.md",
-      "sha256": "6993d0481422569446b63a2bfc7a3b67cf19bd641f2d5879bbd22ccda83c0e30"
+      "sha256": "385ae8f95d6f25688f2bb104bace2cf327e9e4277f170baa426c59624c2a6560"
     },
     {
       "path": "docs/local_model_validation.md",
@@ -188,7 +188,11 @@
     },
     {
       "path": "docs/reproduce_paper_results.md",
-      "sha256": "668e26df7bd0976de9dac490b57fe57914896fd943559c6294e36d893b88476a"
+      "sha256": "eafd3b195ce35cd31bd7634ef5e05d2b531112bfedb2e96aceacb78f29d2d8d4"
+    },
+    {
+      "path": "docs/reproduction_environments.md",
+      "sha256": "3990476559a062e58062aa0a55e75406062cbcc31f0969498ea8b632867edbbf"
     },
     {
       "path": "docs/reviewer_quickstart.md",
@@ -323,6 +327,22 @@
       "sha256": "ee63386b287c2a475fee48afc880c8732e9f1a38d9b39f32ab1f0fa267862d0d"
     },
     {
+      "path": "evaluation/locks/README.md",
+      "sha256": "9066574b8af24e6ceaba53b80b7f70d3b8831dca462efa8b92b55d5027562bad"
+    },
+    {
+      "path": "evaluation/locks/constraints-python310-312.txt",
+      "sha256": "ac91203434e8b855b8d963a7b3deb6bf34b31d92df09eb581645bf9716c7da52"
+    },
+    {
+      "path": "evaluation/locks/pyproject.toml",
+      "sha256": "2fc23c206931078344b595dd0984be9b6385f9226862390079c88aac39faa247"
+    },
+    {
+      "path": "evaluation/locks/validation.json",
+      "sha256": "27ef37216ee2db910a9fa97cbcd06577c20762a280ee3add57c34546d951b098"
+    },
+    {
       "path": "evaluation/prepare_independent.py",
       "sha256": "9843760c302528c3869ba9f8fab1faf8f97cb36ddfbc2dc48d379fc8f3653845"
     },
@@ -348,15 +368,15 @@
     },
     {
       "path": "evaluation/requirements-evaluation.txt",
-      "sha256": "7aae35a738950525c31898420f56f4eb2525e0cd2f1fc846f2a2e21142b8b57a"
+      "sha256": "6684822b31c9368e43907dd0a0c72cd7c8865b5635fa94f2b78e1d2e6c4c4827"
     },
     {
       "path": "evaluation/requirements-report.txt",
-      "sha256": "aefefe676c1233a6a49640513aadd7e69b03958658725c5a30fcfc999bd0b427"
+      "sha256": "4e95d763ff87af2096b523bd4184b98db9c6e187449c0f83f21a1b0a849b773d"
     },
     {
       "path": "evaluation/requirements-workflow.txt",
-      "sha256": "d6e4a46b766830d5688f6ddcbb5801a41dd46b828ac9a8d4e85ce61045dda876"
+      "sha256": "0fedf40a0086db83e56bab09ba06e811679513e9fae488e3e545acf1e80be101"
     },
     {
       "path": "evaluation/results/integrity_matrix.csv",
@@ -428,7 +448,11 @@
     },
     {
       "path": "evaluation/water_v5/README.md",
-      "sha256": "01dfa901c7121fbce544fad94af5bc5d661b89b0b22b6122b54821166069749c"
+      "sha256": "d1efc37ae347bee3aef189d8b44183a9f883c8ed5132c2808d5ae6a4ac87749d"
+    },
+    {
+      "path": "evaluation/water_v5/environment_validation.json",
+      "sha256": "cce7071e8bfc99f1913716594d1d41af3e848a013dc84cef9473dffaba6c51d2"
     },
     {
       "path": "evaluation/water_v5/expected_results.json",
@@ -447,8 +471,12 @@
       "sha256": "470fbaee0192c2f07e53d8fab2010e323fa607fc40aa095996bfc35f42cafe7f"
     },
     {
+      "path": "evaluation/water_v5/requirements-build.txt",
+      "sha256": "c923ff575db3e24d2e2838050c4178a53eb4210d711ca376e60338f7593392ea"
+    },
+    {
       "path": "evaluation/water_v5/requirements.txt",
-      "sha256": "ef6770918b532e0387d6c2417932c37d24056b9f4b4fdf62516bac754f12bd3b"
+      "sha256": "c59ded88f0e0f6f9e53dd406423ecfbcfbd5a0c9d1c0f0a435a79ccbf8f0379a"
     },
     {
       "path": "evaluation/water_v5/scene_manifest.json",
@@ -627,6 +655,10 @@
       "sha256": "09c3b06a6ce14c9c557f175fe9444639781f9b9d5bc7dabcfbea81ceef7a5206"
     },
     {
+      "path": "model_services/locks/validation.json",
+      "sha256": "a992a09906c72cf5c850eccba78012142e4fad76a480ae74277c134279a7fb6a"
+    },
+    {
       "path": "model_services/model-lock.json",
       "sha256": "bd937bce8c044719dc8d648c87307d0e49bd6ca0262d5abe9d89cd359bd3bb66"
     },
@@ -636,11 +668,15 @@
     },
     {
       "path": "model_services/requirements-agent.txt",
-      "sha256": "bbe8e41924c7443feb952ea9c0cf3043c3b7c9d0833e6dad8a549b9c1c1537e8"
+      "sha256": "e9e99ae94a5aa450fa2742fafc6f7a6b1ac50261a36469dd2d1d5b3532ca22c3"
+    },
+    {
+      "path": "model_services/requirements-build-constraints.txt",
+      "sha256": "6b21f1cdd917c24dc7dc82eb2970211b639a803bd4e9132cc978812365b877c2"
     },
     {
       "path": "model_services/requirements-sam.txt",
-      "sha256": "d8e0a45d604ca9298c711e48248eb1ac1a63dc5997b6fdfc9a93d7e20e33b40b"
+      "sha256": "3b45f52c4fcd748b588e664a7961ecc0b2a02ed74bb6276e6d1de7f6aaaee934"
     },
     {
       "path": "model_services/sam_backend.py",
@@ -709,6 +745,10 @@
     {
       "path": "requirements-build.txt",
       "sha256": "1b79d17fd3b0c7fe36e22c2d5b38865e60223f55b5fb3e4322510ea514db4ca7"
+    },
+    {
+      "path": "requirements-extras.txt",
+      "sha256": "14c4e6ddf3a47ea07388862fe22869d54440829cd481cf613d1f15587faba80f"
     },
     {
       "path": "requirements-reviewer.txt",

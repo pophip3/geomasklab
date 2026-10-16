@@ -1,0 +1,70 @@
+{
+  "schema": "geomasklab-model-dependency-validation/1.0",
+  "validation_date": "2026-10-17",
+  "scope": "CPython 3.10; Windows x86_64 and Linux x86_64; CUDA 12.4",
+  "resolver": "uv 0.13.1",
+  "files_sha256": {
+    "model_services/requirements-agent.txt": "e9e99ae94a5aa450fa2742fafc6f7a6b1ac50261a36469dd2d1d5b3532ca22c3",
+    "model_services/requirements-sam.txt": "3b45f52c4fcd748b588e664a7961ecc0b2a02ed74bb6276e6d1de7f6aaaee934",
+    "model_services/requirements-build-constraints.txt": "6b21f1cdd917c24dc7dc82eb2970211b639a803bd4e9132cc978812365b877c2"
+  },
+  "platform_lock_checks": [
+    {
+      "service": "agent",
+      "python": "3.10",
+      "platform": "windows-x86_64",
+      "package_count": 31,
+      "all_versions_exact": true,
+      "matches_successful_original_resolution": true,
+      "cached_metadata_resolution_exit_code": 0,
+      "cached_metadata_resolution_exact_match": true
+    },
+    {
+      "service": "agent",
+      "python": "3.10",
+      "platform": "linux-x86_64",
+      "package_count": 44,
+      "all_versions_exact": true,
+      "matches_successful_original_resolution": true,
+      "cached_metadata_resolution_exit_code": 0,
+      "cached_metadata_resolution_exact_match": true
+    },
+    {
+      "service": "sam",
+      "python": "3.10",
+      "platform": "windows-x86_64",
+      "package_count": 45,
+      "all_versions_exact": true,
+      "matches_successful_original_resolution": true,
+      "cached_metadata_resolution_exit_code": 0,
+      "cached_metadata_resolution_exact_match": true
+    },
+    {
+      "service": "sam",
+      "python": "3.10",
+      "platform": "linux-x86_64",
+      "package_count": 58,
+      "all_versions_exact": true,
+      "matches_successful_original_resolution": true,
+      "cached_metadata_resolution_exit_code": 0,
+      "cached_metadata_resolution_exact_match": true
+    }
+  ],
+  "method": [
+    "Evaluate every environment marker for each target platform and require one exact version per active package.",
+    "Compare the resulting package set with the successful original registry resolution.",
+    "Resolve the complete target-specific package set again from cached registry metadata using the explicit PyTorch CUDA 12.4 backend and pinned build dependencies."
+  ],
+  "fresh_windows_installation": {
+    "python": "3.10.19",
+    "isolated_virtual_environments_created": [
+      "agent",
+      "sam"
+    ],
+    "installation_completed": false,
+    "pip_check_executed": false,
+    "cuda_smoke_executed": false,
+    "reason": "The additional clean GPU installation was not completed; this record verifies exact package resolution and dependency closure."
+  },
+  "execution_scope": "This record validates dependency closure. Existing model inference records remain separate from this environment-resolution check."
+}

@@ -18,13 +18,20 @@ and FN for each of the 65 scenes with the archived experiment.
 
 ## Install
 
-The checked inference environment uses Python 3.9.25, PyTorch 2.6.0 and CUDA 12.4.
-Create a separate virtual environment, activate it, then run:
+The recorded inference uses Python 3.9.25, PyTorch 2.6.0 and CUDA 12.4.
+The complete lock covers Windows AMD64 and Linux x86_64, including Hugging Face
+downloads and the Linux CUDA runtime packages. Create a separate Python 3.9
+virtual environment, activate it, then run:
 
 ```sh
-python -m pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
-python -m pip install -r evaluation/water_v5/requirements.txt
+python -m pip install -r evaluation/water_v5/requirements-build.txt
+python -m pip install --no-build-isolation -r evaluation/water_v5/requirements.txt
+python -m pip check
 ```
+
+The requirements select the CUDA 12.4 PyTorch wheels directly. This environment
+uses Pillow 11.3.0 and NumPy 1.26.4; install the core demo and optional evaluation
+tools in their own environments. See [Reproduction environments](../../docs/reproduction_environments.md).
 
 ## Run
 
@@ -34,7 +41,7 @@ From the source repository root:
 python evaluation/water_v5/reproduce_water_v5.py --weights /path/to/model.safetensors --sam-checkpoint /path/to/sam_vit_h_4b8939.pth --data-root /path/to/OpenEarthMap --output output/water-v5 --device cuda:0
 ```
 
-Use paths to the actual downloaded files on Windows as well as Linux/macOS.
+Use paths to the actual downloaded files on Windows or Linux.
 The script writes a predicted PNG for each scene and `results.json`.
 
 Expected aggregate counts: **TP 1,356,978; FP 35,782; FN 256,701**.

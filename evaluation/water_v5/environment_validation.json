@@ -1,0 +1,41 @@
+{
+  "schema": "geomasklab-water-environment-validation/1.0",
+  "date": "2026-10-17",
+  "lock_sha256": "c59ded88f0e0f6f9e53dd406423ecfbcfbd5a0c9d1c0f0a435a79ccbf8f0379a",
+  "resolver": "uv 0.13.1",
+  "resolver_checks": [
+    {
+      "platform": "windows",
+      "python": "3.9.25",
+      "resolved_packages": 33,
+      "exact_lock_matches_resolver": true
+    },
+    {
+      "platform": "linux",
+      "python": "3.9.25",
+      "resolved_packages": 47,
+      "exact_lock_matches_resolver": true
+    }
+  ],
+  "all_direct_and_transitive_versions_fixed": true,
+  "additional_pins": [
+    "munch==4.0.0",
+    "hf-xet==1.7.0",
+    "Linux NVIDIA CUDA 12.4 runtime packages",
+    "triton==3.2.0"
+  ],
+  "recorded_inference": {
+    "python": "3.9.25",
+    "scenes": 65,
+    "all_scene_counts_match": true,
+    "tp": 1356978,
+    "fp": 35782,
+    "fn": 256701,
+    "record": "reproduction_validation.json"
+  },
+  "inference_code_and_checkpoint_unchanged": true,
+  "fresh_gpu_install": {
+    "completed": false,
+    "reason": "The additional clean GPU installation was not completed; dependency resolution and the recorded inference are verified separately."
+  }
+}

@@ -47,9 +47,9 @@ launch. This is a local model interface, with task context rather than complete
 multi-turn conversational memory. Original replies are currently requested in
 English. Loading and answering can be slow on constrained hardware.
 
-For a fixed reviewed build, the existing `v1.0.0` release page includes the
-**20261007 dated revised source ZIP and wheel**. The tag and undated assets retain
-the earlier snapshot; use the dated revised files for this model integration.
+The [reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016)
+contains the current dependency supplement and source archive. Use the files
+whose names include `dependency-closure-20261016` for this installation route.
 
 | Task | Required processes |
 | --- | --- |
@@ -96,21 +96,25 @@ Linux and macOS. macOS has no CUDA support; its live models need a separate CPU
 setup with sufficient system memory, which this delivery does not claim to
 have verified.
 
-The commands are a pinned setup route, not a clean-install claim for every OS.
-The author's existing model environments used Python 3.9 separately from the
-Python >=3.10 core. Run setup from the repository root:
+The complete Python 3.10 dependency locks cover Windows AMD64 and Linux x86_64.
+Build tools and Linux CUDA runtime libraries are fixed as well. See
+[environment checks](reproduction_environments.md) for the verification record.
+Run setup from the repository root:
 
 ```powershell
 py -3.10 -m venv model-envs/core
 py -3.10 -m venv model-envs/agent
 py -3.10 -m venv model-envs/sam
-.\model-envs\core\Scripts\python.exe -m pip install .
-.\model-envs\agent\Scripts\python.exe -m pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
-.\model-envs\agent\Scripts\python.exe -m pip install -r model_services/requirements-agent.txt
-.\model-envs\agent\Scripts\python.exe -m pip install . --no-deps
-.\model-envs\sam\Scripts\python.exe -m pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
-.\model-envs\sam\Scripts\python.exe -m pip install -r model_services/requirements-sam.txt
-.\model-envs\sam\Scripts\python.exe -m pip install . --no-deps
+.\model-envs\core\Scripts\python.exe -m pip install -r requirements-build.txt -r requirements.txt
+.\model-envs\core\Scripts\python.exe -m pip install --no-build-isolation --no-deps .
+.\model-envs\agent\Scripts\python.exe -m pip install pip==26.0.1
+.\model-envs\agent\Scripts\python.exe -m pip install --build-constraint model_services/requirements-build-constraints.txt -r model_services/requirements-agent.txt
+.\model-envs\agent\Scripts\python.exe -m pip install --no-build-isolation --no-deps .
+.\model-envs\agent\Scripts\python.exe -m pip check
+.\model-envs\sam\Scripts\python.exe -m pip install pip==26.0.1
+.\model-envs\sam\Scripts\python.exe -m pip install --build-constraint model_services/requirements-build-constraints.txt -r model_services/requirements-sam.txt
+.\model-envs\sam\Scripts\python.exe -m pip install --no-build-isolation --no-deps .
+.\model-envs\sam\Scripts\python.exe -m pip check
 ```
 
 The CUDA wheel must work with your installed NVIDIA driver. Check each model
