@@ -5,16 +5,16 @@ import re
 
 
 QUALITY_MODES = {'fast', 'accurate', 'auto'}
-ROI_WORDS = re.compile(r'框选|框内|选区|研究区|矩形|\broi\b|selected region', re.I)
-BATCH_WORDS = re.compile(r'批量|整批|这一批|这些影像|所有影像|\bbatch\b|these images', re.I)
+ROI_WORDS = re.compile('\u6846\u9009|\u6846\u5185|\u9009\u533a|\u7814\u7a76\u533a|\u77e9\u5f62|\\broi\\b|selected region', re.I)
+BATCH_WORDS = re.compile('\u6279\u91cf|\u6574\u6279|\u8fd9\u4e00\u6279|\u8fd9\u4e9b\u5f71\u50cf|\u6240\u6709\u5f71\u50cf|\\bbatch\\b|these images', re.I)
 TARGET_WORDS = {
-    'building': r'建筑|房屋|\bbuildings?\b',
-    'aircraft': r'飞机|\b(?:aircraft|airplanes?|planes?)\b',
-    'road': r'道路|\broads?\b',
-    'water': r'水体|\bwater\b',
-    'tree': r'树木|\btrees?\b',
-    'vegetation': r'植被|\bvegetation\b',
-    'ship': r'船舶?|\bships?\b',
+    'building': '\u5efa\u7b51|\u623f\u5c4b|\\bbuildings?\\b',
+    'aircraft': '\u98de\u673a|\\b(?:aircraft|airplanes?|planes?)\\b',
+    'road': '\u9053\u8def|\\broads?\\b',
+    'water': '\u6c34\u4f53|\\bwater\\b',
+    'tree': '\u6811\u6728|\\btrees?\\b',
+    'vegetation': '\u690d\u88ab|\\bvegetation\\b',
+    'ship': '\u8239\u8236?|\\bships?\\b',
 }
 
 
@@ -60,9 +60,9 @@ def resolve_roi(query, context, selected, width, height):
 
 def resolve_quality(query, context, selected=None):
     q = query.lower()
-    fast = bool(re.search(r'快速|快一点|快些|速度优先|\bfast\b', q))
-    accurate = bool(re.search(r'高精度|精细|细化|分块|小目标|精度优先|\baccurate\b|\btiled refinement\b', q))
-    automatic = bool(re.search(r'自动模式|自动选择|\bauto\b', q))
+    fast = bool(re.search('\u5feb\u901f|\u5feb\u4e00\u70b9|\u5feb\u4e9b|\u901f\u5ea6\u4f18\u5148|\\bfast\\b', q))
+    accurate = bool(re.search('\u9ad8\u7cbe\u5ea6|\u7cbe\u7ec6|\u7ec6\u5316|\u5206\u5757|\u5c0f\u76ee\u6807|\u7cbe\u5ea6\u4f18\u5148|\\baccurate\\b|\\btiled refinement\\b', q))
+    automatic = bool(re.search('\u81ea\u52a8\u6a21\u5f0f|\u81ea\u52a8\u9009\u62e9|\\bauto\\b', q))
     found = [name for name, present in (('fast', fast), ('accurate', accurate), ('auto', automatic)) if present]
     if len(found) > 1:
         raise ValueError('The task requests multiple execution modes. Select one mode.')

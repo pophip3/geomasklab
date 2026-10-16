@@ -22,7 +22,7 @@ class SemanticReviewTests(unittest.TestCase):
         self.data=patch.object(server,'DATA',Path(self.temp.name));self.data.start()
         self.sessions=patch.object(server,'SESSIONS',{});self.sessions.start()
         self.s=server.SESSIONS[server.new_session('urban')['id']]
-        self.r=server.run_task(self.s,{'query':'提取右侧建筑','mode':'demo'})
+        self.r=server.run_task(self.s,{'query':'\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51','mode':'demo'})
         self.folder=server.DATA/self.s['id']/self.r['id']
     def tearDown(self):
         self.sessions.stop();self.data.stop();self.temp.cleanup()
@@ -41,7 +41,7 @@ class SemanticReviewTests(unittest.TestCase):
         with zipfile.ZipFile(io.BytesIO(bundle)) as archive:
             self.assertIn('EXPLICIT TEST FIXTURE',archive.read('report.md').decode())
         for name,raw in before.items():self.assertEqual((self.folder/name).read_bytes(),raw)
-        new=server.run_task(self.s,{'query':'改成左侧建筑','mode':'demo','parent_run_id':self.r['id']})
+        new=server.run_task(self.s,{'query':'\u6539\u6210\u5de6\u4fa7\u5efa\u7b51','mode':'demo','parent_run_id':self.r['id']})
         self.assertEqual(new['semantic_review'],server.initial_review())
         self.assertEqual(new['metrics']['pixel_area'],38000)
     def test_reject_and_reset_preserve_complete_history(self):

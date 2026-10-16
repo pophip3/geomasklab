@@ -6,19 +6,19 @@ Legacy Chinese input patterns remain supported; all generated responses are Engl
 import re
 
 TARGET_PATTERNS = {
-    'building': r'建筑|房屋|楼|\bbuildings?\b',
-    'aircraft': r'飞机|\b(?:aircraft|airplanes?|planes?)\b',
-    'road': r'道路|公路|\broads?\b',
-    'water': r'水体|河流|\bwater(?: bodies| body)?\b',
-    'tree': r'树木|\btrees?\b',
-    'vegetation': r'植被|\bvegetation\b',
-    'ship': r'船|\bships?\b',
+    'building': '\u5efa\u7b51|\u623f\u5c4b|\u697c|\\bbuildings?\\b',
+    'aircraft': '\u98de\u673a|\\b(?:aircraft|airplanes?|planes?)\\b',
+    'road': '\u9053\u8def|\u516c\u8def|\\broads?\\b',
+    'water': '\u6c34\u4f53|\u6cb3\u6d41|\\bwater(?: bodies| body)?\\b',
+    'tree': '\u6811\u6728|\\btrees?\\b',
+    'vegetation': '\u690d\u88ab|\\bvegetation\\b',
+    'ship': '\u8239|\\bships?\\b',
 }
-SEGMENT_WORDS = r'提取|分割|标注|标记|圈出|勾勒|蒙版|掩膜|面积|占比|像素|\b(?:segment|segmentation|mask|extract|annotate|coverage|pixels?)\b'
-FOLLOWUP_WORDS = r'改|换|左|右|上半|下半|全部|全图|重新|重跑|统计|框选|选区|研究区|模式|快一点|小目标|整批|批量|\b(?:switch|change|left|right|top|bottom|whole|entire|rerun|recalculate|statistics|coverage|roi|region|mode|fast|refinement|batch)\b'
-AMBIGUOUS_WORDS = r'那个|那片|那块|这块|\b(?:that region|that area|this part|that part)\b'
-SCENE_WORDS = r'场景|什么地方|介绍.*影像|什么类型|\b(?:scene|describe|caption|what is|what kind)\b'
-EXPORT_COMMAND = re.compile(r'(?:(?:请)?(?:导出|下载)(?:刚才的|当前|这个|所选)?(?:实验包|结果)?[。！! ]*|(?:please )?(?:export|download)(?: the)?(?: selected| current| previous| last)?(?: result| evidence| bundle| evidence bundle)?[.! ]*)', re.I)
+SEGMENT_WORDS = '\u63d0\u53d6|\u5206\u5272|\u6807\u6ce8|\u6807\u8bb0|\u5708\u51fa|\u52fe\u52d2|\u8499\u7248|\u63a9\u819c|\u9762\u79ef|\u5360\u6bd4|\u50cf\u7d20|\\b(?:segment|segmentation|mask|extract|annotate|coverage|pixels?)\\b'
+FOLLOWUP_WORDS = '\u6539|\u6362|\u5de6|\u53f3|\u4e0a\u534a|\u4e0b\u534a|\u5168\u90e8|\u5168\u56fe|\u91cd\u65b0|\u91cd\u8dd1|\u7edf\u8ba1|\u6846\u9009|\u9009\u533a|\u7814\u7a76\u533a|\u6a21\u5f0f|\u5feb\u4e00\u70b9|\u5c0f\u76ee\u6807|\u6574\u6279|\u6279\u91cf|\\b(?:switch|change|left|right|top|bottom|whole|entire|rerun|recalculate|statistics|coverage|roi|region|mode|fast|refinement|batch)\\b'
+AMBIGUOUS_WORDS = '\u90a3\u4e2a|\u90a3\u7247|\u90a3\u5757|\u8fd9\u5757|\\b(?:that region|that area|this part|that part)\\b'
+SCENE_WORDS = '\u573a\u666f|\u4ec0\u4e48\u5730\u65b9|\u4ecb\u7ecd.*\u5f71\u50cf|\u4ec0\u4e48\u7c7b\u578b|\\b(?:scene|describe|caption|what is|what kind)\\b'
+EXPORT_COMMAND = re.compile('(?:(?:\u8bf7)?(?:\u5bfc\u51fa|\u4e0b\u8f7d)(?:\u521a\u624d\u7684|\u5f53\u524d|\u8fd9\u4e2a|\u6240\u9009)?(?:\u5b9e\u9a8c\u5305|\u7ed3\u679c)?[\u3002\uff01! ]*|(?:please )?(?:export|download)(?: the)?(?: selected| current| previous| last)?(?: result| evidence| bundle| evidence bundle)?[.! ]*)', re.I)
 
 
 def ambiguous_query(query):
@@ -40,9 +40,9 @@ def requires_dense_result(query, context=None):
 def resolve_invert(query, context=None):
     """Resolve explicit complement/positive intent, otherwise retain the parent."""
     q = query.lower()
-    targets = r'(?:建筑|房屋|楼|飞机|道路|公路|水体|河流|植被|树木|船舶?|buildings?|aircraft|airplanes?|planes?|roads?|water|trees?|vegetation|ships?)'
-    inverse = bool(re.search(r'非\s*' + targets + '|' + targets + r'\s*(?:之外|以外)|\bnon[ -]' + targets + r'\b|\b(?:complement|outside the mask)\b', q))
-    positive = bool(re.search(r'只要|仅要|仅标注|只标注|只提取|\b(?:only|positive mask|without complement)\b', q))
+    targets = '(?:\u5efa\u7b51|\u623f\u5c4b|\u697c|\u98de\u673a|\u9053\u8def|\u516c\u8def|\u6c34\u4f53|\u6cb3\u6d41|\u690d\u88ab|\u6811\u6728|\u8239\u8236?|buildings?|aircraft|airplanes?|planes?|roads?|water|trees?|vegetation|ships?)'
+    inverse = bool(re.search('\u975e\\s*' + targets + '|' + targets + '\\s*(?:\u4e4b\u5916|\u4ee5\u5916)|\\bnon[ -]' + targets + r'\b|\b(?:complement|outside the mask)\b', q))
+    positive = bool(re.search('\u53ea\u8981|\u4ec5\u8981|\u4ec5\u6807\u6ce8|\u53ea\u6807\u6ce8|\u53ea\u63d0\u53d6|\\b(?:only|positive mask|without complement)\\b', q))
     if inverse:
         return True
     if positive:
@@ -66,4 +66,4 @@ def parse_demo_task(query, context):
         return {'action': 'clarify', 'question': 'Specify one target and scope, for example: Extract buildings in the right half and calculate coverage.'}
     return {'action': 'segment', 'target': target, 'side': context.get('side', 'all'),
             'invert': resolve_invert(query, context), 'inherited_target': inherited,
-            'reuse': bool(re.search(r'统计|占比|面积|\b(?:coverage|statistics|measure)\b', q) and not re.search(r'提取|分割|改|换|\b(?:extract|segment|switch|change)\b', q) and context.get('target') == target)}
+            'reuse': bool(re.search('\u7edf\u8ba1|\u5360\u6bd4|\u9762\u79ef|\\b(?:coverage|statistics|measure)\\b', q) and not re.search('\u63d0\u53d6|\u5206\u5272|\u6539|\u6362|\\b(?:extract|segment|switch|change)\\b', q) and context.get('target') == target)}

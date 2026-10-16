@@ -1,0 +1,461 @@
+{
+  "dataset": "OpenEarthMap",
+  "source": "https://zenodo.org/records/7223446",
+  "scenes": [
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_19.tif",
+      "label": "bielefeld_19.tif",
+      "image_sha256": "a63ed58e3e996b1c750de62112305a23b4e924226eb55fd5b89139b423057e96",
+      "label_sha256": "7b39e3fd07611ec812b34ff0ff04aae220aa785f2fc3ef17c4b2ffbcbc57c683"
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_27.tif",
+      "label": "bielefeld_27.tif",
+      "image_sha256": "ca8f86e62f3f70ef3f5f7f4b7635abde6dbfd807cb0aba956000d246fdecec37",
+      "label_sha256": "22eaf17608d68b1482fafee47a5528ec20a1fb7d39a7473ff8afdc074996c61a"
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_34.tif",
+      "label": "bielefeld_34.tif",
+      "image_sha256": "a24c829ce7c7bb1ed95375755b0edc9762a628ef5d27dc017796f4b90b0727f2",
+      "label_sha256": "920c66e3e64fd01ad7c241db435d21525d38b9e635b00124861dcdb9297e7093"
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_46.tif",
+      "label": "bielefeld_46.tif",
+      "image_sha256": "4df23ce2c66c00a37b9dddec55f20632b6b58fc06c00917236327ba70baed040",
+      "label_sha256": "dee83dc653acfcf1669f66a485d2fa762f1da752318037aa63623c3ba63f8e85"
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_63.tif",
+      "label": "bielefeld_63.tif",
+      "image_sha256": "1e52bee8caf73b0459471aca1f0f65ff786d2bbd6df8863aa4903dd114e15cc2",
+      "label_sha256": "0ef4cf9406e64ac2b76abc0660af36c26ac27c2d46121adaaa75c9f806164f2c"
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_64.tif",
+      "label": "bielefeld_64.tif",
+      "image_sha256": "34f5710705feda2d72a9842bdb37ab5f77e1aaf8c50a37e1b2828c4dcbb447db",
+      "label_sha256": "9b9d9c9cb277a6bea6f845f0a1f350e03a1744858cde4ca3ffb83bcf0cb683f8"
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_8.tif",
+      "label": "bielefeld_8.tif",
+      "image_sha256": "a333390627a28fba7e3495dc6e07e8f1db1203e91a576aebfc3a6f1bd83688a5",
+      "label_sha256": "a8ec62eca25af476726f573892b81f0f4f3141452bb3517e38efb8528e7a2461"
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_9.tif",
+      "label": "bielefeld_9.tif",
+      "image_sha256": "cf3d35f8c53756ebd29ef0da808508da82dd661c7bcbe4004dffb1fb45f56116",
+      "label_sha256": "ae5a9289514c454ff80d2f5f858bed4eaa82622f6d08b70a765a6079687a44d3"
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_25.tif",
+      "label": "koeln_25.tif",
+      "image_sha256": "26746539f845219107c73afa27737d232a50b09711caa445f74c629cbfc792e3",
+      "label_sha256": "2bc3077e6e35cb5524628b130ce30928d6af9b829fc4f10cbd9579373a9c10c6"
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_28.tif",
+      "label": "koeln_28.tif",
+      "image_sha256": "19e61cb03a403a0143d0e43d2abc27ef48a8b83ee207fb38713c01963812ed62",
+      "label_sha256": "a28438becb0b7d896496e10307a6b58694db1e0499b67dedc2bd161a83be2b4e"
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_37.tif",
+      "label": "koeln_37.tif",
+      "image_sha256": "84a14e08f5107c6f49d11108eeea067b0936162f2d6febbaee0839776d371e70",
+      "label_sha256": "bf87d1fd71fa63346416a2a6d67c124d19de3e02938da101ee03eb44d5cd2da5"
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_46.tif",
+      "label": "koeln_46.tif",
+      "image_sha256": "8150bf16edc9f9efc73af9e71d0cef8597c3bd30458d58f84d8435a38f5ad7e8",
+      "label_sha256": "50a59d9a6dd444f079964a823b22914831d30269395abc67ee5f3dfea3fe5690"
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_47.tif",
+      "label": "koeln_47.tif",
+      "image_sha256": "ffb97e81d505c173cac106d637313f30089e734358b3fc61c05bc44786e72d1c",
+      "label_sha256": "9efdc0eaefa00615fb18d189789b59a49fccb411bc635ec947b671bfc63716b5"
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_64.tif",
+      "label": "koeln_64.tif",
+      "image_sha256": "1b2e3a416cc1693834a4cc880676c9883ba29dc0fd5918a0e8bc95f846528447",
+      "label_sha256": "d1a993554498cdfe9920aa163b676910747e044fcdec4e3f83f805e49d20a53c"
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_70.tif",
+      "label": "koeln_70.tif",
+      "image_sha256": "61003a2faf5bbc346cf66072b89cc4c17cbf81126e4b25ee40fa883a0675204a",
+      "label_sha256": "3f7d93ddbb8ec40ffd8aa400a0de0335c5932ef7a792376f239ec1d48d0dfebb"
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_9.tif",
+      "label": "koeln_9.tif",
+      "image_sha256": "6b35eb0a924f929cf04b9338347fe4aa9a6b7a05a58c051048670d91b24ca4f3",
+      "label_sha256": "66ad86f16a4f191925ea0b854e09cef461037a0d840d1f3928e1d02a545c02df"
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_15.tif",
+      "label": "chisinau_15.tif",
+      "image_sha256": "97cdfb525e3a07ee9eee330574b03874fac5b6ade6a1297866cf78105c38a100",
+      "label_sha256": "7fd2b6f15692c7092068b6597fb0d36ed2e60f1047742f5310e73432849d12dc"
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_45.tif",
+      "label": "chisinau_45.tif",
+      "image_sha256": "6f61d786bf4c4a5fe7706c7aadb670dbc8c416ceb21c674dde94c1747009f3fe",
+      "label_sha256": "ac2c6412e8c50f85dc51ad2cb891c6d62083bedff5304411e0f6a4d1ca835da4"
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_67.tif",
+      "label": "chisinau_67.tif",
+      "image_sha256": "94a9f9bbeddadce8fcebb76ae8080a91a7da5279d4a32179f4a94bbf01cda780",
+      "label_sha256": "5e1aa532624f35092f64ae41da56f23d58b0b394223ba80af1dcbc0fb9080de5"
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_1.tif",
+      "label": "kampala_1.tif",
+      "image_sha256": "1f36751be4c842911278b197ad08b1ecf27709e26a51ff6b395429c8ee6bf7aa",
+      "label_sha256": "c638d6c0a0b46097ab5351776e609e7d9827d255155e9981d92fe033a49839e3"
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_2.tif",
+      "label": "kampala_2.tif",
+      "image_sha256": "61627853985fab6ba10060ad86d695296d75b121acc68d1c38ecb9867846dcae",
+      "label_sha256": "6e9bcd43f019389a19b2e83bfaa5291c63eb5090a39a588ca4a6c14cc9581a51"
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_6.tif",
+      "label": "kampala_6.tif",
+      "image_sha256": "74c643d55ea0129ac83ea0a7eb24c301d5a810b598d9d9b94537c035a2987c4e",
+      "label_sha256": "d2f17438440589216a8d1dc3a8587b3a8e368dea9a2beb2b98ef9454f1de53b0"
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_13.tif",
+      "label": "san_tome_13.tif",
+      "image_sha256": "1cb8e83bb80c16593e9c97b58fe6f0ae2438628bbca1ec53fecaf7963996132b",
+      "label_sha256": "650daee3a8d48fcb42a20a3767f2da2a50a7471bd09d4720e5f159fa411cf8ae"
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_14.tif",
+      "label": "san_tome_14.tif",
+      "image_sha256": "a40fc86bbe8d053c6864da220934657a1df04f981490c269436e10e11ff583b3",
+      "label_sha256": "e0690bf6cff85435ac26c2124a897df7c76fd267ea5fa009fa86e296883647f8"
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_43.tif",
+      "label": "san_tome_43.tif",
+      "image_sha256": "dc542fb640bf84399f729cf1e72a46d35731d683e071c8da226b0be45190f9c7",
+      "label_sha256": "0b661d7e69f7fe60fee60ed017e825932eb8fddcf94c08bc8b194b96920f702c"
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_32.tif",
+      "label": "tonga_32.tif",
+      "image_sha256": "ea22ae2b84e968ede815c7293301c2499b237efb74e967adff1051a30ec60f0b",
+      "label_sha256": "309bee6651f2de5e1ed2480a291e6b5ef177ba7c01df1ee00df03a2322997dfc"
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_53.tif",
+      "label": "tonga_53.tif",
+      "image_sha256": "57230a6b3cf33f368058eed769d6d09fac21a4a5635ec7456229020d3a575750",
+      "label_sha256": "98d837c653ce7936d0ca11b6133dbbbf56d300515d6d47b07f057b9b0b8d60e3"
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_68.tif",
+      "label": "tonga_68.tif",
+      "image_sha256": "5aa146e19f4a2ef39b95a05aac04e288179bd6f5970674957b4fa6271198a4c9",
+      "label_sha256": "e374fe705961a95c318e13ee95d8158623f021a41b0518f391c68708ce6ef5ff"
+    },
+    {
+      "region": "western",
+      "image": "western_11.tif",
+      "label": "western_11.tif",
+      "image_sha256": "4c9c9306ab43b162958da32c58dd87aa3debcd0882f225cd541b239839cf402e",
+      "label_sha256": "318db1c64b67cce3680b63cfffe68fc92ffa34ada45c554f0663bce86f9646f4"
+    },
+    {
+      "region": "western",
+      "image": "western_19.tif",
+      "label": "western_19.tif",
+      "image_sha256": "73e3cdbb6d62c131f5665081a2f54d83a675f4542644313ea73e95776dd8e5b7",
+      "label_sha256": "67396100fc878dd170f8bc96412509074a3dccdc4c1291dc655062289fb25957"
+    },
+    {
+      "region": "western",
+      "image": "western_3.tif",
+      "label": "western_3.tif",
+      "image_sha256": "aa1b90b1359131176db4ba5d865a48c88d4adc7a1e1d5abfa612ab02ed37bc08",
+      "label_sha256": "4f9142902899a26b0cc313cf54b8a5fce3192575cede29cf3da96c10a4e453c7"
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_34.tif",
+      "label": "chisinau_34.tif",
+      "image_sha256": "2f67724e6f36931ca7242bd0226403ca5923f57b08ef077649dd97ac235e94bc",
+      "label_sha256": "098c19bc312598493025751bd9f2e055cdc3f0a74f17581b78894025dee2d2e1"
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_47.tif",
+      "label": "chisinau_47.tif",
+      "image_sha256": "34dbf9dd936633a3aa61c75def32b102c87aa2ad50cf0005822475b8533b9470",
+      "label_sha256": "b2b9132e318ceb0fd7a2067956fff87ac17c99276602e68bd1329d9f985e54a4"
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_52.tif",
+      "label": "chisinau_52.tif",
+      "image_sha256": "1011b98015ec076778c3e3be9247358ffe2faae1d2b6031b627adbdfb4cfdc71",
+      "label_sha256": "a300a6a70ff96c6f1371db02c68a12bec7c6ce2baba1ddcdfc2d8f0a5af8843c"
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_3.tif",
+      "label": "kampala_3.tif",
+      "image_sha256": "30055b3c2ececd01ccd8b554121db493cacd33229735556a8606133e351b9546",
+      "label_sha256": "730989d98cc467a33cf76dd913f9c0062d5975b09d922a248b66db95ef881047"
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_5.tif",
+      "label": "kampala_5.tif",
+      "image_sha256": "b8be73c6f9fe41332560c10c913d2e381fd302f353b2780608593bd3fa9cec4d",
+      "label_sha256": "0174b5496ed69a534168c5157e41d148240a69e9b9e49fd05b24c4d4395f5e1d"
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_19.tif",
+      "label": "san_tome_19.tif",
+      "image_sha256": "b8ad8d46667469211c1d7802f0cc4cb7f28ae9d0fd0af9a2f82fdc2db4b82574",
+      "label_sha256": "693c0f327226cdbebe0c91ef3d5b696f838c7c67bbe4cc46153e8c71b9552a5c"
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_41.tif",
+      "label": "san_tome_41.tif",
+      "image_sha256": "4a328258150d889752e5d6d4b658d1faae836f9dcb65a8bf91111d3ebc2ef35d",
+      "label_sha256": "a253a2220c9dddbd29e1e0d39e5db01afc5a1e38ca0035b6ca079ef03e9fd15d"
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_46.tif",
+      "label": "san_tome_46.tif",
+      "image_sha256": "cb50b1b04b3b016fb2328794f0e6f92e92a8f2b5ede77891c89781e1ce9fbea0",
+      "label_sha256": "2646c7a0f3b3d32c71eb6a6d22454afb7bc62e6115b5cc9dd99ddd020e7ae9a7"
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_40.tif",
+      "label": "tonga_40.tif",
+      "image_sha256": "dd1f4ff548967b68c8275806aaebed236f3edce5a48692f978cf25a01b84845e",
+      "label_sha256": "5f1a40b909c9463eb28d1761218d4ff6ed3150fb8b183d1e48df96d2bc17e849"
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_47.tif",
+      "label": "tonga_47.tif",
+      "image_sha256": "424149f7ea3ad747f7f7244067d522b68c488e965ec42eb381f4dec2f2083c85",
+      "label_sha256": "43e44d12c6bb57e654c7695c6b25519b4a3f50d7556ba641790aa21fb2cb9158"
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_52.tif",
+      "label": "tonga_52.tif",
+      "image_sha256": "06e2e1160d263d753d93e63aecfff8ab578d7c70c15f5ce07a6069f1d7663930",
+      "label_sha256": "4da2ca1e4c680e42c9250a9437011642ed8d72d448998dd643c3396ea06a4d39"
+    },
+    {
+      "region": "western",
+      "image": "western_12.tif",
+      "label": "western_12.tif",
+      "image_sha256": "e6bac1bee2144d79e5ae965cfc9568999b4bf6739412db9f765231673ff0cfbe",
+      "label_sha256": "819e36fd5a0ee5447f8168b639443b644acf18a0ba2bb2c33784b4b142a4f98e"
+    },
+    {
+      "region": "western",
+      "image": "western_24.tif",
+      "label": "western_24.tif",
+      "image_sha256": "8ca8d53da3db2086c8fcb5b55dd075feac1d92b8e5a2122e2462c19623c87905",
+      "label_sha256": "e1a39a6cfc4104f566ae6801e89de59a5a16412f85e6446bb7779fefdbbcf11f"
+    },
+    {
+      "region": "western",
+      "image": "western_26.tif",
+      "label": "western_26.tif",
+      "image_sha256": "a6c96b29dff69234dca5bf8cd236d675f6a29d7a7579bb553c8b94fdb5fab3a4",
+      "label_sha256": "7b23b52202158034d350d84885e5f247db1a5c118856f1a63f11720b60bddc78"
+    },
+    {
+      "region": "chicago",
+      "image": "chicago_24.tif",
+      "label": "chicago_24.tif",
+      "image_sha256": "e6b202915f5ec3077b1ba741f06acb387c31b8b77eb92ce8630a1c19f1e86ff9",
+      "label_sha256": "3de8349d4044a4d314a7f50de6c899dd40887ec79f46322186bd4a563aaa57e8"
+    },
+    {
+      "region": "chicago",
+      "image": "chicago_42.tif",
+      "label": "chicago_42.tif",
+      "image_sha256": "b205a0af75745411c962880f2430657f9f3f38e5591098bc2c180300c89cfca1",
+      "label_sha256": "c3f830787e97e853f28f11af598b6bebd30f3b93db82a078d6a804d41e33c8de"
+    },
+    {
+      "region": "chicago",
+      "image": "chicago_44.tif",
+      "label": "chicago_44.tif",
+      "image_sha256": "25255d497f9f859b184606ebb651fc9e5c599a1c7972e03de9ad87005c848978",
+      "label_sha256": "e537661a87183352a554561780a65103cc4d686fd28edf8391ba9cfccb3eb1a2"
+    },
+    {
+      "region": "chicago",
+      "image": "chicago_6.tif",
+      "label": "chicago_6.tif",
+      "image_sha256": "8fd51031bd68186f068b01b8555e623454b0216c90d01026037cac3b6ac84bdb",
+      "label_sha256": "3c056a5ad8ef5a743b112b8ade67fabb98efbabf94eecfcc6b3c8b04100bda84"
+    },
+    {
+      "region": "dolnoslaskie",
+      "image": "dolnoslaskie_14.tif",
+      "label": "dolnoslaskie_14.tif",
+      "image_sha256": "d8290a8bf04de442347b50ab4a612fa02346d8d5c3f93a99aae067855acec093",
+      "label_sha256": "0b5f7362edb1c43aa5dd6f018da7d3978a9bbcaecfa00ea866fa7986f20cc73e"
+    },
+    {
+      "region": "dolnoslaskie",
+      "image": "dolnoslaskie_23.tif",
+      "label": "dolnoslaskie_23.tif",
+      "image_sha256": "2da33179bf1f83d208ef095ac2b8dec65b624445c02c33886ae22ed2a95470e0",
+      "label_sha256": "5e1a8f433517e9d9b3bc3891393181703c0ef5a957d2b77267978ab83ce33bb4"
+    },
+    {
+      "region": "dolnoslaskie",
+      "image": "dolnoslaskie_25.tif",
+      "label": "dolnoslaskie_25.tif",
+      "image_sha256": "2e6c6ba5a7adba3201bda444c2fef15992e8ec046e478a3057d28db103d35aff",
+      "label_sha256": "abe1a685d87fff91f080f9fbe0e3544eaed5bf0ca85b568c7ce51dab7d3d579f"
+    },
+    {
+      "region": "dolnoslaskie",
+      "image": "dolnoslaskie_40.tif",
+      "label": "dolnoslaskie_40.tif",
+      "image_sha256": "7343384533186124ac69cb9b1b6cfd4b20a6ca41b8aea93022b47f28b9e28f3b",
+      "label_sha256": "8276377481d2603a8fcca90cb667de9ec5768d6cae772def0d23700a142c86a9"
+    },
+    {
+      "region": "lubuskie",
+      "image": "lubuskie_13.tif",
+      "label": "lubuskie_13.tif",
+      "image_sha256": "3f690582e12fa1278214fdfc2daf64df7bfb0a8bbaa77a3da37f3c27c769ec99",
+      "label_sha256": "9de73195df8d5ec960232bd6350bd2bfcf7207300faed5807c6f4e240a4b0139"
+    },
+    {
+      "region": "lubuskie",
+      "image": "lubuskie_17.tif",
+      "label": "lubuskie_17.tif",
+      "image_sha256": "84afdf7cb810c1b1e0de1556fa179b7704d39a231b5c2f23c29caec0cc3bde20",
+      "label_sha256": "eb78128e1c0517c6a47fc6e65150f023c73c5ae32e9ccd7bf865583804597efe"
+    },
+    {
+      "region": "lubuskie",
+      "image": "lubuskie_2.tif",
+      "label": "lubuskie_2.tif",
+      "image_sha256": "00ba4ff531f6edc4ab5daf375135bbff27008cb742d3c4685552de053fcd4937",
+      "label_sha256": "7f07303c93bedded83f19278402319b604e56ad8be26ed24d3552ee08f0301d1"
+    },
+    {
+      "region": "lubuskie",
+      "image": "lubuskie_8.tif",
+      "label": "lubuskie_8.tif",
+      "image_sha256": "7048c8694e181a9305f68ad67938a816890f9e14e14d5ad889a10032fce87427",
+      "label_sha256": "abf8ada387e672e7fd9e65b62093efa552a06857dd13029213bd3f7dcc8f148d"
+    },
+    {
+      "region": "malopolskie",
+      "image": "malopolskie_17.tif",
+      "label": "malopolskie_17.tif",
+      "image_sha256": "f0579c661a2f2e560a1b24780ef904f63bd3e3a0c7772fc7e2f6890b3751e2f4",
+      "label_sha256": "e740d1334588c6b54aaaae3ce2a7813f5d5abbc7aee894ea3741fdd6cc726168"
+    },
+    {
+      "region": "malopolskie",
+      "image": "malopolskie_19.tif",
+      "label": "malopolskie_19.tif",
+      "image_sha256": "4cf9cbf82fc26278eec2965c5f72526c309e28e2a2174953c161f645b5e037ec",
+      "label_sha256": "018fe827646b3be2d54f7627de4f9aae6a3ead9e7c604f260077a2aa885a419f"
+    },
+    {
+      "region": "malopolskie",
+      "image": "malopolskie_33.tif",
+      "label": "malopolskie_33.tif",
+      "image_sha256": "6a1ed7ffa126a0d2418409dab54a8bc0c9ff111f513ff89edac1cb5abcfaa71e",
+      "label_sha256": "c060d251e4bcf3dc8a58bac3763584de96af36dd1bd8597c4cbcb2886c81a843"
+    },
+    {
+      "region": "malopolskie",
+      "image": "malopolskie_37.tif",
+      "label": "malopolskie_37.tif",
+      "image_sha256": "d0c72a939215ffed17de5d8f5d22c0b37ba89292cc625f9773dce9467a109b7a",
+      "label_sha256": "819b0aac93931330d9f141dcaa46fd3505b0e6dabf67c2a4914f3c2b5da36d71"
+    },
+    {
+      "region": "podlaskie",
+      "image": "podlaskie_1.tif",
+      "label": "podlaskie_1.tif",
+      "image_sha256": "efb3aae194cb4fb039c442e1aefd79471a03637678206a15606895ec65bcabcc",
+      "label_sha256": "8699aec9389e1274c133dad960d166be0aa49feffd0da84ab5ba16bfa804272b"
+    },
+    {
+      "region": "podlaskie",
+      "image": "podlaskie_2.tif",
+      "label": "podlaskie_2.tif",
+      "image_sha256": "365511cd06fde188ef51d99e883c90c869305e4988776de330f5877271e43c0c",
+      "label_sha256": "61c0894389fa0562b8649a340254391c62de0379b701af29076f43a63d64b962"
+    },
+    {
+      "region": "podlaskie",
+      "image": "podlaskie_4.tif",
+      "label": "podlaskie_4.tif",
+      "image_sha256": "c6a160a6605ce3460ec02260d2dffaf19b189b8b9ba2610cd09cd8bf263701bf",
+      "label_sha256": "97e6ed5fc3c73ab37a873075b93a76fdaef7072e1658570b6a10215f80119aed"
+    },
+    {
+      "region": "podlaskie",
+      "image": "podlaskie_6.tif",
+      "label": "podlaskie_6.tif",
+      "image_sha256": "3e39a6e8ff4ce319fa1e990959f4269f86e6c07072744d21cd2aac612734da2d",
+      "label_sha256": "666163b7195cb4a3bafa56887f65362d3c51552c9c68f81d071597e16f4f043a"
+    }
+  ]
+}

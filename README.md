@@ -170,7 +170,7 @@ with the article's LaTeX source.
 
 For **Table 4, Supplementary Figure S1 and Section 3.4**, download
 `GeoMaskLab_Supplementary_Experiment_Records.zip` from the
-[archived research data](https://doi.org/10.5281/zenodo.23397371), place it in the
+[archived research data](https://doi.org/10.5281/zenodo.23419528), place it in the
 repository root and run:
 
 ```powershell
@@ -184,8 +184,11 @@ Results are saved as `table4_metrics.csv` and `water_metrics.json`.
 
 For new inference on the six selected WHU/iSAID images and the Figure 5 aircraft
 case, obtain the official inputs and model assets and follow the reconstruction
-guides in the reproducibility supplement. The water v5 checkpoint is identified
-by hash in the records; it is not distributed in the public deposit.
+guides in the reproducibility supplement. The water V5 checkpoint is supplied as
+`GeoMaskLab_Water_V5_Checkpoint.zip` in the same deposit and in the
+[reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016).
+Follow the [65-scene inference guide](evaluation/water_v5/README.md) to regenerate
+the water masks and check every scene against the manuscript counts.
 See the [result-by-result reproduction guide](docs/reproduce_paper_results.md)
 for commands, data locations and the complete figure/metric mapping.
 
@@ -259,7 +262,7 @@ Bundled imagery and third-party components retain the terms recorded in
 Use [CITATION.cff](CITATION.cff) for the software author, version and fixed release.
 The manuscript is **GeoMaskLab: Replayable measurements for segmentation masks**,
 by Yun Xing, submitted to SoftwareX. Its article DOI will be added after publication.
-The [research-data DOI](https://doi.org/10.5281/zenodo.23397371) identifies the
+The [research-data DOI](https://doi.org/10.5281/zenodo.23419528) identifies the
 reproduction materials and experiment records.
 
 ## Contact

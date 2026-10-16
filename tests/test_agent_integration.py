@@ -14,7 +14,7 @@ from PIL import Image
 from workbench import server
 class FakeAgentAndSAM(BaseHTTPRequestHandler):
     decision = 'T_call(referring_expression_segmentation, "/not-the-current-image.png", "all buildings")'
-    final = '<answer>完成。</answer>'
+    final = '<answer>\u5b8c\u6210\u3002</answer>'
     requests = []
     fail_sam = False
     fail_feedback = False
@@ -64,7 +64,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
             'GEO_BUILDING_MODEL_REVISION':'fake-building-v1',
             'GEO_SERVICE_PROXY_MODE':'direct'}); self.env.start()
         FakeAgentAndSAM.decision = 'T_call(referring_expression_segmentation, "/wrong.png", "all buildings")'
-        FakeAgentAndSAM.final = '<answer>已收到执行结果。</answer>'
+        FakeAgentAndSAM.final = '<answer>\u5df2\u6536\u5230\u6267\u884c\u7ed3\u679c\u3002</answer>'
         FakeAgentAndSAM.requests = []; FakeAgentAndSAM.fail_sam = False; FakeAgentAndSAM.fail_feedback = False
         server.SESSIONS.clear()
         sid = server.new_session(uploaded=server.image_b64(Image.new('RGB',(11,7),'white')))['id']
@@ -73,7 +73,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
     def tearDown(self):
         server.SESSIONS.clear(); self.env.stop(); self.data.stop(); self.temp.cleanup()
 
-    def run_task(self,query='提取右侧建筑',**kwargs):
+    def run_task(self,query='\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51',**kwargs):
         return server.run_task(self.session,{'query':query,'mode':'live',**kwargs})
 
     def test_official_plan_tool_feedback_contains_real_asset_and_exact_statistics(self):
@@ -95,8 +95,8 @@ class ProtocolIntegrationTests(unittest.TestCase):
         self.assertEqual(result['task']['scope_source'],'harness_pixel_scope_rule')
 
     def test_direct_answer_does_not_segment(self):
-        FakeAgentAndSAM.decision = '<answer>图中有建筑。</answer>'
-        result = self.run_task('描述影像')
+        FakeAgentAndSAM.decision = '<answer>\u56fe\u4e2d\u6709\u5efa\u7b51\u3002</answer>'
+        result = self.run_task('\u63cf\u8ff0\u5f71\u50cf')
         self.assertEqual(result['status'],'answered'); self.assertEqual(len(FakeAgentAndSAM.requests),1)
         self.assertNotIn('metrics',result)
         request = FakeAgentAndSAM.requests[0][1]
@@ -106,7 +106,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
 
     def test_dense_prompt_exposes_only_deployed_tools_and_whole_image_airplanes(self):
         FakeAgentAndSAM.decision = 'T_call(referring_expression_segmentation, "wrong.png", "all airplanes")'
-        result = self.run_task('提取右侧的飞机')
+        result = self.run_task('\u63d0\u53d6\u53f3\u4fa7\u7684\u98de\u673a')
         self.assertEqual(result['status'], 'completed')
         first, sam, _ = FakeAgentAndSAM.requests
         prompt = first[1]['messages'][0]['content']
@@ -128,14 +128,14 @@ class ProtocolIntegrationTests(unittest.TestCase):
 
     def test_visual_question_cannot_accidentally_run_segmentation(self):
         FakeAgentAndSAM.decision = 'T_call(semantic_segmentation, "wrong.png", ["building", "road"])'
-        result = self.run_task('这张影像主要是什么场景？')
+        result = self.run_task('\u8fd9\u5f20\u5f71\u50cf\u4e3b\u8981\u662f\u4ec0\u4e48\u573a\u666f\uff1f')
         self.assertEqual(result['status'], 'failed')
         self.assertNotIn('metrics', result)
         self.assertEqual([r[0] for r in FakeAgentAndSAM.requests], ['/v1/chat/completions'])
 
     def test_annotation_and_complement_route_to_mask_then_invert(self):
         FakeAgentAndSAM.decision = 'T_call(semantic_segmentation, "wrong.png", ["aircraft"])'
-        result = self.run_task('把非飞机的部分标注出来')
+        result = self.run_task('\u628a\u975e\u98de\u673a\u7684\u90e8\u5206\u6807\u6ce8\u51fa\u6765')
         self.assertEqual(result['task']['action'], 'segment')
         self.assertTrue(result['task']['invert'])
         self.assertEqual(result['metrics']['pixel_area'], 0)
@@ -144,7 +144,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
         self.assertEqual(FakeAgentAndSAM.requests[1][1]['classes'], ['aircraft'])
 
     def test_direct_answer_cannot_pretend_dense_task_completed(self):
-        FakeAgentAndSAM.decision = '<answer>已经提取完成。</answer>'
+        FakeAgentAndSAM.decision = '<answer>\u5df2\u7ecf\u63d0\u53d6\u5b8c\u6210\u3002</answer>'
         result = self.run_task()
         self.assertEqual(result['status'],'failed')
         self.assertIn('returned only text',result['message'])
@@ -153,8 +153,8 @@ class ProtocolIntegrationTests(unittest.TestCase):
         self.assertEqual([r[0] for r in FakeAgentAndSAM.requests],['/v1/chat/completions'])
 
     def test_reasoning_text_is_redacted_but_response_hash_is_kept(self):
-        FakeAgentAndSAM.decision = '<think>private model reasoning</think>\n<answer>图中有建筑。</answer>'
-        result = self.run_task('描述影像')
+        FakeAgentAndSAM.decision = '<think>private model reasoning</think>\n<answer>\u56fe\u4e2d\u6709\u5efa\u7b51\u3002</answer>'
+        result = self.run_task('\u63cf\u8ff0\u5f71\u50cf')
         record = result['agent_decision']
         self.assertNotIn('private model reasoning',json.dumps(record))
         self.assertIn('Reasoning omitted from the experiment record',record['raw_response'])
@@ -178,7 +178,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
         FakeAgentAndSAM.decision = (
             'T_call(referring_expression_segmentation, "wrong.png", "all aircraft")'
         )
-        result = self.run_task('提取全图飞机')
+        result = self.run_task('\u63d0\u53d6\u5168\u56fe\u98de\u673a')
         self.assertEqual(result['status'], 'completed')
         request = FakeAgentAndSAM.requests[1][1]
         self.assertEqual(request['task'], 'referring_seg')
@@ -194,7 +194,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
             self.assertEqual(len(FakeAgentAndSAM.requests),1)
 
     def test_complex_or_conflicting_pixel_scope_stops_before_model(self):
-        for query in ['提取靠近道路的建筑','提取左右两侧建筑','提取右下角建筑','提取右侧建筑，但不要右侧的']:
+        for query in ['\u63d0\u53d6\u9760\u8fd1\u9053\u8def\u7684\u5efa\u7b51','\u63d0\u53d6\u5de6\u53f3\u4e24\u4fa7\u5efa\u7b51','\u63d0\u53d6\u53f3\u4e0b\u89d2\u5efa\u7b51','\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51\uff0c\u4f46\u4e0d\u8981\u53f3\u4fa7\u7684']:
             self.assertEqual(self.run_task(query)['status'],'needs_clarification')
         self.assertEqual(self.run_task(scope='left')['status'],'needs_clarification')
         self.assertEqual(FakeAgentAndSAM.requests,[])
@@ -202,7 +202,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
     def test_failure_is_fed_back_without_new_metrics_or_overwriting_old_result(self):
         first = self.run_task(); FakeAgentAndSAM.fail_sam = True
         old = (server.DATA/self.session['id']/first['id']/'mask.png').read_bytes()
-        result = self.run_task('改成左侧',parent_run_id=first['id'],force_perception=True)
+        result = self.run_task('\u6539\u6210\u5de6\u4fa7',parent_run_id=first['id'],force_perception=True)
         self.assertEqual(result['status'],'failed'); self.assertNotIn('metrics',result)
         self.assertEqual(result['tool_feedback']['status'],'error')
         self.assertEqual(self.session['context']['side'],'right')
@@ -217,7 +217,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
         self.assertIn('feedback failed',result['message'])
 
     def test_feedback_cannot_overwrite_statistics_or_start_another_tool(self):
-        FakeAgentAndSAM.final = '<answer>面积是999999像素，占99%。</answer>'
+        FakeAgentAndSAM.final = '<answer>\u9762\u79ef\u662f999999\u50cf\u7d20\uff0c\u536099%\u3002</answer>'
         result = self.run_task()
         self.assertEqual(result['metrics']['pixel_area'],42)
         self.assertNotIn('999999',result['message'])
@@ -229,7 +229,7 @@ class ProtocolIntegrationTests(unittest.TestCase):
 
     def test_cache_reuse_still_reports_execution_to_model_and_selected_context(self):
         first = self.run_task()
-        second = self.run_task('改成左侧的',parent_run_id=first['id'])
+        second = self.run_task('\u6539\u6210\u5de6\u4fa7\u7684',parent_run_id=first['id'])
         self.assertEqual(second['metrics']['pixel_area'],35)
         self.assertEqual(second['tool_feedback']['reused_from_run_id'],first['id'])
         self.assertEqual(len([r for r in FakeAgentAndSAM.requests if r[0]=='/predict']),1)
@@ -238,13 +238,13 @@ class ProtocolIntegrationTests(unittest.TestCase):
     def test_switching_tool_task_does_not_reuse_other_task_mask(self):
         first = self.run_task()
         FakeAgentAndSAM.decision = 'T_call(semantic_segmentation, "x.png", ["building"])'
-        second = self.run_task('改成左侧',parent_run_id=first['id'])
+        second = self.run_task('\u6539\u6210\u5de6\u4fa7',parent_run_id=first['id'])
         self.assertNotIn('reused_from_run_id',second)
         self.assertEqual(len([r for r in FakeAgentAndSAM.requests if r[0]=='/predict']),2)
 
     def test_export_is_local_and_preserves_decision_evidence(self):
         first = self.run_task()
-        result = self.run_task('导出刚才的结果',parent_run_id=first['id'])
+        result = self.run_task('\u5bfc\u51fa\u521a\u624d\u7684\u7ed3\u679c',parent_run_id=first['id'])
         self.assertEqual(result['export_url'],first['export_url'])
         self.assertEqual(len(FakeAgentAndSAM.requests),3)
         saved = json.loads((server.DATA/self.session['id']/first['id']/'result.json').read_text(encoding='utf-8'))

@@ -26,58 +26,58 @@ class V07AgentContractTests(unittest.TestCase):
         return server.run_task(self.session, {'query': query, 'mode': 'demo', **kwargs})
 
     def test_roi_clips_and_is_saved_with_version(self):
-        first = self.run_task('提取框选区域内的飞机', roi=self.roi, quality_mode='fast')
+        first = self.run_task('\u63d0\u53d6\u6846\u9009\u533a\u57df\u5185\u7684\u98de\u673a', roi=self.roi, quality_mode='fast')
         self.assertEqual(first['status'], 'completed')
         mask = Image.open(server.DATA / self.session['id'] / first['id'] / 'mask.png')
         self.assertEqual(mask.getbbox(), (120, 410, 321, 656))
         self.assertEqual(first['metrics']['roi'], self.roi)
-        second = self.run_task('改成高精度模式', parent_run_id=first['id'])
+        second = self.run_task('\u6539\u6210\u9ad8\u7cbe\u5ea6\u6a21\u5f0f', parent_run_id=first['id'])
         self.assertEqual(second['task']['roi'], self.roi)
         self.assertEqual(second['task']['quality_mode'], 'accurate')
         self.assertNotEqual(first['id'], second['id'])
         self.assertEqual(first['task']['quality_mode'], 'fast')
-        third = self.run_task('快一点即可', parent_run_id=second['id'])
+        third = self.run_task('\u5feb\u4e00\u70b9\u5373\u53ef', parent_run_id=second['id'])
         self.assertEqual(third['task']['target'], 'aircraft')
         self.assertEqual(third['task']['roi'], self.roi)
         self.assertEqual(third['task']['quality_mode'], 'fast')
 
     def test_invalid_roi_and_missing_roi_preserve_result(self):
-        good = self.run_task('提取飞机')
+        good = self.run_task('\u63d0\u53d6\u98de\u673a')
         for roi in ({'xyxy': [0, 0, 801, 20], 'source': 'drawn', 'image_size': [800, 800]},
                     {'xyxy': [0, 0, 0, 20], 'source': 'drawn', 'image_size': [800, 800]},
                     {'xyxy': [0, 0, 20, 20], 'source': 'drawn', 'image_size': [600, 800]}):
-            rejected = self.run_task('提取框选区域内的飞机', roi=roi)
+            rejected = self.run_task('\u63d0\u53d6\u6846\u9009\u533a\u57df\u5185\u7684\u98de\u673a', roi=roi)
             self.assertEqual(rejected['status'], 'failed')
             self.assertNotIn('mask_url', rejected)
-        missing = self.run_task('提取框选区域内的飞机', roi={})
+        missing = self.run_task('\u63d0\u53d6\u6846\u9009\u533a\u57df\u5185\u7684\u98de\u673a', roi={})
         self.assertEqual(missing['status'], 'failed')
         self.assertEqual(self.session['context']['target'], 'aircraft')
         self.assertTrue((server.DATA / self.session['id'] / good['id'] / 'mask.png').exists())
 
     def test_quality_rejection_and_batch_intent(self):
-        self.assertEqual(self.run_task('提取飞机', quality_mode='turbo')['status'], 'failed')
-        self.assertEqual(self.run_task('快速且高精度提取飞机')['status'], 'failed')
-        self.assertEqual(self.run_task('把同一任务应用到这些影像')['status'], 'needs_clarification')
+        self.assertEqual(self.run_task('\u63d0\u53d6\u98de\u673a', quality_mode='turbo')['status'], 'failed')
+        self.assertEqual(self.run_task('\u5feb\u901f\u4e14\u9ad8\u7cbe\u5ea6\u63d0\u53d6\u98de\u673a')['status'], 'failed')
+        self.assertEqual(self.run_task('\u628a\u540c\u4e00\u4efb\u52a1\u5e94\u7528\u5230\u8fd9\u4e9b\u5f71\u50cf')['status'], 'needs_clarification')
         with patch('workbench.agent_bridge.WorkbenchAgent._run_llm') as model, \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST'}):
-            ambiguous = server.run_task(self.session, {'query': '提取所有物体的轮廓', 'mode': 'live'})
+            ambiguous = server.run_task(self.session, {'query': '\u63d0\u53d6\u6240\u6709\u7269\u4f53\u7684\u8f6e\u5ed3', 'mode': 'live'})
         self.assertEqual(ambiguous['status'], 'needs_clarification')
         model.assert_not_called()
         with self.assertRaisesRegex(ValueError, 'batch_id'):
-            self.run_task('批量提取飞机', batch_id='untrusted')
+            self.run_task('\u6279\u91cf\u63d0\u53d6\u98de\u673a', batch_id='untrusted')
         with self.assertRaisesRegex(ValueError, 'session_ids'):
-            server.run_batch({'session_ids': [{}, self.session['id']], 'query': '批量提取飞机'})
+            server.run_batch({'session_ids': [{}, self.session['id']], 'query': '\u6279\u91cf\u63d0\u53d6\u98de\u673a'})
         other = server.SESSIONS[server.new_session('airport')['id']]
         with self.assertRaisesRegex(ValueError, 'target shared'):
             server.run_batch({'session_ids': [self.session['id'], other['id']],
-                              'query': '把同一任务应用到这些影像', 'mode': 'demo'})
+                              'query': '\u628a\u540c\u4e00\u4efb\u52a1\u5e94\u7528\u5230\u8fd9\u4e9b\u5f71\u50cf', 'mode': 'demo'})
 
     def test_batch_keeps_other_images_after_one_failure(self):
         other = server.SESSIONS[server.new_session('urban')['id']]
         third = server.SESSIONS[server.new_session('airport')['id']]
         batch = server.run_batch({'session_ids': [self.session['id'], other['id'], third['id']],
-                                  'query': '批量提取飞机', 'mode': 'demo'})
+                                  'query': '\u6279\u91cf\u63d0\u53d6\u98de\u673a', 'mode': 'demo'})
         self.assertEqual([item['status'] for item in batch['items']],
                          ['completed', 'failed', 'completed'])
         self.assertEqual(batch['completed_count'], 2)
@@ -90,7 +90,7 @@ class V07AgentContractTests(unittest.TestCase):
              patch.object(server, 'post_json', return_value={'status': 'success', 'mask': server.image_b64(mask)}), \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
-            result = server.run_task(self.session, {'query': '高精度提取飞机', 'mode': 'live'})
+            result = server.run_task(self.session, {'query': '\u9ad8\u7cbe\u5ea6\u63d0\u53d6\u98de\u673a', 'mode': 'live'})
         self.assertEqual(result['status'], 'failed')
         self.assertIn('did not confirm', result['message'])
         self.assertNotIn('mask_url', result)
@@ -101,7 +101,7 @@ class V07AgentContractTests(unittest.TestCase):
              patch.object(server, 'post_json', return_value={'status': 'success', 'mask': server.image_b64(mask)}), \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
-            result = server.run_task(self.session, {'query': '提取飞机', 'mode': 'live'})
+            result = server.run_task(self.session, {'query': '\u63d0\u53d6\u98de\u673a', 'mode': 'live'})
         self.assertEqual(result['status'], 'completed')
         self.assertIsNone(result['task']['effective_quality_mode'])
         self.assertEqual(result['service_metadata']['quality_confirmation'], 'legacy_service_unconfirmed')
@@ -112,9 +112,9 @@ class V07AgentContractTests(unittest.TestCase):
              patch.object(server, 'post_json') as service, \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
-            explicit = server.run_task(self.session, {'query': '提取飞机', 'mode': 'live'})
+            explicit = server.run_task(self.session, {'query': '\u63d0\u53d6\u98de\u673a', 'mode': 'live'})
             self.session['context'] = {'target': 'aircraft', 'side': 'all', 'quality_mode': 'fast'}
-            inherited = server.run_task(self.session, {'query': '改成快速模式', 'mode': 'live'})
+            inherited = server.run_task(self.session, {'query': '\u6539\u6210\u5feb\u901f\u6a21\u5f0f', 'mode': 'live'})
         self.assertEqual([explicit['status'], inherited['status']],
                          ['needs_clarification', 'needs_clarification'])
         self.assertNotIn('mask_url', explicit)
@@ -130,7 +130,7 @@ class V07AgentContractTests(unittest.TestCase):
              patch.object(server, 'post_json', return_value=response), \
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
-            result = server.run_task(self.session, {'query': '高精度提取框选区域内的飞机',
+            result = server.run_task(self.session, {'query': '\u9ad8\u7cbe\u5ea6\u63d0\u53d6\u6846\u9009\u533a\u57df\u5185\u7684\u98de\u673a',
                                                       'mode': 'live', 'roi': self.roi})
         self.assertEqual(result['status'], 'completed')
         self.assertEqual(result['service_metadata']['mode_parameters']['overlap'], 256)
@@ -148,7 +148,7 @@ class V07AgentContractTests(unittest.TestCase):
              patch.dict(server.os.environ, {'GEO_AGENT_BASE_URL': 'http://example.invalid/v1',
                                             'GEO_AGENT_MODEL': 'TEST', 'GEO_REMOTESAM_URL': 'http://example.invalid/predict'}):
             batch = server.run_batch({'session_ids': [s['id'] for s in sessions],
-                                      'query': '批量提取飞机', 'mode': 'live', 'quality_mode': 'fast'})
+                                      'query': '\u6279\u91cf\u63d0\u53d6\u98de\u673a', 'mode': 'live', 'quality_mode': 'fast'})
         self.assertEqual(service.call_count, 3)
         self.assertEqual([item['status'] for item in batch['items']], ['completed', 'failed', 'completed'])
         self.assertEqual(batch['completed_count'], 2)

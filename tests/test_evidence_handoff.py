@@ -36,7 +36,7 @@ class EvidenceHandoffTests(unittest.TestCase):
         self.data=patch.object(server,'DATA',Path(self.temp.name));self.data.start()
         self.sessions=patch.object(server,'SESSIONS',{});self.sessions.start()
         self.s=server.SESSIONS[server.new_session('urban')['id']]
-        self.r=server.run_task(self.s,{'query':'提取右侧建筑','mode':'demo'})
+        self.r=server.run_task(self.s,{'query':'\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51','mode':'demo'})
         self.folder=server.DATA/self.s['id']/self.r['id']
         self.bundle=build_bundle(server.DATA/self.s['id']/'original.png',self.folder)
     def tearDown(self):

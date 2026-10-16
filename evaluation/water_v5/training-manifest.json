@@ -1,0 +1,20 @@
+{
+  "model_name": "GeoMaskLab-Water-UNet-B4-v5",
+  "architecture": "Unet-EfficientNet-B4-SCSE",
+  "classes": 9,
+  "water_class": 6,
+  "base_model": "OpenEarthMap official UNet-EfficientNet-B4",
+  "source": "https://open-earth-map.org/code.html",
+  "steps": 900,
+  "seed": 143,
+  "train_images": 249,
+  "known_park_and_pier_negatives_used_in_training": true,
+  "P0543_annotation": "Codex visually traced water interior and walkway interiors; shoreline band unlabeled; training corrections, not independent ground truth",
+  "rotation_augmentation": "continuous uniform 0..360 degrees with aligned labels; random park crops; brightness 0.8..1.2",
+  "hard_negative_mining": "top 2048 non-water pixel losses on known correction scenes",
+  "heldout_images": 65,
+  "weight_sha256": "ef86d7d5c4e1b9c30762f72a5435b59efe2da917e5a04a9b2364bf977a85596e",
+  "normalization": "RGB / 255",
+  "batch_norm_statistics": "pretrained frozen; same training and inference statistics",
+  "duration_seconds": 78.8315787
+}

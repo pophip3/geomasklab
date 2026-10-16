@@ -1,4 +1,4 @@
-# Author and ORCID confirmed by 邢芸.
+# Author and ORCID confirmed by Yun Xing.
 cff-version: 1.2.0
 message: "If you use GeoMaskLab, cite the software version used in your work."
 type: software
@@ -9,9 +9,9 @@ authors:
     affiliation: "Hohai University"
     orcid: "https://orcid.org/0009-0009-1746-5019"
 version: "1.0.0"
-date-released: "2026-10-15"
+date-released: "2026-10-16"
 license: MIT
-url: "https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-build.20261015"
+url: "https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016"
 repository-code: "https://github.com/pophip3/geomasklab"
 abstract: "GeoMaskLab records images, binary masks, explicit analysis domains and measurements in replayable evidence packages, with a shared Python core, command-line interface and browser workbench."
 keywords:

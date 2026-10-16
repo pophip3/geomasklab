@@ -1,0 +1,541 @@
+{
+  "weights_sha256": "ef86d7d5c4e1b9c30762f72a5435b59efe2da917e5a04a9b2364bf977a85596e",
+  "scene_count": 65,
+  "device": "cuda:0",
+  "inference_performed": true,
+  "rotations_per_tile": 4,
+  "sam_refinement_performed": true,
+  "sam_checkpoint_sha256": "a7bf3b02f3ebf1267aba913ff637d9a2d5c33d3173bb679e46d9f338c26f262e",
+  "all_scene_counts_match": true,
+  "tp": 1356978,
+  "fp": 35782,
+  "fn": 256701,
+  "iou": 0.8226796511102717,
+  "dice": 0.9027144738343269,
+  "precision": 0.9743085671616072,
+  "recall": 0.8409218933877184,
+  "scenes": [
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_19.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 80,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_27.tif",
+      "tp": 7118,
+      "fp": 214,
+      "fn": 468,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_34.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 1431,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_46.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_63.tif",
+      "tp": 0,
+      "fp": 67,
+      "fn": 317,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_64.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_8.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 7,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "bielefeld",
+      "image": "bielefeld_9.tif",
+      "tp": 1627,
+      "fp": 159,
+      "fn": 1353,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_25.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_28.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 284,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_37.tif",
+      "tp": 99,
+      "fp": 0,
+      "fn": 342,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_46.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 331,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_47.tif",
+      "tp": 47,
+      "fp": 1,
+      "fn": 1464,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_64.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_70.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "koeln",
+      "image": "koeln_9.tif",
+      "tp": 69815,
+      "fp": 4,
+      "fn": 1558,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_15.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_45.tif",
+      "tp": 0,
+      "fp": 283,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_67.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_1.tif",
+      "tp": 2741,
+      "fp": 51,
+      "fn": 1298,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_2.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_6.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_13.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_14.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_43.tif",
+      "tp": 5373,
+      "fp": 485,
+      "fn": 410,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_32.tif",
+      "tp": 6371,
+      "fp": 291,
+      "fn": 1887,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_53.tif",
+      "tp": 19779,
+      "fp": 554,
+      "fn": 2688,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_68.tif",
+      "tp": 0,
+      "fp": 320,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "western",
+      "image": "western_11.tif",
+      "tp": 469667,
+      "fp": 1100,
+      "fn": 21810,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "western",
+      "image": "western_19.tif",
+      "tp": 28922,
+      "fp": 666,
+      "fn": 41428,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "western",
+      "image": "western_3.tif",
+      "tp": 185813,
+      "fp": 2369,
+      "fn": 30595,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_34.tif",
+      "tp": 0,
+      "fp": 330,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_47.tif",
+      "tp": 3139,
+      "fp": 577,
+      "fn": 341,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chisinau",
+      "image": "chisinau_52.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_3.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 3277,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "kampala",
+      "image": "kampala_5.tif",
+      "tp": 3530,
+      "fp": 255,
+      "fn": 564,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_19.tif",
+      "tp": 97996,
+      "fp": 476,
+      "fn": 9300,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_41.tif",
+      "tp": 2253,
+      "fp": 95,
+      "fn": 6070,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "san_tome",
+      "image": "san_tome_46.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_40.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_47.tif",
+      "tp": 0,
+      "fp": 73,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "tonga",
+      "image": "tonga_52.tif",
+      "tp": 21575,
+      "fp": 19980,
+      "fn": 1943,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "western",
+      "image": "western_12.tif",
+      "tp": 158769,
+      "fp": 1602,
+      "fn": 17761,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "western",
+      "image": "western_24.tif",
+      "tp": 152523,
+      "fp": 2480,
+      "fn": 51532,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "western",
+      "image": "western_26.tif",
+      "tp": 832,
+      "fp": 105,
+      "fn": 1027,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chicago",
+      "image": "chicago_24.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chicago",
+      "image": "chicago_42.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 96,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chicago",
+      "image": "chicago_44.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "chicago",
+      "image": "chicago_6.tif",
+      "tp": 40,
+      "fp": 0,
+      "fn": 133,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "dolnoslaskie",
+      "image": "dolnoslaskie_14.tif",
+      "tp": 28192,
+      "fp": 566,
+      "fn": 21468,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "dolnoslaskie",
+      "image": "dolnoslaskie_23.tif",
+      "tp": 0,
+      "fp": 37,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "dolnoslaskie",
+      "image": "dolnoslaskie_25.tif",
+      "tp": 29600,
+      "fp": 1739,
+      "fn": 2046,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "dolnoslaskie",
+      "image": "dolnoslaskie_40.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "lubuskie",
+      "image": "lubuskie_13.tif",
+      "tp": 2064,
+      "fp": 4,
+      "fn": 3459,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "lubuskie",
+      "image": "lubuskie_17.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 793,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "lubuskie",
+      "image": "lubuskie_2.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "lubuskie",
+      "image": "lubuskie_8.tif",
+      "tp": 15441,
+      "fp": 32,
+      "fn": 11262,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "malopolskie",
+      "image": "malopolskie_17.tif",
+      "tp": 43652,
+      "fp": 867,
+      "fn": 1453,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "malopolskie",
+      "image": "malopolskie_19.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "malopolskie",
+      "image": "malopolskie_33.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 9806,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "malopolskie",
+      "image": "malopolskie_37.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "podlaskie",
+      "image": "podlaskie_1.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "podlaskie",
+      "image": "podlaskie_2.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "podlaskie",
+      "image": "podlaskie_4.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 6619,
+      "matches_recorded_counts": true
+    },
+    {
+      "region": "podlaskie",
+      "image": "podlaskie_6.tif",
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "matches_recorded_counts": true
+    }
+  ],
+  "validation_date": "2026-10-16",
+  "python": "3.9.25"
+}

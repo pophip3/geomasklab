@@ -39,7 +39,7 @@ class FakeModels(BaseHTTPRequestHandler):
                 answer = 'T_call(referring_expression_segmentation, "ignored.png", "all buildings")'
             else:
                 assert '[Execution Result]' in content
-                answer = '<answer>已收到工作台的分割结果和确定性统计。</answer>'
+                answer = '<answer>\u5df2\u6536\u5230\u5de5\u4f5c\u53f0\u7684\u5206\u5272\u7ed3\u679c\u548c\u786e\u5b9a\u6027\u7edf\u8ba1\u3002</answer>'
             return self.reply({'choices': [{'message': {'content': answer}}]})
         if self.path == '/predict':
             type(self).calls += 1
@@ -74,35 +74,35 @@ class IntegrationTests(unittest.TestCase):
     def run_task(self, query, **extra):
         return server.run_task(self.session, {'query': query, 'mode': 'live', **extra})
     def test_actual_http_binary_one_masks_cache_and_restart(self):
-        right = self.run_task('提取右半幅建筑')
+        right = self.run_task('\u63d0\u53d6\u53f3\u534a\u5e45\u5efa\u7b51')
         self.assertEqual(right['metrics']['pixel_area'], 42)
         server.SESSIONS.clear()
         self.session = server.get_session(self.session['id'])
-        left = self.run_task('改成左半幅', parent_run_id=right['id'])
+        left = self.run_task('\u6539\u6210\u5de6\u534a\u5e45', parent_run_id=right['id'])
         self.assertEqual(left['metrics']['pixel_area'], 35)
         self.assertEqual(FakeModels.calls, 1)
         self.assertEqual(left['reused_from_run_id'], right['id'])
         self.assertEqual(len(server.session_index()), 1)
         self.assertEqual(server.session_index()[0]['run_count'], 2)
     def test_revision_change_invalidates_cached_segmentation(self):
-        first = self.run_task('提取右侧建筑')
+        first = self.run_task('\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51')
         os.environ['GEO_BUILDING_MODEL_REVISION'] = 'fake-building-v2'
-        second = self.run_task('改成左侧', parent_run_id=first['id'])
+        second = self.run_task('\u6539\u6210\u5de6\u4fa7', parent_run_id=first['id'])
         self.assertEqual(FakeModels.calls, 2); self.assertNotIn('reused_from_run_id', second)
     def test_unknown_revision_and_force_do_not_reuse(self):
-        first = self.run_task('提取右侧建筑')
-        self.run_task('改成左侧', parent_run_id=first['id'], force_perception=True)
+        first = self.run_task('\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51')
+        self.run_task('\u6539\u6210\u5de6\u4fa7', parent_run_id=first['id'], force_perception=True)
         os.environ['GEO_BUILDING_MODEL_REVISION'] = ''
-        self.run_task('改成左侧', parent_run_id=first['id'])
+        self.run_task('\u6539\u6210\u5de6\u4fa7', parent_run_id=first['id'])
         self.assertEqual(FakeModels.calls, 3)
     def test_corrupt_cached_mask_triggers_new_inference(self):
-        first = self.run_task('提取右侧建筑')
+        first = self.run_task('\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51')
         (server.DATA/self.session['id']/first['id']/'full_mask.png').write_bytes(b'corrupt')
-        second = self.run_task('改成左侧', parent_run_id=first['id'])
+        second = self.run_task('\u6539\u6210\u5de6\u4fa7', parent_run_id=first['id'])
         self.assertEqual(second['status'], 'completed'); self.assertEqual(FakeModels.calls, 2)
     def test_probability_maps_are_rejected(self):
         with patch.object(server, 'post_json', return_value={'status': 'success', 'mask': server.image_b64(Image.new('L', (11, 7), 128))}):
-            result = self.run_task('提取右侧建筑')
+            result = self.run_task('\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51')
         self.assertEqual(result['status'], 'failed'); self.assertNotIn('metrics', result)
         self.assertFalse((server.DATA/self.session['id']/result['id']/'mask.png').exists())
     def test_quick_building_uses_building_mask_without_planner(self):
@@ -122,7 +122,7 @@ class IntegrationTests(unittest.TestCase):
         os.environ['GEO_AGENT_MODEL'] = 'NOT-A-SERVED-MODEL'
         self.assertEqual(inspect_services()['agent']['status'], 'model_missing')
     def test_export_over_http_and_missing_session(self):
-        result = self.run_task('提取右侧建筑')
+        result = self.run_task('\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51')
         class QuietHandler(server.Handler):
             def log_message(self, *args): pass
         httpd = ThreadingHTTPServer(('127.0.0.1', 0), QuietHandler)
@@ -150,7 +150,7 @@ class IntegrationTests(unittest.TestCase):
             httpd.shutdown(); httpd.server_close(); thread.join()
     def test_roi_candidate_statistics_use_final_mask(self):
         roi={'xyxy':[0,0,5,7],'source':'drawn','image_size':[11,7]}
-        result=self.run_task('提取框选区域内的建筑',roi=roi,scope='all')
+        result=self.run_task('\u63d0\u53d6\u6846\u9009\u533a\u57df\u5185\u7684\u5efa\u7b51',roi=roi,scope='all')
         self.assertEqual(result['status'],'completed')
         self.assertEqual(result['metrics']['pixel_area'],35)
         stats=result['metrics']['candidate_stats']
@@ -169,7 +169,7 @@ class IntegrationTests(unittest.TestCase):
                   'quality_mode':'fast','model':{'service_version':'fixture-1.2','checkpoint_sha256':'fixture-checkpoint'}}
         with patch('workbench.agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(semantic_segmentation, "ignored.png", ["building"])'), \
              patch.object(server,'post_json',return_value=response):
-            result=self.run_task('提取建筑',quality_mode='fast')
+            result=self.run_task('\u63d0\u53d6\u5efa\u7b51',quality_mode='fast')
         self.assertEqual(result['status'],'completed',result['message'])
         report=(server.DATA/self.session['id']/result['id']/'report.md').read_text(encoding='utf-8')
         self.assertIn('"task": "semantic_seg"',report)
@@ -183,7 +183,7 @@ class IntegrationTests(unittest.TestCase):
         response={'status':'success','masks':{'road':server.image_b64(Image.new('L',(11,7),255))},'quality_mode':'fast'}
         with patch('workbench.agent_bridge.WorkbenchAgent._run_llm',return_value='T_call(referring_expression_segmentation, "ignored.png", "all roads")'), \
              patch.object(server,'post_json',return_value=response):
-            result=self.run_task('提取道路',quality_mode='fast')
+            result=self.run_task('\u63d0\u53d6\u9053\u8def',quality_mode='fast')
         self.assertEqual(result['status'],'completed')
         self.assertEqual(result['capability']['level'],'supported')
         self.assertNotIn('experimental',result['message'])
@@ -193,14 +193,14 @@ class IntegrationTests(unittest.TestCase):
 
     def test_demo_report_never_invents_a_model_prompt(self):
         s=server.SESSIONS[server.new_session('urban')['id']]
-        result=server.run_task(s,{'query':'提取建筑','mode':'demo'})
+        result=server.run_task(s,{'query':'\u63d0\u53d6\u5efa\u7b51','mode':'demo'})
         report=(server.DATA/s['id']/result['id']/'report.md').read_text(encoding='utf-8')
         self.assertIn('No model call in the procedural demonstration',report)
         self.assertNotIn('all buildings',report)
 
     def test_new_quality_label_maps_to_existing_accurate_mode(self):
         from workbench.v07_contract import resolve_quality
-        for label in ('改成分块细化模式','use accurate mode','改成高精度模式'):
+        for label in ('\u6539\u6210\u5206\u5757\u7ec6\u5316\u6a21\u5f0f','use accurate mode','\u6539\u6210\u9ad8\u7cbe\u5ea6\u6a21\u5f0f'):
             self.assertEqual(resolve_quality(label,{},None)[:2],('accurate','accurate'))
 
     def test_dotenv_is_literal_and_shell_wins(self):

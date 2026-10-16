@@ -27,7 +27,7 @@ class ResearchEvidenceTests(unittest.TestCase):
         self.patcher.stop()
         self.temp.cleanup()
 
-    def bundle(self, query='提取右侧建筑', **options):
+    def bundle(self, query='\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51', **options):
         result = server.run_task(self.session,{'query':query,'mode':'demo',**options})
         self.assertIn(result['status'],('completed','needs_review'))
         folder = self.data / self.session['id'] / result['id']
@@ -50,7 +50,7 @@ class ResearchEvidenceTests(unittest.TestCase):
         return result.getvalue()
 
     def test_scope_and_complement_replay(self):
-        for query in ['提取右侧建筑','提取左侧建筑','把非建筑的部分标注出来']:
+        for query in ['\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51','\u63d0\u53d6\u5de6\u4fa7\u5efa\u7b51','\u628a\u975e\u5efa\u7b51\u7684\u90e8\u5206\u6807\u6ce8\u51fa\u6765']:
             with self.subTest(query=query):
                 report = verify_bundle(self.bundle(query))
                 self.assertTrue(report['verified'])
@@ -58,7 +58,7 @@ class ResearchEvidenceTests(unittest.TestCase):
 
     def test_roi_replay(self):
         roi={'xyxy':[80,50,280,250],'source':'drawn','image_size':[800,600]}
-        report=verify_bundle(self.bundle('提取框选区域内的建筑',roi=roi,scope='all'))
+        report=verify_bundle(self.bundle('\u63d0\u53d6\u6846\u9009\u533a\u57df\u5185\u7684\u5efa\u7b51',roi=roi,scope='all'))
         self.assertEqual(report['pixel_area'],12850)
 
     def test_changed_file_is_detected(self):
@@ -118,13 +118,13 @@ class ResearchEvidenceTests(unittest.TestCase):
         self.assertEqual(parse_decision(raw,'bound.png',set()).status,'rejected_tool')
 
     def test_roi_cannot_silently_intersect_inherited_half(self):
-        first=server.run_task(self.session,{'query':'提取右侧建筑','mode':'demo'})
+        first=server.run_task(self.session,{'query':'\u63d0\u53d6\u53f3\u4fa7\u5efa\u7b51','mode':'demo'})
         roi={'xyxy':[80,50,280,250],'source':'drawn','image_size':[800,600]}
-        rejected=server.run_task(self.session,{'query':'提取框选区域内的建筑','mode':'demo',
+        rejected=server.run_task(self.session,{'query':'\u63d0\u53d6\u6846\u9009\u533a\u57df\u5185\u7684\u5efa\u7b51','mode':'demo',
                                              'parent_run_id':first['id'],'roi':roi})
         self.assertEqual(rejected['status'],'failed')
         self.assertNotIn('mask_url',rejected)
-        accepted=server.run_task(self.session,{'query':'提取框选区域内的建筑','mode':'demo',
+        accepted=server.run_task(self.session,{'query':'\u63d0\u53d6\u6846\u9009\u533a\u57df\u5185\u7684\u5efa\u7b51','mode':'demo',
                                              'parent_run_id':first['id'],'roi':roi,'scope':'all'})
         self.assertEqual(accepted['metrics']['pixel_area'],12850)
 

@@ -11,13 +11,13 @@ from workbench.service_transport import agent_request_settings, request_json
 
 ALLOWED_TOOLS = {'referring_expression_segmentation', 'semantic_segmentation'}
 LABELS = {
-    'building': ('building', 'buildings', '建筑', '房屋'),
-    'aircraft': ('aircraft', 'airplane', 'airplanes', 'plane', 'planes', '飞机'),
-    'road': ('road', 'roads', '道路'),
-    'water': ('water', 'water body', 'water bodies', '水体'),
-    'tree': ('tree', 'trees', '树木'),
-    'vegetation': ('vegetation', '植被'),
-    'ship': ('ship', 'ships', '船舶'),
+    'building': ('building', 'buildings', '\u5efa\u7b51', '\u623f\u5c4b'),
+    'aircraft': ('aircraft', 'airplane', 'airplanes', 'plane', 'planes', '\u98de\u673a'),
+    'road': ('road', 'roads', '\u9053\u8def'),
+    'water': ('water', 'water body', 'water bodies', '\u6c34\u4f53'),
+    'tree': ('tree', 'trees', '\u6811\u6728'),
+    'vegetation': ('vegetation', '\u690d\u88ab'),
+    'ship': ('ship', 'ships', '\u8239\u8236'),
 }
 PROMPTS = {'building':'all buildings', 'aircraft':'all planes', 'road':'all roads',
            'water':'water bodies', 'tree':'all trees', 'vegetation':'all vegetation', 'ship':'all ships'}
@@ -41,13 +41,13 @@ class PlannerResponseError(ValueError):
 def resolve_scope(query, context, selected=None):
     """Explicit, logged pixel-scope grammar; not an LLM reasoning capability."""
     q = query.lower()
-    if re.search(r'靠近|附近|之间|东侧|西侧|南侧|北侧|平方米|公顷|米以内|最大|最小|除外|除了|不要.*[左右上下]|不含|左上|左下|右上|右下|\b(near|between|except|largest|smallest|north|south|east|west)\b', q):
+    if re.search('\u9760\u8fd1|\u9644\u8fd1|\u4e4b\u95f4|\u4e1c\u4fa7|\u897f\u4fa7|\u5357\u4fa7|\u5317\u4fa7|\u5e73\u65b9\u7c73|\u516c\u9877|\u7c73\u4ee5\u5185|\u6700\u5927|\u6700\u5c0f|\u9664\u5916|\u9664\u4e86|\u4e0d\u8981.*[\u5de6\u53f3\u4e0a\u4e0b]|\u4e0d\u542b|\u5de6\u4e0a|\u5de6\u4e0b|\u53f3\u4e0a|\u53f3\u4e0b|\\b(near|between|except|largest|smallest|north|south|east|west)\\b', q):
         raise Clarification('Use a whole image or one pixel half. Complex relationships, exclusions and geographic area are unsupported; no segmentation was executed.')
     found = {side for side, pattern in {
-        'left': r'左|\bleft\b', 'right': r'右|\bright\b',
-        'top': r'上半|上方|顶部|\b(top|upper)\b',
-        'bottom': r'下半|下方|底部|\b(bottom|lower)\b',
-        'all': r'全图|全部|整幅|\bwhole image\b|\bentire image\b',
+        'left': '\u5de6|\\bleft\\b', 'right': '\u53f3|\\bright\\b',
+        'top': '\u4e0a\u534a|\u4e0a\u65b9|\u9876\u90e8|\\b(top|upper)\\b',
+        'bottom': '\u4e0b\u534a|\u4e0b\u65b9|\u5e95\u90e8|\\b(bottom|lower)\\b',
+        'all': '\u5168\u56fe|\u5168\u90e8|\u6574\u5e45|\\bwhole image\\b|\\bentire image\\b',
     }.items() if re.search(pattern, q)}
     if len(found) > 1:
         raise Clarification('Select one scope: whole image, left, right, top or bottom half.')

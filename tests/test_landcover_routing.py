@@ -17,7 +17,7 @@ class Legacy:
 class LandcoverTests(unittest.TestCase):
     def test_trees_and_vegetation_have_distinct_semantics(self):
         self.assertEqual(target_intent('Extract all vegetation'),'vegetation')
-        self.assertEqual(target_intent('提取树木'),'tree')
+        self.assertEqual(target_intent('\u63d0\u53d6\u6811\u6728'),'tree')
         self.assertEqual(TARGET_CLASSES['tree'],(5,))
         self.assertEqual(TARGET_CLASSES['vegetation'],(2,5,7))
         self.assertIsNone(landcover_target(None,'buildings near roads'))

@@ -579,7 +579,7 @@ def _run_task(s,p,allow_batch=False,job=None):
             cache_key=mask_cache_key(s,mode,target,plan.get('service_request'))
             cached=DATA/s['id']/previous['id']/'full_mask.png' if previous else None
             reusable=bool(cache_key and previous and previous.get('mask_cache_key')==cache_key and cached.is_file()
-                          and not p.get('force_perception') and not re.search(r'重新|重跑|不要复用|\b(?:rerun|re-run|do not reuse|new inference)\b',query,re.I))
+                          and not p.get('force_perception') and not re.search('\u91cd\u65b0|\u91cd\u8dd1|\u4e0d\u8981\u590d\u7528|\\b(?:rerun|re-run|do not reuse|new inference)\\b',query,re.I))
             if reusable and hashlib.sha256(cached.read_bytes()).hexdigest()!=previous.get('full_mask_sha256'):
                 reusable=False
             if reusable:

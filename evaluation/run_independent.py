@@ -18,7 +18,7 @@ from segmentation_metrics import score
 import urllib.request
 
 PROMPTS={'building':'all buildings','aircraft':'all planes'}
-TARGETS={'building':'建筑','aircraft':'飞机'}
+TARGETS={'building':'\u5efa\u7b51','aircraft':'\u98de\u673a'}
 def sha(b):return hashlib.sha256(b).hexdigest()
 def utc():return datetime.now(timezone.utc).isoformat()
 def save(path,obj):
@@ -100,7 +100,7 @@ def main():
                     event.update(success=True,score=score(p,gt,valid),wall_ms=elapsed,service_timing_ms=timing,model=model)
                 else:
                     target=TARGETS[row['target']];scope='right' if method=='right' else 'all'
-                    query=('提取右半幅' if method=='right' else '提取')+target+'并计算像素覆盖率'
+                    query=('\u63d0\u53d6\u53f3\u534a\u5e45' if method=='right' else '\u63d0\u53d6')+target+'\u5e76\u8ba1\u7b97\u50cf\u7d20\u8986\u76d6\u7387'
                     payload={'session_id':r['session_id'],'query':query,'mode':'live','scope':scope,'quality_mode':'fast','force_perception':True,'roi':{}}
                     if method=='roi':
                         w,h=size;payload['roi']={'xyxy':[w//4,h//4,3*w//4,3*h//4],'source':'imported','image_size':[w,h]}
