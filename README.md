@@ -4,7 +4,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776ab)](https://www.python.org/)
 [![MIT license](https://img.shields.io/badge/license-MIT-24836b)](LICENSE)
-[![Release 1.0.0](https://img.shields.io/badge/release-1.0.0-2563eb)](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-build.20261015)
+[![Release 1.0.0](https://img.shields.io/badge/release-1.0.0-2563eb)](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016)
 [![Research software checks](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml/badge.svg)](https://github.com/pophip3/geomasklab/actions/workflows/research-checks.yml)
 
 ## Description
@@ -15,7 +15,7 @@ run repeatable analyses from the command line. Saved masks, analysis settings an
 results travel together in portable evidence packets.
 
 [Installation](#installation) · [Demo](#quick-start--demo) ·
-[Reproduce paper results](#reproduce-paper-results) ·
+[How to reproduce results](#how-to-reproduce-results) ·
 [Browser workbench](#open-the-browser-workbench) ·
 [Documentation](https://pophip3.github.io/geomasklab/) · [Example data](#example-data)
 
@@ -56,9 +56,12 @@ git clone https://github.com/pophip3/geomasklab.git
 cd geomasklab
 ```
 
-The manuscript's fixed implementation is [commit 2be0c18](https://github.com/pophip3/geomasklab/tree/2be0c18f54333df2f560b8ae8a9311ae0a6b267f),
-also available as the [1.0.0 submission release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-build.20261015).
-The current `main` adds the reproduction instructions and helper below to that implementation.
+The manuscript's fixed reproduction edition is [commit 15233af](https://github.com/pophip3/geomasklab/tree/15233afa4db75b59a813cdaa3b62c59eb7c5e457),
+also available as the [English reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016).
+The repository, fixed commit and release downloads are public and require no login.
+These are ordinary repository and version URLs, not expiring download tokens.
+The commands below work on the current `main`; to use the exact manuscript source,
+run `git checkout 15233afa4db75b59a813cdaa3b62c59eb7c5e457` before installation.
 
 ### Windows PowerShell
 
@@ -135,9 +138,9 @@ Its batch completes three samples and records one deliberately missing input;
 the empty valid domain has undefined coverage. `five-step-output/summary.json`
 reports `"passed": true` when all checks succeed.
 
-## Reproduce paper results
+<a id="reproduce-paper-results"></a>
 
-### How to reproduce results
+## How to reproduce results
 
 After installation, run the paper measurement helper from the repository root:
 
