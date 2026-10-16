@@ -12,10 +12,11 @@
 GeoMaskLab brings regional measurement, segmentation assessment and result
 comparison into one open-source workbench. Work interactively in the browser or
 run repeatable analyses from the command line. Saved masks, analysis settings and
-results travel together in portable evidence packets.
+results travel together in portable evidence packets. Applications include urban
+land-cover measurement, vegetation monitoring and surface-water assessment.
 
 [Installation](#installation) · [Demo](#quick-start--demo) ·
-[How to reproduce results](#how-to-reproduce-results) ·
+[Reproduce paper results](#reproduce-paper-results) ·
 [Browser workbench](#open-the-browser-workbench) ·
 [Documentation](https://pophip3.github.io/geomasklab/) · [Example data](#example-data)
 
@@ -138,9 +139,9 @@ Its batch completes three samples and records one deliberately missing input;
 the empty valid domain has undefined coverage. `five-step-output/summary.json`
 reports `"passed": true` when all checks succeed.
 
-<a id="reproduce-paper-results"></a>
+<a id="how-to-reproduce-results"></a>
 
-## How to reproduce results
+## Reproduce paper results
 
 After installation, run the paper measurement helper from the repository root:
 
