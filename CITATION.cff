@@ -2,6 +2,7 @@
 cff-version: 1.2.0
 message: "If you use GeoMaskLab, cite the software version used in your work."
 type: software
+doi: "10.5281/zenodo.23447736"
 title: "GeoMaskLab: Replayable measurements and portable evidence for segmentation masks"
 authors:
   - family-names: "Xing"

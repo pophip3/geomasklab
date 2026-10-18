@@ -82,7 +82,8 @@ The older tags and dated archives remain historical records. The 18 October upda
 corrects documentation and review entry points; executable code and dependency locks
 are unchanged from `v1.0.0-dependencies.20261017`.
 All project links above belong to `pophip3/geomasklab` and require no login.
-Existing Zenodo DOIs identify historical packages, not this submission archive.
+The fixed review source is archived at [Zenodo DOI 10.5281/zenodo.23447736](https://doi.org/10.5281/zenodo.23447736).
+Older Zenodo dataset DOIs identify historical packages, not this source archive.
 See [submission identities and verification scope](docs/submission_20261018.md).
 
 ### Windows PowerShell
@@ -287,7 +288,8 @@ Bundled imagery and third-party components retain the terms recorded in
 
 Use [CITATION.cff](CITATION.cff) for the software author, version and fixed release.
 The manuscript is **GeoMaskLab: Replayable measurements for segmentation masks**,
-by Yun Xing, submitted to SoftwareX. Its article DOI will be added after publication.
+by Yun Xing, prepared for submission to SoftwareX. Its article DOI will be added after publication.
+The fixed software source can already be cited using [DOI 10.5281/zenodo.23447736](https://doi.org/10.5281/zenodo.23447736); this is a software DOI, separate from the future article DOI.
 The [versioned reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016) supplies the
 reproduction materials and experiment records.
 
