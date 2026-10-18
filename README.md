@@ -69,15 +69,15 @@ Use the separate environments and commands in [Reproduction environments](docs/r
 Clone the public repository and keep the terminal in its root directory:
 
 ```sh
-git clone --branch v1.0.0-submission.20261018 https://github.com/pophip3/geomasklab.git
+git clone --branch v1.0.0-submission.20261018.1 https://github.com/pophip3/geomasklab.git
 cd geomasklab
 ```
 
-The SoftwareX submission uses the fixed review tag [v1.0.0-submission.20261018](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018).
+The SoftwareX submission uses the fixed review tag [v1.0.0-submission.20261018.1](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018.1).
 The project repository is [https://github.com/pophip3/geomasklab](https://github.com/pophip3/geomasklab); the tag is a version inside this same repository.
 The [research-data release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016) retains the original water V5 checkpoint,
-experiment records and the updated `GeoMaskLab_Supplementary_Reproducibility_Evidence_Submission_20261018.zip`.
-Use `GeoMaskLab-1.0.0-submission-20261018-source.zip` for a downloadable copy of this review source.
+experiment records and the updated `GeoMaskLab_Supplementary_Reproducibility_Evidence_Final_20261018.zip`.
+Use `GeoMaskLab-1.0.0-submission-20261018-final-source.zip` for a downloadable copy of this review source.
 The older tags and dated archives remain historical records. The 18 October update
 corrects documentation and review entry points; executable code and dependency locks
 are unchanged from `v1.0.0-dependencies.20261017`.

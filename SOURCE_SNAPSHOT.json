@@ -1,9 +1,9 @@
 {
   "software_version": "1.0.0",
   "build_date": "2026-10-18",
-  "release_tag": "v1.0.0-submission.20261018",
+  "release_tag": "v1.0.0-submission.20261018.1",
   "publication_status_at_packaging": "Submission review source; confirm publication using the public tag.",
-  "identification": "Documentation and version-identity corrections; executable code and dependencies unchanged from bb66e07bf0a19f477c6fff39df0977e83b1cee9f.",
+  "identification": "Final submission documentation and explicit historical provenance labels. Executable code and dependency locks unchanged from bb66e07bf0a19f477c6fff39df0977e83b1cee9f.",
   "historical_reproduction_commit": "15233afa4db75b59a813cdaa3b62c59eb7c5e457",
   "files": [
     {
@@ -40,7 +40,7 @@
     },
     {
       "path": "CITATION.cff",
-      "sha256": "29e0a25cd27c2ef5ff4c3bc8bfd574529d2787a18114b603fc7a89c8793c9094"
+      "sha256": "79ea70fd227f655f0ba6b3e11b7ddc621478b60dceedec9874b27bf80cc9ce7e"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -64,7 +64,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "0afa8b3207514c2e95feaa2120eb35259022a4d6e5c8afbd4a2992c2bacf9c8e"
+      "sha256": "55bd87802697f819f0728eb079c5194e5bdecca6e02dd34c87e2cfde354d7572"
     },
     {
       "path": "SECURITY.md",
@@ -72,7 +72,7 @@
     },
     {
       "path": "THIRD_PARTY_NOTICES.md",
-      "sha256": "af8d643cc85bcebe7e17e464bfb21d28b6288fd1ddaabda48523458f81bb2599"
+      "sha256": "21de80f5ec20e7e8214e4fa0ab6f9f17675acc1bc7b0faae7419774d9fcd0629"
     },
     {
       "path": "_source_package.py",
@@ -164,7 +164,7 @@
     },
     {
       "path": "docs/origin.json",
-      "sha256": "292b162d0c8a39c2f4f8a4aea59eabeb7afe4cf10418537af4834cf94b40d8f1"
+      "sha256": "050ceb22977bee97aafd6248481183db1956832837d0eb668b6c650a9f7661cf"
     },
     {
       "path": "docs/presentation_workbench.md",
@@ -188,7 +188,7 @@
     },
     {
       "path": "docs/reproduce_paper_results.md",
-      "sha256": "eafd3b195ce35cd31bd7634ef5e05d2b531112bfedb2e96aceacb78f29d2d8d4"
+      "sha256": "a02336e82d49cc1d27ac8ff212539257e8e774f5c817c146364a6a604a27c7fa"
     },
     {
       "path": "docs/reproduction_environments.md",
@@ -204,7 +204,7 @@
     },
     {
       "path": "docs/site/index.html",
-      "sha256": "a67a63c2e9b0af810881920aae905368edb8243695f93659eb219527ee76176c"
+      "sha256": "c277849f208a332310f130d6a81a377ff7a809f2eb16ada2f6b0c3e98380b543"
     },
     {
       "path": "docs/site/schemas/analysis-1.0.schema.json",
@@ -268,7 +268,7 @@
     },
     {
       "path": "docs/submission_20261018.md",
-      "sha256": "ede8374ed41f34af87b6d0064c9e55c06bcc4174875cb2f49b107348aed316c6"
+      "sha256": "8467f8be9b46fe2b2e63fca87f87070099ca69cce25ae5feb2bb19e74f6f9cd1"
     },
     {
       "path": "docs/validation/local-model-acceptance-20261007.json",

@@ -1,10 +1,10 @@
 # SoftwareX submission identities - 18 October 2026
 
 - Project repository: https://github.com/pophip3/geomasklab
-- Fixed code and documentation tag: [v1.0.0-submission.20261018](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018)
+- Fixed code and documentation tag: [v1.0.0-submission.20261018.1](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018.1)
 - Research-data archive: https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016
-- Current source asset: `GeoMaskLab-1.0.0-submission-20261018-source.zip`
-- Current evidence asset: `GeoMaskLab_Supplementary_Reproducibility_Evidence_Submission_20261018.zip`
+- Current source asset: `GeoMaskLab-1.0.0-submission-20261018-final-source.zip`
+- Current evidence asset: `GeoMaskLab_Supplementary_Reproducibility_Evidence_Final_20261018.zip`
 
 All project release and tag links above are inside the same `pophip3/geomasklab` repository.
 Other repositories in model provenance are third-party dependencies or historical attribution.

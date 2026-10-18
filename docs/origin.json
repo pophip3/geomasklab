@@ -36,5 +36,7 @@
   "license_selection_basis": "User authorized public release of their modified code, required a standard root open-source license, and requested completion of all release materials without further questions.",
   "individual_creator_metadata": "not yet confirmed; no author identities or order inferred",
   "third_party_approval_claimed": false,
-  "public_visibility_verified_on": "2026-10-05"
+  "public_visibility_verified_on": "2026-10-05",
+  "competition_repository_status": "Historical provenance only; HTTP 404 on 2026-10-18. Not the submission repository.",
+  "submission_repository": "https://github.com/pophip3/geomasklab"
 }

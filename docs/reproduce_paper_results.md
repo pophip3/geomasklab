@@ -5,7 +5,7 @@ Manuscript: **GeoMaskLab: Replayable measurements for segmentation masks**.
 Install the supplied source edition using the pinned commands in the [README](../README.md#installation).
 The source archive manifest records its exact Git commit and file hashes.
 It includes the measurement helper, bundled NAIP data, complete dependency locks
-and validated water V5 inference scripts. The public manuscript snapshot
+and validated water V5 inference scripts. The historical manuscript snapshot
 [`15233af`](https://github.com/pophip3/geomasklab/tree/15233afa4db75b59a813cdaa3b62c59eb7c5e457)
 remains available for source comparison.
 
@@ -65,7 +65,7 @@ These commands recalculate the published numerical records.
 
 ## Model reconstruction
 
-The supplied dependency edition of the supplementary archive is named `GeoMaskLab_Supplementary_Reproducibility_Evidence_Dependency_Closure_20261016.zip`.
+The current submission edition of the supplementary archive is named `GeoMaskLab_Supplementary_Reproducibility_Evidence_Final_20261018.zip`.
 Extract it into a separate directory:
 
 - Six-image WHU/iSAID experiment: follow `public-model-case/README.md` for official

@@ -1,9 +1,10 @@
 # Provenance and third-party components
 
 The modified research workbench derives from selected files in
-[SitianGao/geoscope](https://github.com/SitianGao/geoscope), competition commit
-`df802ab54b8f4ee496ca83c104bfaee44f7ee888`. The original competition repository
-is preserved. Selected modifications are MIT licensed in this research distribution.
+the historical `SitianGao/geoscope` competition repository, commit
+`df802ab54b8f4ee496ca83c104bfaee44f7ee888`. The historical upstream URL returned HTTP 404 during the public check on
+18 October 2026. It is provenance information, not an available download entry
+or the GeoMaskLab submission repository. Selected modifications are MIT licensed in this research distribution.
 Git history and `docs/origin.json` retain the code's source provenance. Repository
 account attribution is separate from a confirmed manuscript author list.
 
