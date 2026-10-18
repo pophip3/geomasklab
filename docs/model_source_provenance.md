@@ -83,7 +83,9 @@ model readiness, real inference and measurement replay are separate checks.
   protocol does not expose the full upstream RemoteAgent tool collection.
 
 The competition repository supplied the existing deployment context and
-transport requirements: [SitianGao/geoscope](https://github.com/SitianGao/geoscope).
+transport requirements: the historical `SitianGao/geoscope` competition repository.
+That historical upstream returned HTTP 404 during the 18 October 2026 public check;
+it is retained here for attribution only and is not the GeoMaskLab submission repository.
 The paper software and these independently maintained adapters are delivered
 through [pophip3/geomasklab](https://github.com/pophip3/geomasklab).
 

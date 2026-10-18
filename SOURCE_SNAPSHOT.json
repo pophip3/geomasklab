@@ -1,9 +1,9 @@
 {
   "software_version": "1.0.0",
-  "build_date": "2026-10-17",
-  "release_tag": "v1.0.0-dependencies.20261017",
-  "publication_status_at_packaging": "Prepared for publication; consult the release for availability.",
-  "identification": "Complete reproduction dependency locks with fixed build tools and platform-specific transitive dependencies.",
+  "build_date": "2026-10-18",
+  "release_tag": "v1.0.0-submission.20261018",
+  "publication_status_at_packaging": "Submission review source; confirm publication using the public tag.",
+  "identification": "Documentation and version-identity corrections; executable code and dependencies unchanged from bb66e07bf0a19f477c6fff39df0977e83b1cee9f.",
   "historical_reproduction_commit": "15233afa4db75b59a813cdaa3b62c59eb7c5e457",
   "files": [
     {
@@ -36,11 +36,11 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "d3fb5266aebd1ac68dc3f4519209d79a5cc3c8d2ba1eaa022c32d7a18abde01d"
+      "sha256": "1c2bd40f1edd3caf0d21a9c718b0a751dd29c97d8c52822093549cd85251320c"
     },
     {
       "path": "CITATION.cff",
-      "sha256": "7028a57c36146e24c3c045c3fe772a39199e06738063f47ccd304411eaf10ad4"
+      "sha256": "29e0a25cd27c2ef5ff4c3bc8bfd574529d2787a18114b603fc7a89c8793c9094"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -64,7 +64,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "4cbcf8adc8b5cf3e5c2ea44b9db3a9867ce26eab74fae94c6082296e4f202dad"
+      "sha256": "0afa8b3207514c2e95feaa2120eb35259022a4d6e5c8afbd4a2992c2bacf9c8e"
     },
     {
       "path": "SECURITY.md",
@@ -160,7 +160,7 @@
     },
     {
       "path": "docs/model_source_provenance.md",
-      "sha256": "6575f85a826253bfe7f9f8fb9bb5a50d88801649349b98646ddb4d342d5e8567"
+      "sha256": "f57cb294311b4b26ba927a9d04b82c943db633c2fdd440d09314c3ad2bb512a3"
     },
     {
       "path": "docs/origin.json",
@@ -204,7 +204,7 @@
     },
     {
       "path": "docs/site/index.html",
-      "sha256": "07b4eb7bc2fb181c4fd77f54d0108d8da64e774331ea2cfea5aadb88cd8a2fd1"
+      "sha256": "a67a63c2e9b0af810881920aae905368edb8243695f93659eb219527ee76176c"
     },
     {
       "path": "docs/site/schemas/analysis-1.0.schema.json",
@@ -265,6 +265,10 @@
     {
       "path": "docs/software_scope.md",
       "sha256": "d07cb672435c65ae60a7fed0d8b54eb007732835792377f7b4dbfbebd4cc3862"
+    },
+    {
+      "path": "docs/submission_20261018.md",
+      "sha256": "ede8374ed41f34af87b6d0064c9e55c06bcc4174875cb2f49b107348aed316c6"
     },
     {
       "path": "docs/validation/local-model-acceptance-20261007.json",

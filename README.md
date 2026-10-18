@@ -69,19 +69,21 @@ Use the separate environments and commands in [Reproduction environments](docs/r
 Clone the public repository and keep the terminal in its root directory:
 
 ```sh
-git clone https://github.com/pophip3/geomasklab.git
+git clone --branch v1.0.0-submission.20261018 https://github.com/pophip3/geomasklab.git
 cd geomasklab
 ```
 
-The manuscript's fixed reproduction edition is [commit 15233af](https://github.com/pophip3/geomasklab/tree/15233afa4db75b59a813cdaa3b62c59eb7c5e457),
-also available as the [English reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016).
-The repository, fixed commit and release downloads are public and require no login.
-These are ordinary repository and version URLs, not expiring download tokens.
-This dependency edition includes complete locks and preserves the inference code.
-When using the dependency supplement, extract its source ZIP and run the commands
-below from that directory. `SOURCE_SNAPSHOT.json` and the source archive manifest
-identify the exact files and Git commit. The original manuscript snapshot remains
-available at the fixed commit above for source comparison.
+The SoftwareX submission uses the fixed review tag [v1.0.0-submission.20261018](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018).
+The project repository is [https://github.com/pophip3/geomasklab](https://github.com/pophip3/geomasklab); the tag is a version inside this same repository.
+The [research-data release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016) retains the original water V5 checkpoint,
+experiment records and the updated `GeoMaskLab_Supplementary_Reproducibility_Evidence_Submission_20261018.zip`.
+Use `GeoMaskLab-1.0.0-submission-20261018-source.zip` for a downloadable copy of this review source.
+The older tags and dated archives remain historical records. The 18 October update
+corrects documentation and review entry points; executable code and dependency locks
+are unchanged from `v1.0.0-dependencies.20261017`.
+All project links above belong to `pophip3/geomasklab` and require no login.
+Existing Zenodo DOIs identify historical packages, not this submission archive.
+See [submission identities and verification scope](docs/submission_20261018.md).
 
 ### Windows PowerShell
 

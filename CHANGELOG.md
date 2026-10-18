@@ -1,5 +1,11 @@
 # Changelog
 
+## Submission documentation - 2026-10-18
+
+- Pin the current review tag in installation, citation and public documentation.
+- Distinguish the project repository, fixed source, data archive and historical DOI records.
+- Correct stale provenance and verification-scope statements. Executable code and dependencies are unchanged.
+
 ## 1.0.0 — submission build, 15 October 2026
 
 - Publish the tested 14 October implementation with a concise installation and
