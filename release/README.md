@@ -1,8 +1,10 @@
 # Release and archival preparation
 
-The current software version is `1.0.0`. Automated software
-checks and real-data arithmetic are distinct from confirmed creator attribution
-and observed human-study results.
+This directory contains metadata preparation, source packaging and distribution
+checks. The version `1.0.0` submission source is fixed at
+[`v1.0.0-submission.20261018.1`](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018.1)
+and archived at [10.5281/zenodo.23447736](https://doi.org/10.5281/zenodo.23447736).
+The following procedure applies to future releases.
 
 1. Run the full and Pillow-only tests, the real NAIP comparison, installed-wheel
    checks and extracted-source checks at the exact release commit. Inspect the
@@ -18,19 +20,18 @@ and observed human-study results.
 3. Validate the staged `CITATION.cff` with the official CFF schema and review
    `.zenodo.json`. Put reviewed files in the repository root. Software creators
    and manuscript authors may differ; attribution is not inferred from an account.
-4. Set the stable source version, rerun affected checks, commit, build exact
-   artifacts and publish the `v1.0.0` tag/release. Record SHA-256 and source commit.
-   Never reuse a stable tag for changed contents.
+4. Set the new release version, rerun affected checks, commit and build the
+   artifacts. Publish a new version tag and release with the source commit and
+   SHA-256 checksums. Preserve existing version tags and published artifacts.
 5. Connect the confirmed public repository to Zenodo or upload the exact version
    archive there. Inspect creators, licenses, third-party dataset terms, version,
    title and source URL before publishing the deposit. Store its actual version DOI
-   in citation/archive metadata. A fabricated DOI or an unpublished local template
-   is not an archive.
+   in citation/archive metadata after the deposit is publicly available.
 
-`prepare_metadata.py` writes both complete files from real confirmed facts;
-the root CITATION.cff now records the author-confirmed Yun Xing, Hohai University
-and ORCID 0009-0009-1746-5019. Archival DOI registration remains a separate step.
-The creator template remains an input example, not an observed human result.
+`prepare_metadata.py` generates `CITATION.cff` and `.zenodo.json` from the supplied
+creator metadata. The root `CITATION.cff` records Yun Xing, Hohai University,
+ORCID 0009-0009-1746-5019, and the published version DOI. The template is reusable
+input for future releases; it does not replace the current citation metadata.
 
 The compatible core format remains `geoscope-evidence/1.0`; this is a legacy
 format identifier, not a competing software name. All new assessment/signature

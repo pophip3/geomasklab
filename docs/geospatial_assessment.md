@@ -79,8 +79,8 @@ or authenticity; self-consistent replacements remain possible.
 
 `examples/geospatial_workflow.py` creates explicitly **synthetic** GeoTIFF fixtures
 with known pixel sizes to check area conversion and exported-grid preservation.
-The bundled NASA photograph has no georeference and is never assigned invented
-coordinates. The [real 2019 NAIP case](../evaluation/geospatial/README.md) checks four polygon
+The bundled NASA photograph has no georeference and is excluded from geographic
+area checks. The [real 2019 NAIP case](../evaluation/geospatial/README.md) checks four polygon
 domains and nominal areas against independently rasterized GDAL/Rasterio results.
 Axis-aligned EPSG:4326/3857 geodesic areas reuse a longitude-invariant cell area
 per row; other supported grids retain individual four-corner evaluation.

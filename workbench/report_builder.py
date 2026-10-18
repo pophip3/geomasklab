@@ -4,10 +4,9 @@ from workbench.semantic_review import initial_review
 
 
 def build_report(session, result, target_labels, scope_labels, capabilities):
-    """Describe recorded artifacts and distinguish integrity from semantic accuracy.
+    """Build a report from saved parameters, measurements and provenance.
 
-    Historical/user-supplied text is quoted unchanged. No missing service version,
-    inference request, review decision or geographic measurement is inferred.
+    Preserve historical and user-supplied text; leave missing metadata unrecorded.
     """
     if result.get('execution_kind') == 'saved_mask_region_analysis':
         from workbench.region_analysis import region_report
@@ -39,7 +38,7 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
     lines = [f'# GeoMaskLab experiment report: {session["name"]}', '',
         '## Task and prediction provenance', '',
         f'- Run ID: {result["id"]}', f'- Software version: {result.get("software_version", "Not recorded")}',
-        f'- Status: {result["status"]}; semantic and boundary review is separate.',
+        f'- Status: {result["status"]}',
         f'- Image dimensions: {session["width"]} × {session["height"]} pixels',
         f'- Recorded data source: {session["source"]}', f'- Recorded user task: {result["query"]}',
         f'- Execution origin: {origin}', f'- Planner: {result["provenance"]["planner"]}',
@@ -61,7 +60,7 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
         f'- Whole-image coverage: {metrics["area_ratio"] * 100:.4f}% (denominator: all image pixels)',
         f'- Selected-region pixels: {metrics.get("scope_area_pixels", "Not recorded")}',
         f'- Within-region coverage: {region_coverage} (denominator: selected-region pixels)',
-        f'- Candidate components: {candidates["candidate_count"]}; candidates are not verified object counts.',
+        f'- Candidate components: {candidates["candidate_count"]}',
         f'- Connectivity: {candidates["connectivity"]}; minimum component area: {candidates["min_area_pixels"]} pixels',
         f'- Components before/after filtering: {candidates["raw_candidate_count"]} / {candidates["candidate_count"]}',
         f'- Mean candidate area: {candidates["mean_area"]} pixels',
@@ -72,9 +71,9 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
     if 'validity_measurements' in metrics:
         lines.extend(['', '## Declared validity', '',
                       recorded(result['analysis_config']),recorded(metrics['validity_measurements']),
-                      'Validity is a user-declared analysis condition, not an accuracy assessment.'])
+                      'Validity defines the included analysis pixels.'])
     lines += ['', '## Review and reproduction', '',
-        f'- Semantic review state: {review["state"]}; decisions are self-reported, not authenticated.',
+        f'- Semantic review state: {review["state"]}',
         f'- Recorded review events: {recorded(review["events"])}',
         f'- Image SHA-256: {result["provenance"]["image_sha256"]}',
         f'- Segmentation revision: {result["provenance"].get("perception_revision", "Not recorded")}',
@@ -82,10 +81,13 @@ def build_report(session, result, target_labels, scope_labels, capabilities):
         f'- Spatial check: {metrics["spatial_check"]}',
         '- Bundle files: original.png, full_mask.png, mask.png, overlay.png, statistics.json, result.json, run_log.json, report.md and manifest.json.',
         '- Offline verification: `geomasklab verify path/to/evidence.zip`.',
-        '- Verification replays scope, complement and pixel measurements. It does not authenticate authors or establish semantic accuracy.',
-        '- Measurements use image pixels, not square meters, hectares or geographic coordinates.',
-        '- Review target identity, omissions, false positives and component boundaries separately.',
-        '- User-supplied and historical source text is preserved verbatim.', '']
+        '- Verification replays scope, complement and pixel measurements.',
+        '- User-supplied and historical source text is preserved verbatim.', '',
+        '## Interpretation', '',
+        'Coverage describes foreground on the declared pixel domain; it is not an accuracy score or geographic area. '
+        'Candidate components are connected mask regions, not verified object counts. '
+        'Offline verification checks recorded pixels and calculations; source authentication and semantic assessment require separate evidence. '
+        'Review decisions are self-reported. Inspect target identity, omissions, false positives and component boundaries for the intended use.', '']
     if result.get('imported_evidence'):
         origin = result['imported_evidence']
         lines += ['## Evidence handoff', '',

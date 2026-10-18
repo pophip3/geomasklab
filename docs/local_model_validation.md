@@ -2,7 +2,7 @@
 
 Software version remains **1.0.0**. Revised snapshots have an exact Git commit
 and dated build/checksum records; the original release tag and artifacts are
-preserved. The manuscript was not edited during this code delivery.
+preserved.
 
 ## Reviewer installation and replay
 
@@ -24,14 +24,14 @@ verifies every manifest hash and starts its browser server. The wheel checker
 uses a fresh Pillow-only environment outside the development checkout and
 exercises the installed CLI, writable workbench storage and browser resources.
 
-## Actual model execution on 7 October 2026
+## Model execution on 7 October 2026
 
 The full [saved acceptance report](validation/local-model-acceptance-20261007.json)
-records genuine local RemoteAgent and RemoteSAM requests on the supplied
+records local RemoteAgent and RemoteSAM requests on the supplied
 512 x 512 NAIP chip. It reports `passed: true` for scene answering, fresh
 segmentation, Agent feedback, four exports, independent pixel counts and source
 preservation. Original BF16 Agent weights and the fixed official SAM architecture
-were used; no quantization or injected model responses were used.
+were used without quantization.
 
 The tested laptop had an RTX 4060 Laptop GPU with 8 GB VRAM and 16 GB system RAM.
 Agent placement used a 3 GiB GPU budget, 2 GiB CPU budget and disk offload;

@@ -10,8 +10,8 @@ GeoMaskLab uses its own pixel-center scanline rasterizer. The comparison path
 projects the supplied GeoJSON vertices with PyProj, rasterizes with Rasterio/GDAL
 `all_touched=False`, and directly counts decoded binary pixels with NumPy.
 Both paths use the same supplied coordinate model and nominal projected-area
-definition. This checks implementation consistency; it is not independent
-survey validation, semantic accuracy or a human-efficiency experiment.
+definition. This checks implementation consistency within that shared coordinate
+and area model.
 
 | Study region | Foreground pixels, both paths | Region pixels, both paths | Nominal area, both paths (m2) | Difference (m2) |
 | --- | ---: | ---: | ---: | ---: |

@@ -14,10 +14,9 @@ mask. GeoMaskLab retains these together, rejects inconsistent records and permit
 a new region to be measured without rebuilding the model environment.
 
 Masks may be supplied by GIS/annotation software, a model or a local baseline.
-Provider execution is an adapter; the scientific scope is measurement and replay.
-Text segmentation, experiment history, annotation exports and manual review already
-exist in other tools and are not treated as GeoMaskLab's contribution. Global
-uniqueness, industrial adoption and reduced human labor require separate evidence.
+GeoMaskLab's shared measurement core and portable evidence format connect those
+sources to deterministic regional analysis and replay. Model execution,
+annotation exchange and review support that workflow.
 
 ## Core version 1.0 boundary
 
@@ -38,9 +37,8 @@ The headless core supports explicit ASCII target labels; the optional workbench 
 and review decisions do not establish semantic accuracy. The real NASA example
 uses green-color candidates and explicitly documents their unvalidated semantics.
 
-Version comparison, experiment management, batch controls, animation, model-service
-questions and Label Studio conversion remain supporting source-workbench features.
-They are frozen rather than expanded or presented as independent scientific claims.
+The workbench also provides version comparison, experiment management, batch
+controls, animation, model-service questions and Label Studio conversion.
 
 ## Measurement definitions and limitations
 

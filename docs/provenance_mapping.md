@@ -13,13 +13,13 @@ relationships. The complete source ZIP has its own SHA-256 identity.
 
 Caller-supplied source, model/alignment assertions and original prediction
 metadata form a separate unauthenticated entity. An immediate derived-parent
-identity is recorded as **not embedded**. Missing historical activities and
-ancestor packages are not fabricated. A timestamp is retained as `gml:recordedAt`
+identity is recorded as **not embedded**. The mapping includes only recorded
+activities and available ancestor packages. A timestamp is retained as `gml:recordedAt`
 without claiming an authenticated event time.
 
 This uses the [PROV-JSON Member Submission serialization](https://www.w3.org/submissions/prov-json/)
 of the PROV data model. PROV-JSON's document status is distinct from the W3C PROV
-Recommendations; no W3C certification is claimed. GeoMaskLab's extension namespace
+Recommendations. GeoMaskLab's extension namespace
 is `urn:geomasklab:provenance:`. Hash/file, domain and assertion properties use
 that namespace while relation types use `http://www.w3.org/ns/prov#`.
 
@@ -32,6 +32,6 @@ mapping from the source bundle and rejects any difference.
 Share both the evidence ZIP and this JSON file. The JSON supplies interoperable
 metadata; the ZIP retains the bytes necessary for deterministic pixel replay.
 PROV serialization alone neither verifies a segmentation model nor authenticates
-an author. A full RO-Crate profile remains deferred. Optional detached
+an author. Optional detached
 [trusted-key signatures](signatures.md) authenticate exact bundle bytes under an
 external trust policy; they do not establish semantic correctness.

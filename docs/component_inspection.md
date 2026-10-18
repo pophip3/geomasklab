@@ -81,4 +81,4 @@ python examples/five_step_workflow.py --output five-step-output
 geomasklab verify-components five-step-output/components.zip
 ```
 
-The frozen NAIP example selects candidates of at least 16 pixels touching a clipping boundary. It checks component-area conservation against independently counted source pixels and preserves the exact validity source during ROI derivation. The alternative mask is a declared protocol perturbation, and the example makes no segmentation-accuracy or human-study claim.
+The frozen NAIP example selects candidates of at least 16 pixels touching a clipping boundary. It checks component-area conservation against independently counted source pixels and preserves the exact validity source during ROI derivation. The alternative mask is a declared protocol perturbation.

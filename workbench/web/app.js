@@ -248,17 +248,17 @@ async function selectRun(run){
   $('recalculateBtn').disabled=false;
   $('qualityValue').textContent=run.mode==='demo'?'Procedural demo':qualityNames[run.task?.effective_quality_mode]||'Unconfirmed by service';
   if(run.mode==='external')$('qualityValue').textContent='Imported mask';
-  $('resultTitle').textContent=(run.task.roi?'Rectangle ROI':sideNames[run.task.side])+' · '+targetLabel(run);$('resultSubtitle').textContent=`V${run.version} · ${run.mode==='demo'?'Procedural mask · Not model output':'Model output · Review required'}`;
-  if(run.mode==='external')$('resultSubtitle').textContent=`V${run.version} · Imported prediction · No inference during import · Review required`;
-  if(run.imported_evidence)$('resultSubtitle').textContent+=` · Imported from V${run.imported_evidence.source_version} · No new inference`;
+  $('resultTitle').textContent=(run.task.roi?'Rectangle ROI':sideNames[run.task.side])+' · '+targetLabel(run);$('resultSubtitle').textContent=`V${run.version} · ${run.mode==='demo'?'Procedural demo':'Model prediction'}`;
+  if(run.mode==='external')$('resultSubtitle').textContent=`V${run.version} · Imported prediction · Offline import`;
+  if(run.imported_evidence)$('resultSubtitle').textContent+=` · Source evidence V${run.imported_evidence.source_version}`;
   if(run.imported_evidence)$('timeValue').textContent=run.duration_ms+' ms (source run)';
   if(run.execution_kind==='saved_mask_region_analysis'){
-   $('resultSubtitle').textContent=`V${run.version} · Offline region analysis · No model inference · Source ${run.source_prediction.mode}`;
+   $('resultSubtitle').textContent=`V${run.version} · Saved-mask region analysis · Source ${run.source_prediction.mode}`;
    $('qualityValue').textContent='Saved mask';
   }
   $('resultStatus').textContent=runStateLabel(run);
   const category=run.capability||state.status?.capabilities?.targets?.[run.task.target];
-  if(category?.level==='experimental')$('resultSubtitle').textContent+=' · Experimental category · Accuracy not validated';
+  if(category?.level==='experimental')$('resultSubtitle').textContent+=' · Experimental category';
   renderReview(run);
   $('coverageBar').style.width=ratio+'%';$('ringValue').setAttribute('stroke-dasharray',`${ratio*1.634} 164`);
   $('checksList').innerHTML=['Mask and image dimensions match',`Scope matches ${run.task.roi?'the rectangle ROI':sideNames[run.task.side].toLowerCase()}`,'Measurements and result files saved'].map(s=>`<p><span>✓</span>${escape(s)}</p>`).join('');$('checkCount').textContent='3 / 3';

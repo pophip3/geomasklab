@@ -1,11 +1,9 @@
 # Independent application evaluation: protocol v2.1
 
-Locked before any test prediction on 2026-10-04. This executable version replaces
-the earlier **planned** WHU/iSAID sampling proposal. Many WHU and OEM samples have
-since appeared in other local experiments, so buildings are evaluated on unused
-LoveDA validation tiles instead. Data acquisition plans and their hashes are
-retained locally; a draft that incorrectly treated all archive inventory IDs as
-used model inputs was corrected before prediction and retained as superseded.
+This page describes the protocol frozen before test prediction on 2026-10-04.
+It superseded the planned WHU/iSAID sampling proposal, using previously unused
+LoveDA validation tiles for buildings. Selection and exclusion rules below refer
+to recorded model inputs; archive inventories are tracked separately.
 
 ## Data and annotations
 
@@ -38,8 +36,9 @@ Raw images, source labels, derived binary GT and valid masks stay outside Git.
 The [LoveDA license](https://github.com/Junjue-Wang/LoveDA#license) and iSAID/DOTA
 terms allow academic use and restrict commercial use. Download recipes, metadata,
 CRC checks and file SHA-256 values are supplied without redistributing raw imagery.
-The agent does not claim to have performed human annotation. A separate audit sheet
-can record later human review; no reviewer approval is fabricated.
+Annotations come from the dataset providers. A separate audit sheet is available
+for additional human review; no completed additional review is recorded in this
+evaluation.
 
 ## Frozen models and requests
 

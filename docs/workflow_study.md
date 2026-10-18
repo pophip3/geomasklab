@@ -1,12 +1,11 @@
 # Existing-tool interoperability and workflow evidence
 
-The practical question is whether a recipient can reconstruct a saved
-segmentation measurement without rebuilding the model environment, while
-retaining the image, target, mask, scope and review state. GeoMaskLab addresses
-this handoff; it does not introduce text-guided segmentation or replace GIS and
-annotation applications.
+GeoMaskLab lets a recipient reconstruct a saved segmentation measurement from
+its image, target, mask, scope and review state without rebuilding the model
+environment. The following checks test artifact exchange and offline region
+analysis.
 
-## Actual comparison performed
+## SDK round-trip checks
 
 `examples/compare_handoff.py` executes the official Label Studio SDK 2.1.2 brush
 converter, not a reimplementation. For five procedural examples it compares:
@@ -19,16 +18,14 @@ converter, not a reimplementation. For five procedural examples it compares:
 All five examples passed these component-level round trips. Four controlled
 metadata inconsistencies (whole-image denominator, ROI intent, review/mask
 binding and candidate count) were rejected after checksums were regenerated.
-This demonstrates additional application-specific verification, not a defect in
-the SDK or superior segmentation. See [the numerical record](../evaluation/workflow/summary.json).
+See [the numerical record](../evaluation/workflow/summary.json).
 
-The adapter creates **predictions**, with no accepted manual annotation, ground
-truth designation or invented confidence. It preserves image dimensions and
-exports local image assets plus an English labeling configuration. The full
-Label Studio GUI was not installed or benchmarked. QGIS and SAMGeo were examined
-through their official papers/documentation; their complete applications were
-not benchmarked here. Observed timings compare different work and therefore are
-not a speed ranking or user-efficiency study.
+The adapter exports **predictions**, preserving image dimensions and local image
+assets with an English labeling configuration. Confidence scores are omitted;
+annotation acceptance is a separate review step. This test covers the SDK brush
+converter, not the full Label Studio GUI. QGIS and SAMGeo provide context through
+their official papers and documentation. Timings measure different operations
+and are reported separately rather than ranked.
 
 ## Offline region investigation
 
@@ -44,18 +41,10 @@ pixels, 40,000 selected-region pixels and 480,000 whole-image pixels. Whole-imag
 coverage is 2.6771%; within-region coverage is 32.125%. The explicit denominator
 prevents those different questions from being silently conflated.
 
-## Claims supported and still unmeasured
+## Interpretation
 
-| Supported by executed checks | Not established |
-| --- | --- |
-| Exact artifact/mask round trips | Superiority over a complete competing application |
-| Independent pixel-operation replay | Higher segmentation accuracy |
-| Rejection of selected internally inconsistent metadata | Cryptographic author authentication or universal tamper prevention |
-| Saved-mask region analysis without inference | Quantified human labor or time savings |
-| Explicit distinction between verification and review | Industrial adoption or independently verified user acceptance |
-
-For a later user study, prospectively specify tasks, participants, comparison
-workflow, error categories and outcome definitions. Do not fill in hypothetical
-user-study values as results. Current publication claims should remain at the
-executed component/workflow level with a separate, limited real-image application
-example.
+These checks establish artifact/mask round trips, independent pixel replay,
+rejection of the selected inconsistent records and saved-mask region analysis.
+They evaluate component interoperability and numerical preservation. Human
+completion times and usability require the separate
+[handoff-study protocol](handoff_study.md).

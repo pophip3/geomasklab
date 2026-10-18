@@ -1,17 +1,8 @@
 # Distribution layout and release reference
 
-The supplied GeoRocket 1.3.0 CLI and server ZIPs were inspected as release-package
-references. Their top-level `bin/`, `lib/`, `conf/` and `docs/` directories make
-entry points, Java dependencies, connection configuration and offline documentation
-easy to locate. The server package also includes an embedded Elasticsearch tree;
-the CLI package contains a client configuration. Their HTML manual documents the
-architecture, commands, HTTP routes, query language, configuration and errors.
-These are runtime distributions, distinct from their source repository. See the
-[GeoRocket website](https://georocket.io/) for its own downloads and documentation.
-No third-party launch scripts, binaries, illustrations or interface code were
-copied into GeoMaskLab.
-
-GeoMaskLab applies these delivery principles to its smaller Python application:
+GeoMaskLab separates its reusable analysis core, local browser workbench,
+optional model adapters and release tools. Entry points, dependencies and
+offline documentation are organized as follows:
 
 | Location | Purpose |
 | --- | --- |
@@ -20,7 +11,7 @@ GeoMaskLab applies these delivery principles to its smaller Python application:
 | `release/check_wheel.py` | Installed-wheel acceptance outside the checkout |
 | `bin/geomasklab.cmd`, `bin/geomasklab.sh` | Windows/POSIX entry points; prefer a root virtual environment and forward command-line arguments |
 | `quickstart.py` | Local server entry point with port diagnostics |
-| `requirements.txt`, `requirements-reviewer.txt` | Minimal dependency range and pinned reviewer environment |
+| `requirements.txt`, `requirements-reviewer.txt` | Pinned core and reviewer dependencies |
 | `.env.example`, `docs/model_services.md` | Placeholder-only configuration and service contracts; credentials/weights excluded |
 | `workbench/web/help.html` | Complete local English user guide, independent of network assets |
 | `docs/api.md`, `docs/architecture.md` | API and implementation documentation |
@@ -29,12 +20,16 @@ GeoMaskLab applies these delivery principles to its smaller Python application:
 | `LICENSE`, `Licence.txt`, `THIRD_PARTY_NOTICES.md` | MIT source license, origin and external dependency boundaries |
 | `release/build_source.py`, `release/check_distribution.py` | Fixed-commit archive, file hashes and extracted-package acceptance |
 
-The software is distributed as a complete Python wheel and a matching fixed source
-archive. Both contain the same core, workbench modules and browser assets.
-Run `geomasklab-ui` after installing the wheel. The source supplies the executable
+The wheel contains the core, workbench modules and browser assets; run
+`geomasklab-ui` after installation. A source checkout also supplies executable
 examples and handoff materials; `python quickstart.py` opens the same interface.
-Both require Python and Pillow. A Python runtime is installed separately. The lightweight offline workflow
-and external live-model installation are documented separately. A versioned source
-archive is produced from committed files only, with a `SOURCE-MANIFEST.json`
-containing the exact Git commit and per-file checksums. Development archives are
-not final releases or DOI deposits.
+Both require a separately installed Python runtime and Pillow. The lightweight
+offline workflow and external model installation have separate setup instructions.
+
+`release/build_source.py` builds an archive from committed files and adds
+`SOURCE-MANIFEST.json` with the exact Git commit and per-file checksums. The fixed
+SoftwareX submission archive instead carries `SOURCE_SNAPSHOT.json`; its version
+and published DOI are listed in [submission identities](submission_20261018.md).
+
+The distinction between runtime and source distributions follows common release
+practice; [GeoRocket](https://georocket.io/) was a packaging reference.

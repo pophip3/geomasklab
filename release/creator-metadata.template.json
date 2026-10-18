@@ -2,5 +2,5 @@
   "confirmed": false,
   "release_date": null,
   "creators": [],
-  "instructions": "Supply confirmed software creators, not inferred manuscript authors. Each creator needs given_names, family_names and optional affiliation/orcid. Confirm their order and attribution before setting confirmed=true. No creator facts have been invented."
+  "instructions": "List the software creators in citation order. Each entry requires given_names and family_names; affiliation and orcid are optional. Set release_date and verify the entries before setting confirmed=true."
 }

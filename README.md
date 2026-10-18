@@ -73,18 +73,13 @@ git clone --branch v1.0.0-submission.20261018.1 https://github.com/pophip3/geoma
 cd geomasklab
 ```
 
-The SoftwareX submission uses the fixed review tag [v1.0.0-submission.20261018.1](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018.1).
-The project repository is [https://github.com/pophip3/geomasklab](https://github.com/pophip3/geomasklab); the tag is a version inside this same repository.
-The [research-data release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016) retains the original water V5 checkpoint,
-experiment records and the updated `GeoMaskLab_Supplementary_Reproducibility_Evidence_Final_20261018.zip`.
-Use `GeoMaskLab-1.0.0-submission-20261018-final-source.zip` for a downloadable copy of this review source.
-The older tags and dated archives remain historical records. The 18 October update
-corrects documentation and review entry points; executable code and dependency locks
-are unchanged from `v1.0.0-dependencies.20261017`.
-All project links above belong to `pophip3/geomasklab` and require no login.
-The fixed review source is archived at [Zenodo DOI 10.5281/zenodo.23447736](https://doi.org/10.5281/zenodo.23447736).
-Older Zenodo dataset DOIs identify historical packages, not this source archive.
-See [submission identities and verification scope](docs/submission_20261018.md).
+The fixed review version is [v1.0.0-submission.20261018.1](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018.1), archived at [Zenodo DOI 10.5281/zenodo.23447736](https://doi.org/10.5281/zenodo.23447736).
+A downloadable copy is `GeoMaskLab-1.0.0-submission-20261018-final-source.zip`.
+The [research-data release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016) supplies
+`GeoMaskLab_Supplementary_Reproducibility_Evidence_20261018_v7.zip`, experiment records
+and the original water V5 checkpoint. Its entry guides describe the source and
+data needed for each reproduction task. See [submission identities](docs/submission_20261018.md)
+for the fixed commit, checksums and historical versions.
 
 ### Windows PowerShell
 

@@ -1,10 +1,9 @@
-# Observed handoff-study protocol
+# Planned handoff study
 
 `python examples/prepare_handoff_study.py` prepares real NAIP inputs for a small
 matched-information, counterbalanced study. Its output contains participant
 materials, an administrator-only answer key, protocol and an empty response CSV.
-Preparing those files does not constitute an experiment: observed participants
-and generated observations remain zero.
+The study has not yet recruited participants or collected observations.
 
 Recruit 3–5 voluntary colleagues after checking applicable ethics/privacy
 requirements. Use anonymous participant IDs. Each participant completes two
@@ -15,7 +14,7 @@ Record prior familiarity, actual tools, elapsed time and each response. Allow
 equivalent local Python/GIS tools and retain all failures.
 
 The task is to reproduce foreground pixels, both denominators and both ratios,
-and determine whether the region derivation called a model. For actual collected
+and determine whether the region derivation called a model. After collecting
 responses, run:
 
 ```sh
@@ -29,5 +28,3 @@ tolerance for ratios is relative `1e-4`/absolute `1e-6`. Task order and raw resp
 must be retained. Convenience participants cannot establish population-wide
 productivity gains, and familiarity/learning can confound results.
 
-No colleagues have participated in this repository's current preparation. There
-are no claimed error rates, completion times or human-impact findings yet.

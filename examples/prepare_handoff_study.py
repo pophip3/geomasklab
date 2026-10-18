@@ -1,4 +1,4 @@
-"""Prepare matched-information handoff tasks; never fabricate participant observations."""
+"""Prepare matched-information handoff materials and an empty observations sheet."""
 import argparse
 import csv
 import hashlib

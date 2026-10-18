@@ -17,8 +17,7 @@ mask values and dimensions are checked, but untrusted image-processing libraries
 must still be maintained. Use supported interpreter/dependency versions and
 review their upstream security updates.
 
-For non-sensitive problems use the repository issue tracker. Do not post
-credentials, private images or exploit details in a public issue. If available,
-use the repository's private vulnerability-reporting channel for sensitive
-reports. No private disclosure email or reporting feature is claimed until the
-maintainers have configured it.
+Report non-sensitive problems through the repository issue tracker. For a
+sensitive report, contact the maintainer using the contact details in the README
+to arrange an appropriate exchange. Keep credentials, private images and exploit
+details out of public issues.

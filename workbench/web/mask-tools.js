@@ -37,7 +37,7 @@ $('importMaskBtn').onclick=()=>{
    if(validFile){request.valid_mask=await maskFileData(validFile);request.valid_source=validSource;}
    const result=await api('/api/import-mask',request);
    if(state.session?.id===sid){localStorage.setItem('geoscope-selected-'+sid,result.id);await showSession(await api('/api/session/'+sid));}
-   if($('maskImportForm')===form)closeModal();toast('External mask imported. Review is pending; no inference was performed.');
+   if($('maskImportForm')===form)closeModal();toast('Prediction mask saved as a new version.');
   }catch(error){if($('maskImportForm')===form){$('maskImportStatus').textContent=error.message;$('submitMaskImport').disabled=false;}toast(error.message);}
   finally{state.busy=false;refreshWorkbench();}
  };

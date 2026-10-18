@@ -1,9 +1,8 @@
-# Run the optional models on your own computer
+# Optional local model services
 
-The revised **1.0.0** model integration is merged into `main`. Start with the
-[reviewer quickstart](reviewer_quickstart.md) to install and verify the core
-without model downloads, CUDA, or API credentials. This page is needed only
-for **fresh model-generated answers or masks**.
+This guide configures RemoteAgent and RemoteSAM for **new model-generated scene
+answers or masks** in GeoMaskLab 1.0.0. The [reviewer quickstart](reviewer_quickstart.md)
+covers core installation, examples and evidence replay with Python and Pillow.
 
 Obtain the current repository:
 
@@ -12,25 +11,22 @@ git clone https://github.com/pophip3/geomasklab.git
 cd geomasklab
 ```
 
-GeoMaskLab can use local model processes for scene questions and natural-language
-segmentation. A reviewer starts them on their own machine when needed. No
-connection to the author's computer or continuously hosted inference server is
-required. Downloads and environment setup need network access once; inference
-uses local files and local endpoints afterward.
+The services run on the computer configured in this guide. Network access is
+needed to obtain dependencies and model assets; subsequent inference uses local
+files and local endpoints.
 
-## Choose the shortest route
+## Select a workflow
 
-- **Review measurements, exports and replay:** follow the three-step README
-  quickstart, then run `geomasklab-ui`. No model installation is required.
-- **Inspect an actual saved RemoteSAM prediction:** run
-  `python examples/replay_model_mask.py`. The image and mask are bundled.
-- **Ask new questions about your own image:** prepare RemoteAgent once using
-  the steps below; select `--only agent` when checking/starting its service.
-- **Generate a new mask from text:** prepare both models once using this guide.
+| Task | Required processes |
+| --- | --- |
+| Open synthetic procedural examples, import masks, measure, compare and export/replay evidence | GeoMaskLab core only; Python and Pillow |
+| Inspect the bundled RemoteSAM image and prediction with `python examples/replay_model_mask.py` | Core only; replay of a saved prediction |
+| Ask a new scene question about an uploaded image | Core + RemoteAgent; select `--only agent` below |
+| Generate a new segmentation mask from text | Core + RemoteAgent + RemoteSAM |
 
-Saved-mask replay does not answer new questions or generate new predictions.
-Demo scene text is preset. The live route performs real inference. Model setup
-is optional for core review, but is required to evaluate these live capabilities.
+Replay checks retained pixels, settings, counts and denominators. Fresh inference
+runs the configured models on a new request. The built-in procedural examples use
+synthetic masks and preset scene text.
 
 After the one-time setup and configuration, daily use is two commands in two
 terminals (keep both open):
@@ -50,19 +46,6 @@ English. Loading and answering can be slow on constrained hardware.
 The [reproduction release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0-repro.20261016)
 contains the current dependency supplement and source archive. Use the files
 whose names include `dependency-closure-20261016` for this installation route.
-
-| Task | Required processes |
-| --- | --- |
-| Open procedural examples, import a saved mask, measure, compare and export/replay evidence | GeoMaskLab core only; Python and Pillow |
-| Ask about the uploaded image's scene | Core + RemoteAgent |
-| Request a fresh mask with text, for example `Extract all planes` | Core + RemoteAgent + RemoteSAM |
-| Derive another half-image region from retained mask evidence | Core; no new inference is needed |
-
-**Fresh inference and evidence replay are different.** Fresh inference runs a
-model on an image and request. Replay verifies retained pixels, settings,
-counts and denominators without rerunning that model. Procedural examples are
-explicitly labeled synthetic; they are not offline substitutes for model scene
-answers or segmentation of arbitrary new images.
 
 ## Hardware and environments
 
@@ -92,9 +75,8 @@ environment assignments.
 
 The CUDA installation commands are for Windows/Linux with an NVIDIA GPU.
 The Pillow-only quickstart and model HTTP contracts are checked on Windows,
-Linux and macOS. macOS has no CUDA support; its live models need a separate CPU
-setup with sufficient system memory, which this delivery does not claim to
-have verified.
+Linux and macOS. A macOS CPU deployment of the live models has not been verified;
+the CUDA setup below applies to Windows and Linux with an NVIDIA GPU.
 
 The complete Python 3.10 dependency locks cover Windows AMD64 and Linux x86_64.
 Build tools and Linux CUDA runtime libraries are fixed as well. See
@@ -275,10 +257,9 @@ Start the core in a separate terminal:
 ```
 
 Open `http://127.0.0.1:4180`, choose live mode, upload your image and use
-**Runtime settings -> Check connections**. A scene question should create a
-qualitative answer without segmentation measurements. `Extract all planes`
-is a supported extraction request, not a promise that planes will be detected.
-Inspect the actual SAM response and grid-aligned mask. Ask for the left
+**Runtime settings -> Check connections**. A scene question creates a qualitative
+answer; `Extract all planes` requests aircraft segmentation. Inspect the returned
+SAM response and grid-aligned mask. Ask for the left
 half next: the Harness applies a deterministic pixel-half domain to the full
 prediction, so an object crossing the center line can be clipped. All displayed
 areas, denominators and ratios are computed by the core.
@@ -292,11 +273,8 @@ documented in [local validation](local_model_validation.md), including the
 observed prompt sensitivity. Use the bundled saved mask to reproduce fixed
 counts, rather than expecting fresh inference to reproduce those counts.
 
-The two endpoints are on the machine running these services. On a reviewer's
-computer, `127.0.0.1` refers to that reviewer's own processes. When all assets
-have been obtained, the adapters load local files without requesting external
-model downloads during inference. Keep this local launch running while using
-the module; the author need not be online.
+`127.0.0.1` identifies processes on the computer running the services. Keep the
+local supervisor terminal open while using the module.
 
 ## Run real acceptance and replay independently
 
@@ -331,16 +309,14 @@ The installed core replays the exported bundles without model services:
 ```
 
 Replace `run-...` with the actual attempt directory and verify the other ZIPs in
-the same way. Replay proves saved pixel arithmetic and internal consistency,
-not scene-answer accuracy, segmentation accuracy or authenticated model origin.
-The overlay still requires separate semantic review.
+the same way. Replay checks saved pixel arithmetic and internal consistency.
+Semantic assessment and source authentication require separate evidence.
 
 The [saved validation record](local_model_validation.md) reports a completed
 real two-model NAIP run, separate nonempty SAM prediction and supervised
 start/status/stop checks. The laptop's disk-offload end-to-end run took about
-35.6 minutes. These are execution checks; segmentation and scene-answer accuracy
-were not established. Use the retained-model-mask replay for a short,
-weights-free walkthrough.
+35.6 minutes. Use the retained-model-mask replay for a short walkthrough without
+model weights.
 
 ## Stop the local models
 

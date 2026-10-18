@@ -35,10 +35,9 @@ fingerprint. The detached JSON cannot authorize its own public key. The fingerpr
 is SHA-256 of the raw Ed25519 public key. There is no signing-time, revocation service,
 institutional identity certificate or automatic trust-on-first-use mechanism.
 
-For an external hash register, retain the same versioned artifact SHA-256 in a
-separately trusted repository release, institutional record or archival deposit.
-The [release metadata procedure](../release/README.md) describes archival preparation.
-A local manifest alone is not an external register; no registration or DOI is claimed
-until an actual externally visible record exists.
+Publish the versioned artifact SHA-256 in a separately trusted repository release,
+institutional record or archival deposit. The
+[release metadata procedure](../release/README.md) describes source archiving.
+Recipients can compare this external checksum with the artifact before replay.
 
 Implementation reference: [Cryptography Ed25519 API](https://cryptography.io/en/latest/hazmat/primitives/asymmetric/ed25519/).

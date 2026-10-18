@@ -1,4 +1,9 @@
-# GeoMaskLab independent release handoff
+# GeoMaskLab independent handoff: original stable distribution
+
+This walkthrough uses the original `v1.0.0` source and wheel. For the current
+fixed submission source, start with [Reviewer quick start](reviewer_quickstart.md)
+and [submission identities](submission_20261018.md). The commands below retain
+the earlier artifact names.
 
 Ask a colleague who did not develop GeoMaskLab to follow this path using the
 public 1.0.0 release and its documentation. Record failures and any author help.
@@ -124,5 +129,5 @@ Return the filled record, relevant error messages and exported evidence to the
 author. Do not rely on the author's development directory or existing virtual
 environment. One successful handoff establishes that participant's completion;
 it does not estimate a general productivity or usability improvement. The
-[separate observed study protocol](handoff_study.md) remains available if a
+[planned handoff-study protocol](handoff_study.md) remains available if a
 matched comparison study is later conducted.

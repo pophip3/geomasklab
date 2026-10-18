@@ -36,8 +36,7 @@ not geographic north. Geographic annotations require recorded georeferencing.
 
 Review status and integrity status are distinct. An accepted review is a
 self-reported decision; passing integrity checks is not a semantic-accuracy score.
-Error dialogs display the actual error message, rather than invented validation
-codes or successful checks.
+Error dialogs show the error message and details needed to locate the failure.
 
 The default working view shows the image, target, whole-image coverage,
 foreground pixels, candidate components and primary actions. **Measurement

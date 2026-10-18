@@ -1,19 +1,22 @@
-# Stable 1.0.0 validation
+# Stable 1.0.0 and historical release validation
 
 Version 1.0.0 retains the restored rc4 scientific implementation and packet schemas.
 Exact-commit tests, installed-wheel/source checks and archived-packet compatibility results
-are recorded in the release assets and Actions runs. The rc4 records below remain historical.
-No regenerated ZIP byte-identity claim is made.
+are recorded in the release assets and Actions runs. The fixed submission source
+is [`v1.0.0-submission.20261018.1`](https://github.com/pophip3/geomasklab/tree/v1.0.0-submission.20261018.1),
+archived at [10.5281/zenodo.23447736](https://doi.org/10.5281/zenodo.23447736).
+The rc4 and rc3 records below describe earlier artifacts; their counts and hashes
+are retained for that historical context.
 
-# GeoMaskLab release validation
+## Historical rc4 handoff
 
-The current handoff candidate is **1.0.0rc4**, which combines the complete browser
+The **1.0.0rc4** handoff candidate combined the complete browser
 presentation and CLI in the wheel and fixed source ZIP. Its exact artifact
-hashes, technical acceptance and current-commit CI link are supplied on the
+hashes, technical acceptance and matching CI link are supplied on the
 [rc4 release](https://github.com/pophip3/geomasklab/releases/tag/v1.0.0rc4).
 Use [independent_handoff.md](independent_handoff.md) for the matching interface.
-Independent human completion is still pending; no semantic-accuracy or DOI claim
-is implied by automated acceptance.
+These are automated distribution checks. Human handoff evaluation is described
+separately in the [planned study protocol](handoff_study.md).
 
 ## Historical rc3 baseline
 
@@ -112,4 +115,5 @@ historical run. No new model calls or human observations are claimed.
 Integrity replay, self-reported review acceptance and semantic validation have
 different meanings. Ordinary RGB inputs provide pixel coordinates and a pixel
 scale. Geographic area requires the optional geospatial path and its declared
-assumptions. No stable release or archival DOI is asserted here.
+assumptions. These historical validation records apply to their named artifacts;
+use the stable source/archive identities at the top of this page for current review.

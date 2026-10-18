@@ -69,8 +69,8 @@ and source-coordinate assertions require separate trust.
 The [real NAIP example](../examples/data/naip-denver/README.md) compares four
 domains with Rasterio/GDAL `all_touched=False` and direct NumPy counts. Its vertices
 avoid exact center/edge ties. Rasterizers can differ on those ties; the explicit
-GeoMaskLab rule remains the definition for its packet. The comparison is numerical
-workflow validation, not a claim of new segmentation performance or faster GIS.
+GeoMaskLab rule remains the definition for its packet. The comparison checks
+numerical agreement for these four domains.
 
 References: [RFC 7946](https://www.rfc-editor.org/rfc/rfc7946),
 [Rasterio feature rasterization](https://rasterio.readthedocs.io/en/stable/topics/features.html).

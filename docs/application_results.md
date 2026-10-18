@@ -1,18 +1,17 @@
 # Frozen prior-version application study
 
 Completed on 4 October 2026 using software commit
-`46ffbbb1898a4b5e8f2ac5974f0bdabace3a94bd`. This is a limited application
-evaluation of the earlier workbench/model configuration, not new-version
-semantic-performance evidence. The version 1.0 candidate adds language, evidence
-and offline-analysis work; it does not claim to improve these predictions.
+`46ffbbb1898a4b5e8f2ac5974f0bdabace3a94bd`. Results apply to that workbench/model
+configuration. Version 1.0.0 retains the record as an earlier application study;
+its evidence and offline-analysis changes were evaluated separately.
 
 ## Data and score definitions
 
 The prospectively frozen set contains 60 native-resolution images: 30 buildings
 from LoveDA validation and 30 aircraft from iSAID validation human pixel labels
 paired with DOTA-v1.0 imagery. Each class includes 20 positive and 10 empty-target
-images. Dataset-provided human annotations are used; no new human reviewer or
-user study is claimed. Data, models, prompts, fast mode and scoring were fixed
+images. The evaluation uses dataset-provided human annotations. Data, models,
+prompts, fast mode and scoring were fixed
 before prediction without outcome-based replacement, threshold tuning or label
 editing. See [the executable protocol](application_protocol_v2.md).
 
@@ -29,12 +28,10 @@ are overlap scores, not object-detection correctness rates.
 
 Fixed direct prompts are `all buildings` and `all planes`. The workbench planner
 can select semantic or referring segmentation; most building requests used the
-semantic route. This is not a same-parameter algorithm comparison. Differences
-must not be attributed to an improvement or degradation of the underlying
-model's intrinsic capability. Nine of 20 positive building images and one of 20
-positive aircraft images produced empty masks in the whole-image workbench path;
-these missed targets remain scored as zero. Lower false-positive counts must not
-be promoted independently of these omissions.
+semantic route. The two paths therefore use different request parameters. Nine
+of 20 positive building images and one of 20 positive aircraft images produced
+empty masks in the whole-image workbench path; these missed targets remain scored
+as zero and must be considered alongside the empty-target false-positive counts.
 
 The frozen service's fast path internally resizes to 896 × 896, normalizes
 channels, applies argmax and restores masks with nearest-neighbor interpolation.
@@ -56,10 +53,9 @@ image denominators; inspect the complete numerical record.
 - 420/420 confusion-count and IoU/Dice tables passed independent Pillow Boolean
   reconstruction, covering 60 fixed-direct, 180 workbench and 180 matched-direct cases.
 
-Execution success, numerical preservation and semantic recognition are separate
-outcomes. The findings support traceable preservation for the recorded models and
-scopes; they do not support high-accuracy general segmentation, novel model
-superiority, measured labor savings or official full-dataset leaderboard scores.
+These checks measure numerical preservation and request completion for the
+recorded models and scopes. Segmentation overlap is reported separately in the
+table above.
 
 ## Limits and reproducibility
 

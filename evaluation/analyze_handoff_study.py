@@ -1,4 +1,4 @@
-"""Score actual anonymous responses; refuse an empty study or invented defaults."""
+"""Score anonymous handoff responses against the prepared answer key."""
 import argparse
 import csv
 import json
@@ -10,12 +10,12 @@ from statistics import median
 def analyze(observations,key):
     answers={r['case_id']:r for r in json.loads(Path(key).read_text(encoding='utf-8'))}
     with Path(observations).open(encoding='utf-8-sig',newline='') as handle:records=list(csv.DictReader(handle))
-    if not records:raise ValueError('No participant observations exist. A prepared protocol is not an executed study.')
+    if not records:raise ValueError('No participant observations were supplied; provide at least one completed response.')
     seen=set();scored=[]
     for row in records:
         participant=row['participant_id'];case=row['case_id'];condition=row['condition']
         if not participant or condition not in ('loose-files','evidence') or case not in answers:
-            raise ValueError('Every actual response needs an anonymous ID, known case and condition.')
+            raise ValueError('Every response requires an anonymous participant ID, a known case ID and a valid condition.')
         identity=(participant,case)
         if identity in seen:raise ValueError('Duplicate participant/case response.')
         seen.add(identity);expected=answers[case]
@@ -36,7 +36,7 @@ def analyze(observations,key):
             'error_rate':sum(not r['all_fields_correct'] for r in group)/len(group) if group else None,
             'median_elapsed_seconds':median(r['elapsed_seconds'] for r in group) if group else None}
     return {'participants_observed':len({r['participant_id'] for r in scored}),'conditions':groups,'responses':scored,
-        'interpretation':'Descriptive observed convenience-sample results; no invented observations or population-level efficacy claim.'}
+        'interpretation':'Descriptive results for the observed convenience sample; population-level effects require a larger study.'}
 
 
 def main():

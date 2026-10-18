@@ -1,14 +1,14 @@
 # Version 1.0 functional contract
 
-Core decision date: 5 October 2026. Unified handoff candidate: 1.0.0rc4.
+Core decision date: 5 October 2026. The five-operation contract was implemented
+in `1.0.0rc4` and retained in stable version `1.0.0`.
 
 The software freeze target consists of five connected operations: declared pixel
 validity and realized configuration, fair result comparison, reliable manifest-based
 batch execution, candidate-component inspection and one shared-core browser workflow.
 All five operations are implemented in the core, CLI and source workbench.
-Automated acceptance must use the same fixed candidate artifacts. Actual human
-handoff testing and stable-release metadata remain separate
-release gates; implementation alone does not establish those outcomes.
+Automated acceptance uses the exact versioned artifacts. Current source/archive
+identities are listed in [submission identities](submission_20261018.md).
 
 ## Five connected operations
 
@@ -52,17 +52,17 @@ origin and human workflow value require separate evidence.
 9. Build a source archive at a fixed commit and check its hashes, examples,
    browser startup and launchers after extraction.
 
-The existing reference-assessment packet is a supporting validation operation.
-Fair comparison belongs to the selected workflow. Experiment management, annotation
-conversion, model questions and animation remain auxiliary features. They are not separate contribution
-claims and do not block the headless core's installation.
+Reference-assessment packets support validation. Experiment management, annotation
+conversion, model questions and animation are available in the workbench and are
+optional for headless installation.
 
-## Release gates
+## Validation and extensions
 
 Automated acceptance belongs to the exact tested commit. Cross-platform CI,
-source/wheel identity and package metadata must be checked before stable tagging.
-Current-version live-model inference and an actual human handoff study are separate
-scientific checks, not inferred from core tests or historical model results.
+source/wheel identity and package metadata are checked for the release under
+review. [Local-model validation](local_model_validation.md) records live-model
+execution, and the [handoff-study protocol](handoff_study.md) describes the
+planned human evaluation.
 
 Optional extensions add a replayed PROV-JSON mapping and matched-GeoTIFF area
 assessment, with declared units, CRS, pixel equality, area assumptions and exported
