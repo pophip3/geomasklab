@@ -267,14 +267,6 @@ download is needed for the offline example.
 | [API and evidence format](docs/core_package.md) | Integrate the measurement core and understand exported records. |
 | [Local-model setup](docs/local_model_modules.md) | Configure optional model adapters. |
 
-## Source layout
-
-- [`src/geomasklab/`](src/geomasklab/): measurement core and command-line interface.
-- [`workbench/`](workbench/): browser interface and local server.
-- [`model_services/`](model_services/): optional local model adapters.
-- [`examples/`](examples/): runnable examples and bundled data.
-- [`tests/`](tests/): software tests.
-
 Report bugs or suggest improvements through [GitHub Issues](https://github.com/pophip3/geomasklab/issues).
 For development setup and checks, see [Contributing](CONTRIBUTING.md).
 

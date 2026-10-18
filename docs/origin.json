@@ -1,7 +1,7 @@
 {
   "competition_repository": "https://github.com/SitianGao/geoscope",
   "competition_commit": "df802ab54b8f4ee496ca83c104bfaee44f7ee888",
-  "research_repository": "https://github.com/pophip3/geoscope-softwarex",
+  "research_repository": "https://github.com/pophip3/geomasklab",
   "visibility": "public",
   "selected_files": [
     "server.py",
@@ -29,14 +29,24 @@
     "competition planning documents",
     "raw historical model responses and personal coordination material"
   ],
-  "publication_authorization_status": "user expressly authorizes publication of their code in a modified research version; original competition repository remains unchanged",
-  "release_license_status": "standard MIT text in LICENSE and Licence.txt; external model/data rights remain separate",
+  "release_license_status": "Standard MIT text in LICENSE, LICENSE.txt and Licence.txt; external model and data rights remain separate.",
   "license_selected_on": "2026-10-05",
   "license_selected": "MIT",
-  "license_selection_basis": "User authorized public release of their modified code, required a standard root open-source license, and requested completion of all release materials without further questions.",
-  "individual_creator_metadata": "not yet confirmed; no author identities or order inferred",
   "third_party_approval_claimed": false,
-  "public_visibility_verified_on": "2026-10-05",
+  "public_visibility_verified_on": "2026-10-18",
   "competition_repository_status": "Historical provenance only; HTTP 404 on 2026-10-18. Not the submission repository.",
-  "submission_repository": "https://github.com/pophip3/geomasklab"
+  "submission_repository": "https://github.com/pophip3/geomasklab",
+  "historical_research_repository": "https://github.com/pophip3/geoscope-softwarex",
+  "creators": [
+    {
+      "name": "Yun Xing",
+      "orcid": "https://orcid.org/0009-0009-1746-5019",
+      "affiliation": "Hohai University",
+      "source": "CITATION.cff"
+    }
+  ],
+  "copyright_notice": "Copyright (c) 2026 GeoMaskLab contributors",
+  "selected_files_scope": "Historical initial selection from the competition commit; current package layout is documented in README.md.",
+  "excluded_scope": "Historical initial exclusion policy; this list is not a current assessment of all image reproduction permissions.",
+  "provenance_scope": "Historical upstream attribution and source identities; repository account names do not determine manuscript authorship or grant third-party permissions."
 }
